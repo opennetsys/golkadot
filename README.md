@@ -1,9 +1,9 @@
 # go-substrate
 
-> Polkadot Substrate in Go
+> [Polkadot](https://github.com/paritytech/polkadot) [Substrate](https://github.com/paritytech/substrate) implementation in Go
 
 TODO: everything
 
 ## License
 
-[LICENSE](GNU GPL v3)
+[GNU GPLv3](LICENSE)
