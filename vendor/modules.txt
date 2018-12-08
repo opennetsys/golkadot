@@ -1,0 +1,20 @@
+# github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wagon v0.3.1-0.20180825141017-f8cb99b55a39
+github.com/go-interpreter/wagon/disasm
+github.com/go-interpreter/wagon/wasm
+github.com/go-interpreter/wagon/wasm/leb128
+github.com/go-interpreter/wagon/wasm/operators
+github.com/go-interpreter/wagon/wasm/internal/readpos
+# github.com/konsorten/go-windows-terminal-sequences v1.0.1
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/perlin-network/life v0.0.0-20181118045116-6bf6615afaa9
+github.com/perlin-network/life/compiler
+github.com/perlin-network/life/exec
+github.com/perlin-network/life/compiler/opcodes
+github.com/perlin-network/life/utils
+# github.com/sirupsen/logrus v1.2.0
+github.com/sirupsen/logrus
+# golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
+golang.org/x/crypto/ssh/terminal
+# golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33
+golang.org/x/sys/unix
+golang.org/x/sys/windows
