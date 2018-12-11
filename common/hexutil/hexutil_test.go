@@ -3,6 +3,7 @@ package hexutil
 import (
 	"fmt"
 	"math/big"
+	"reflect"
 	"testing"
 )
 
@@ -270,6 +271,52 @@ func TestToBN(t *testing.T) {
 				t.Error(err)
 			}
 			if result.String() != tt.out.String() {
+				t.Errorf("want %v; got %v", tt.out, result)
+			}
+		})
+	}
+}
+
+func TestToUint8Slice(t *testing.T) {
+	type input struct {
+		hexStr    string
+		bitLength int
+	}
+
+	tests := []struct {
+		in  input
+		out []uint8
+	}{
+		{
+			input{
+				"0x80001f",
+				-1,
+			},
+			[]uint8{0x80, 0x00, 0x1f},
+		},
+		{
+			input{
+				"0x80001f",
+				32,
+			},
+			[]uint8{0x00, 0x80, 0x00, 0x1f},
+		},
+		{
+			input{
+				"0x80000a",
+				-1,
+			},
+			[]uint8{128, 0, 10},
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result, err := ToUint8Slice(tt.in.hexStr, tt.in.bitLength)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(result, tt.out) {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
 		})

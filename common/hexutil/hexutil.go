@@ -6,11 +6,17 @@ import (
 	"math"
 	"math/big"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
-// Prefix ...
-const Prefix = "0x"
+var (
+	// Prefix hex prefix
+	Prefix = "0x"
+
+	// ErrInvalidHex is error for invalid hex
+	ErrInvalidHex = errors.New("invalid hex")
+)
 
 // HasPrefix tests for the existence of a `0x` prefix. Checks for a valid hex input value and if the start matched `0x`.
 func HasPrefix(hexStr string) bool {
@@ -89,13 +95,49 @@ func ToBN(hexStr string, isLittleEndian bool) (*big.Int, error) {
 		hx = Reverse(hx)
 	}
 
-	fmt.Println(hx)
-
 	if _, ok := i.SetString(hx, 16); !ok {
 		return nil, errors.New("could not decode to big.Int")
 	}
 
 	return i, nil
+}
+
+// ToUint8Slice creates a uint8 array from a hex string. empty inputs returns an empty array result. Hex input values return the actual bytes value converted to a uint8. Anything that is not a hex string (including the `0x` prefix) returns an error.
+func ToUint8Slice(hexStr string, bitLength int) ([]uint8, error) {
+	if hexStr == "" {
+		return []uint8{}, nil
+	}
+
+	if !ValidHex(hexStr) {
+		return nil, ErrInvalidHex
+	}
+
+	value := StripPrefix(hexStr)
+	valLength := len(value) / 2
+	var bufLength int
+	if bitLength == -1 {
+		bufLength = int(math.Ceil(float64(valLength)))
+	} else {
+		bufLength = int(math.Ceil(float64(bitLength) / float64(8)))
+	}
+
+	result := make([]uint8, bufLength)
+	offset := int(math.Max(float64(0), float64(bufLength-valLength)))
+	for index := 0; index < bufLength; index++ {
+		n := (index * 2) + 2
+		if n > len(value) {
+			continue
+		}
+		s := value[index*2 : n]
+		v, err := strconv.ParseInt(s, 16, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		result[index+offset] = uint8(v)
+	}
+
+	return result, nil
 }
 
 // Reverse reverses a hex string
