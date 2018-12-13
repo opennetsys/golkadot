@@ -31,3 +31,7 @@ test/common/ext:
 .PHONY test/common/bn:
 test/common/bn:
 	@go test -v common/bn/*.go
+
+.PHONY test/common/chainspec:
+test/common/chainspec:
+	@go test -v common/chainspec/*.go
