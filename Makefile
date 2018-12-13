@@ -39,3 +39,7 @@ test/common/chainspec:
 .PHONY test/common/u8compact:
 test/common/u8compact:
 	@go test -v common/u8compact/*.go
+
+.PHONY test/common/u8util:
+test/common/u8util:
+	@go test -v common/u8util/*.go
