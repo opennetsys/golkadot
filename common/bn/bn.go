@@ -14,40 +14,50 @@ func FromHex(hexStr string) (*big.Int, error) {
 }
 
 // ToBN creates a BN value from a number input
-func ToBN(ivalue interface{}) *big.Int {
-	i := new(big.Int)
+func ToBN(ivalue interface{}, isLittleEndian bool) *big.Int {
 	switch v := ivalue.(type) {
 	case *big.Int:
 		return v
 	case string:
+		i := new(big.Int)
 		i.SetString(v, 10)
+		return i
 	case float32:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case float64:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case int64:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case int32:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case int16:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case int8:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case int:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case uint64:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case uint32:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case uint16:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case uint8:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
 	case uint:
-		i = big.NewInt(int64(v))
+		return big.NewInt(int64(v))
+	case []uint8:
+		i := new(big.Int)
+		i.SetBytes(v)
+		hx := ToHex(i, -1)
+		n, err := hexutil.ToBN(hx, isLittleEndian)
+		if err != nil {
+			panic(err)
+		}
+		return n
 	}
 
-	return i
+	return new(big.Int)
 }
 
 // ToHex creates a hex value from a math/big big number. 0 inputs returns a `0x` result, BN values return the actual value as a `0x` prefixed hex value. With `bitLength` set, it fixes the number to the specified length.

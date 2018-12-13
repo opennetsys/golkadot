@@ -35,3 +35,7 @@ test/common/bn:
 .PHONY test/common/chainspec:
 test/common/chainspec:
 	@go test -v common/chainspec/*.go
+
+.PHONY test/common/u8compact:
+test/common/u8compact:
+	@go test -v common/u8compact/*.go

@@ -38,7 +38,7 @@ func TestToBN(t *testing.T) {
 		{float64(21), big.NewInt(21)},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result := ToBN(tt.in)
+			result := ToBN(tt.in, false)
 			if result.String() != tt.out.String() {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
