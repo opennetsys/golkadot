@@ -43,3 +43,7 @@ test/common/u8compact:
 .PHONY test/common/u8util:
 test/common/u8util:
 	@go test -v common/u8util/*.go
+
+.PHONY test/common/triecodec:
+test/common/triecodec:
+	@go test -v common/triecodec/*.go
