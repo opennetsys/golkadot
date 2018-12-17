@@ -81,7 +81,11 @@ func TestToUint8Slice(t *testing.T) {
 		out []uint8
 	}{
 		{
-			input{big.NewInt(1193046), -1, false},
+			input{big.NewInt(2045), 16, true},
+			[]uint8{0xFD, 0x7},
+		},
+		{
+			input{big.NewInt(1193046), -1, false}, // 0x123456
 			[]uint8{0x12, 0x34, 0x56},
 		},
 		{

@@ -3,7 +3,6 @@ package bn
 import (
 	"math"
 	"math/big"
-	"sort"
 
 	"github.com/c3systems/go-substrate/common/hexutil"
 )
@@ -90,18 +89,23 @@ func ToUint8Slice(value *big.Int, bitLength int, isLittleEndian bool) []uint8 {
 	output := make([]uint8, bufLength)
 	b := value.Bytes()
 
-	for index := 0; index < bufLength-1; index++ {
-		output[index+1] = uint8(b[index])
-	}
-
-	if isLittleEndian {
-		sort.Sort(sort.Reverse(Uint8Slice(output)))
+	for index := 0; index < bufLength; index++ {
+		if isLittleEndian {
+			if index < len(b) {
+				output[len(b)-index-1] = uint8(b[index])
+			}
+		} else {
+			if index < len(b) && len(b)-index > 0 {
+				output[len(output)-index-1] = uint8(b[len(b)-index-1])
+			}
+		}
 	}
 
 	return output
 }
 
-// Uint8Slice ...
+// Uint8Slice  ...
+// Example: sort.Sort(sort.Reverse(Uint8Slice(output)))
 type Uint8Slice []uint8
 
 // Len ...

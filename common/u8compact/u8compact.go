@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	"github.com/c3systems/go-substrate/common/bn"
+	"github.com/c3systems/go-substrate/common/u8util"
 )
 
 // DefaultBitLength ...
@@ -32,4 +33,38 @@ func FromUint8Slice(input []uint8, bitLength int) (int, *big.Int) {
 	}
 	return offset, bn.ToBN(input[1:end], true)
 
+}
+
+// CompactToUint8Slice encodes a number into a compact representation.
+func CompactToUint8Slice(value *big.Int, bitLength int) []uint8 {
+	maxU8 := new(big.Int).Sub(pow(big.NewInt(2), big.NewInt(8-2)), big.NewInt(1))
+	maxU16 := new(big.Int).Sub(pow(big.NewInt(2), big.NewInt(16-2)), big.NewInt(1))
+	maxU32 := new(big.Int).Sub(pow(big.NewInt(2), big.NewInt(32-2)), big.NewInt(1))
+
+	if value.Cmp(maxU8) <= 0 {
+		return []uint8{uint8(value.Int64() << 2)}
+	} else if value.Cmp(maxU16) <= 0 {
+		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(1))
+		return bn.ToUint8Slice(i, 16, true)
+	} else if value.Cmp(maxU32) <= 0 {
+		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(2))
+		return bn.ToUint8Slice(i, 32, true)
+	}
+
+	return u8util.Concat(
+		[]uint8{0x3},
+		bn.ToUint8Slice(value, bitLength, true),
+	)
+}
+
+// AddLength adds a length prefix to the input value.
+func AddLength(input []uint8, bitLength int) []uint8 {
+	return u8util.Concat(
+		CompactToUint8Slice(big.NewInt(int64(len(input))), bitLength),
+		input,
+	)
+}
+
+func pow(i, e *big.Int) *big.Int {
+	return new(big.Int).Exp(i, e, nil)
 }
