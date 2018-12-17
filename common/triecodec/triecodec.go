@@ -9,8 +9,9 @@ func Decode() {
 }
 
 // Encode ...
-func Encode() {
+func Encode(input []uint8) []uint8 {
 	// TODO
+	return nil
 }
 
 // Hashing ...
