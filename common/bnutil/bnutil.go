@@ -1,4 +1,4 @@
-package bn
+package bnutil
 
 import (
 	"math"

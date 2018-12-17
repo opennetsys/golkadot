@@ -8,9 +8,17 @@ deps:
 build:
 	@go build
 
+.PHONY test:
+test:
+	@go test -v ./...
+
 .PHONY test/wasm:
 test/wasm:
 	@go test -v wasm/*.go
+
+.PHONY test/common:
+test/common:
+	@go test -v $$(go list ./... | grep common/)
 
 .PHONY test/common/hexutil:
 test/common/hexutil:
@@ -28,9 +36,9 @@ test/common/assert:
 test/common/ext:
 	@go test -v common/ext/*.go
 
-.PHONY test/common/bn:
-test/common/bn:
-	@go test -v common/bn/*.go
+.PHONY test/common/bnutil:
+test/common/bnutil:
+	@go test -v common/bnutil/*.go
 
 .PHONY test/common/chainspec:
 test/common/chainspec:
@@ -51,3 +59,7 @@ test/common/triecodec:
 .PHONY test/common/crypto:
 test/common/crypto:
 	@go test -v common/crypto/*.go
+
+.PHONY test/common/mathutil:
+test/common/mathutil:
+	@go test -v common/mathutil/*.go

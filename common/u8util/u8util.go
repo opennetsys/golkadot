@@ -5,7 +5,7 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/c3systems/go-substrate/common/bn"
+	"github.com/c3systems/go-substrate/common/bnutil"
 )
 
 var alphabet = "0123456789abcdef"
@@ -75,5 +75,5 @@ func ToHex(value []uint8, bitLength int, isPrefixed bool) string {
 
 // ToBN creates a utf-8 string from a uint8 slice.
 func ToBN(value []uint8, isLittleEndian bool) *big.Int {
-	return bn.ToBN(value, isLittleEndian)
+	return bnutil.ToBN(value, isLittleEndian)
 }
