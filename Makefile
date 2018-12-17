@@ -47,3 +47,7 @@ test/common/u8util:
 .PHONY test/common/triecodec:
 test/common/triecodec:
 	@go test -v common/triecodec/*.go
+
+.PHONY test/common/crypto:
+test/common/crypto:
+	@go test -v common/crypto/*.go
