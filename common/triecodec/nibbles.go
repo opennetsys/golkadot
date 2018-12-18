@@ -89,7 +89,9 @@ func AddNibblesTerminator(nibbles []uint8) []uint8 {
 	terminated := make([]uint8, len(nibbles)+1)
 
 	for i := 0; i < len(terminated); i++ {
-		terminated[i] = nibbles[i]
+		if i < len(nibbles) {
+			terminated[i] = nibbles[i]
+		}
 	}
 
 	terminated[len(nibbles)] = NibbleTerminator

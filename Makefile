@@ -10,7 +10,7 @@ build:
 
 .PHONY test:
 test:
-	@go test -v ./...
+	@go test -v ./... && echo "ALL PASS" || echo "FAILURE"
 
 .PHONY test/wasm:
 test/wasm:
@@ -54,7 +54,7 @@ test/common/u8util:
 
 .PHONY test/common/triecodec:
 test/common/triecodec:
-	@go test -v common/triecodec/*.go
+	@go test -v common/triecodec/*.go $(ARGS)
 
 .PHONY test/common/crypto:
 test/common/crypto:

@@ -1,6 +1,8 @@
 package triecodec
 
-import "log"
+import (
+	"log"
+)
 
 // Null ...
 type Null struct {
@@ -71,13 +73,13 @@ func (n *NodeHeader) NodeType() int {
 // Value ...
 func (n *NodeHeader) Value() int {
 	switch v := n.value.(type) {
-	case Null:
+	case *Null:
 		return 0
-	case ExtensionHeader:
+	case *ExtensionHeader:
 		return v.value
-	case BranchHeader:
+	case *BranchHeader:
 		return v.value
-	case LeafHeader:
+	case *LeafHeader:
 		return v.value
 	}
 
@@ -89,9 +91,9 @@ func (n *NodeHeader) EncodedLength() int {
 	if n.nodeType == NODE_TYPE_NULL || n.nodeType == NODE_TYPE_BRANCH {
 		return 1
 	} else if n.nodeType == NODE_TYPE_EXT {
-		header, ok := n.value.(ExtensionHeader)
+		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal("Could not parse extension header")
+			log.Fatal(ErrCastingType)
 		}
 
 		nibbleCount := header.value
@@ -102,9 +104,9 @@ func (n *NodeHeader) EncodedLength() int {
 
 		return 2
 	} else if n.nodeType == NODE_TYPE_LEAF {
-		header, ok := n.value.(LeafHeader)
+		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal("Could not parse leaf header")
+			log.Fatal(ErrCastingType)
 		}
 
 		nibbleCount := header.value
@@ -115,7 +117,7 @@ func (n *NodeHeader) EncodedLength() int {
 		return 2
 	}
 
-	log.Fatal("Unreachable code")
+	log.Fatal(ErrUnreachableCode, 1)
 
 	return 0
 }
@@ -125,9 +127,9 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	if n.nodeType == NODE_TYPE_NULL {
 		return []uint8{uint8(EMPTY_TRIE)}
 	} else if n.nodeType == NODE_TYPE_BRANCH {
-		header, ok := n.value.(BranchHeader)
+		header, ok := n.value.(*BranchHeader)
 		if !ok {
-			log.Fatal("Could not parse branch header")
+			log.Fatal(ErrCastingType)
 		}
 
 		if header.value == 1 {
@@ -135,9 +137,9 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 		}
 		return []uint8{uint8(BRANCH_NODE_NO_VALUE)}
 	} else if n.nodeType == NODE_TYPE_EXT {
-		header, ok := n.value.(ExtensionHeader)
+		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal("Could not parse extension header")
+			log.Fatal(ErrCastingType)
 		}
 
 		nibbleCount := header.value
@@ -147,9 +149,9 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 
 		return []uint8{uint8(EXTENSION_NODE_BIG), uint8(nibbleCount - EXTENSION_NODE_THRESHOLD)}
 	} else if n.nodeType == NODE_TYPE_LEAF {
-		header, ok := n.value.(LeafHeader)
+		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal("Could not parse leaf header")
+			log.Fatal(ErrCastingType)
 		}
 
 		nibbleCount := header.value
@@ -160,7 +162,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 		return []uint8{uint8(LEAF_NODE_BIG), uint8(nibbleCount - LEAF_NODE_THRESHOLD)}
 	}
 
-	log.Fatal("Unreachable code")
+	log.Fatal(ErrUnreachableCode, 2)
 
 	return nil
 }
@@ -171,10 +173,16 @@ func DecodeNodeHeader(input interface{}) (int, interface{}) {
 	case []uint8:
 		return DecodeNodeHeaderUint8Slice(v)
 	case []interface{}:
+		if len(v) == 1 {
+			arr, ok := v[0].([]uint8)
+			if ok {
+				return DecodeNodeHeaderUint8Slice(arr)
+			}
+		}
 		return DecodeNodeHeaderUint8Slices(v)
 	}
 
-	log.Fatal("Invalid type")
+	log.Fatal(ErrUnreachableCode, 3)
 
 	return 0, nil
 }
@@ -202,19 +210,27 @@ func DecodeNodeHeaderUint8Slice(input []uint8) (int, interface{}) {
 		return NODE_TYPE_LEAF, NewLeafHeader(int(input[1] + LEAF_NODE_THRESHOLD))
 	}
 
-	log.Fatal("Unreachable code")
+	log.Fatal(ErrUnreachableCode, 4)
 
 	return 0, nil
 }
 
 // DecodeNodeHeaderUint8Slices ...
 func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
-	if len(input) == 0 {
+	var isNull bool
+	if len(input) == 1 {
+		_, ok := input[0].(*Null)
+		if ok {
+			isNull = true
+		}
+	}
+
+	if len(input) == 0 || isNull {
 		return NODE_TYPE_NULL, NewNull()
 	} else if len(input) == 2 {
 		value, ok := input[0].([]uint8)
 		if !ok {
-			panic("could not typecast")
+			log.Fatal(ErrCastingType)
 		}
 		nibbles := DecodeNibbles(value)
 		isTerminated := IsNibblesTerminated(nibbles)
@@ -226,9 +242,9 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 	} else if len(input) == 17 {
 		var value bool
 		switch v := input[16].(type) {
-		case Null:
+		case *Null:
 			value = false
-		case BranchHeader:
+		case *BranchHeader:
 			if v.value == 1 {
 				value = true
 			}
@@ -238,7 +254,7 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 		return NODE_TYPE_BRANCH, NewBranchHeader(value)
 	}
 
-	log.Fatal("Unreachable code")
+	log.Fatal(ErrUnreachableCode, 5)
 
 	return 0, nil
 }
