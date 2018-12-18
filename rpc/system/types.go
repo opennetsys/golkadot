@@ -1,6 +1,7 @@
 package system
 
 const (
+	// Error is the rpc system error code.
 	Error int64 = 2000
 )
 

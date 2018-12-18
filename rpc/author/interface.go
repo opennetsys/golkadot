@@ -2,15 +2,16 @@ package author
 
 import (
 	"github.com/c3systems/go-substrate/p2p/pubsub"
+	rpctypes "github.com/c3systems/go-substrate/rpc/types"
 )
 
 type ServiceInterface interface {
 	// SubmitExtrinsic submits a hex-encoded extrinsic for inclusion in block.
-	SubmitExtrinsic(extrinsic []byte) (string, error)
+	SubmitExtrinsic(extrinsic []byte, response *string) error
 	// PendingExtrinsics returns all pending extrinsics, potentially grouped by sender.
-	PendingExtrinsics() ([][]byte, error)
+	PendingExtrinsics(args rpc.NilArgs, response [][]byte) error
 	// SubmitAndWatchExtrinsic submits an extrinsic to watch.
-	SubmitAndWatchExtrinsic(subscriber pubsub.Subscriber, extrinsic []byte) error
+	SubmitAndWatchExtrinsic(args *SubmitAndWatchExtrinsicArgs, response rpctypes.NilResponse) error
 	// UnwatchExtrinsic unsubscribes from extrinsic watching.
-	UnwatchExtrinsic(id pubsub.SubscriptionID) (bool, error)
+	UnwatchExtrinsic(id pubsub.SubscriptionID, response *bool) error
 }

@@ -6,10 +6,10 @@ package storage
 // TODO: implement
 
 // Key ...
-type Key struct {}
+type Key struct{}
 
 // Data ...
-type Data struct {}
+type Data struct{}
 
 // ChangeSet ...
-type ChangeSet {}
+type ChangeSet struct{}
