@@ -72,7 +72,7 @@ func EncodeNibbles(nibbles []uint8) []uint8 {
 	}
 
 	j := 0
-	for i := len(prefix); i < len(rawNibbles); i++ {
+	for i := len(prefix); i < len(rawNibbles)+len(prefix); i++ {
 		prefixed[i] = rawNibbles[j]
 		j++
 	}
