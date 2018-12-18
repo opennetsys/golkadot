@@ -13,6 +13,11 @@ type BranchHeader struct {
 	value int // bool
 }
 
+// Value ....
+func (b *BranchHeader) Value() bool {
+	return b.value == 1
+}
+
 // ExtensionHeader ...
 type ExtensionHeader struct {
 	value int

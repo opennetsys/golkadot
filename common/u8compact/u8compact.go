@@ -70,3 +70,11 @@ func AddLength(input []uint8, bitLength int) []uint8 {
 		input,
 	)
 }
+
+// StripLength removes the length prefix, returning both the total length (including the value + compact encoding) and the decoded value with the correct length.
+func StripLength(input []uint8, bitLength int) (int, []uint8) {
+	offset, length := FromUint8Slice(input, bitLength)
+	total := offset + int(length.Uint64())
+
+	return total, input[offset:total]
+}

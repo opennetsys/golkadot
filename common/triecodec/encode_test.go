@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/c3systems/go-substrate/common/hexutil"
 )
 
 func TestEncode(t *testing.T) {
@@ -87,22 +85,10 @@ func TestEncode(t *testing.T) {
 		}, hexToU8a("0xfe8c00682007b3872d47181b4a2dc15f0da43e702620e80300000000000080170d322ac49d8708f151346c68d9e58452d83a9d3b710e1ead35eb3269ab235368200935e46f94f24b82716c0142e2271de9200087000000000000")},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			if i == 0 || i == 1 {
-				t.Skip()
-			}
 			result := Encode(tt.in)
 			if !reflect.DeepEqual(result, tt.out) {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
 		})
 	}
-}
-
-func hexToU8a(s string) []uint8 {
-	u8, err := hexutil.ToUint8Slice(s, -1)
-	if err != nil {
-		panic(err)
-	}
-
-	return u8
 }

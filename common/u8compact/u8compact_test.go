@@ -97,3 +97,30 @@ func TestAddLength(t *testing.T) {
 		})
 	}
 }
+
+func TestStripLength(t *testing.T) {
+	type input struct {
+		value     []uint8
+		bigLength int
+	}
+	type output struct {
+		length int
+		value  []uint8
+	}
+	for i, tt := range []struct {
+		in  input
+		out output
+	}{
+		{input{[]uint8{uint8(2 << 2), 0xC, 0xD}, 32}, output{3, []uint8{0xC, 0xD}}},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			length, value := StripLength(tt.in.value, tt.in.bigLength)
+			if length != tt.out.length {
+				t.Errorf("want %v; got %v", tt.out, length)
+			}
+			if !reflect.DeepEqual(value, tt.out.value) {
+				t.Errorf("want %v; got %v", tt.out, value)
+			}
+		})
+	}
+}

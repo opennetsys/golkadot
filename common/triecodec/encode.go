@@ -80,6 +80,9 @@ func encodeKv(header *NodeHeader, input []interface{}) []uint8 {
 	)
 }
 
+// in the case of odd nibbles, the first byte is encoded as a single
+// byte from the nibble, with the remainder of the nibbles is converted
+// as nomral nibble combined bytes
 func encodeKey(input []uint8) []uint8 {
 	nibbles := ExtractKey(input)
 
