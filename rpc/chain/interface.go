@@ -1,6 +1,9 @@
 package chain
 
-import "github.com/c3systems/go-substrate/runtime"
+import (
+	"github.com/c3systems/go-substrate/p2p/pubsub"
+	"github.com/c3systems/go-substrate/runtime"
+)
 
 // ServiceInterface defines the methods implemented by the chain service
 type ServiceInterface interface {
@@ -19,7 +22,7 @@ type ServiceInterface interface {
 	// UnsubscribeNewHead unsubscribes from new head subscription.
 	UnsubscribeNewHead(id pubsub.SubscriptionID) (bool, error)
 	// SubscribeFinalizedHeads returns a new head subscription
-	SubscribeFinalizedHeads(subscriber pubsib.Subscriber) error
+	SubscribeFinalizedHeads(subscriber pubsub.Subscriber) error
 	// UnsubscribeFinalizedHeads from new head subscription.
 	UnsubscribeFinalizedHeads(id pubsub.SubscriptionID) (bool, error)
 }

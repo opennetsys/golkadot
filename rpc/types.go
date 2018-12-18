@@ -1,15 +1,21 @@
 package rpc
 
 import (
-	gorpc "github.com/libp2p/go-libp2p-gorpc"
+	"github.com/c3systems/go-substrate/rpc/author"
+	"github.com/c3systems/go-substrate/rpc/chain"
+	"github.com/c3systems/go-substrate/rpc/state"
+	"github.com/c3systems/go-substrate/rpc/system"
+
+	libp2pHost "github.com/libp2p/go-libp2p-host"
+	protocol "github.com/libp2p/go-libp2p-protocol"
 )
 
-// Server is an RPC server that will respond to calls
-type Server struct {
-	RPCHost *gorpc.Server
-}
-
-// Client is an RPC client that can make calls
-type Client struct {
-	RPCClient *gorpc.Client
+// ServerConfig is passed to NewServer
+type ServerConfig struct {
+	Host          libp2pHost.Host
+	SystemService system.ServiceInterface
+	StateService  state.ServiceInterface
+	ChainService  chain.ServiceInterface
+	AuthorService author.ServiceInterface
+	ID            *protocol.ID
 }
