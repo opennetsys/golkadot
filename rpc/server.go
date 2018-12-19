@@ -2,7 +2,8 @@ package rpc
 
 import (
 	"errors"
-	"log"
+
+	"github.com/c3systems/go-substrate/log"
 
 	gorpc "github.com/libp2p/go-libp2p-gorpc"
 )
@@ -16,22 +17,22 @@ func NewServer(config ServerConfig) (*gorpc.Server, error) {
 	rpcHost := gorpc.NewServer(config.Host, *config.ID)
 
 	if err := rpcHost.Register(config.SystemService); err != nil {
-		log.Printf("[rpc] err registering the system service\n%v", err)
+		log.Errorf("[rpc] err registering the system service\n%v", err)
 		return nil, err
 	}
 
 	if err := rpcHost.Register(config.StateService); err != nil {
-		log.Printf("[rpc] err registering the state service\n%v", err)
+		log.Errorf("[rpc] err registering the state service\n%v", err)
 		return nil, err
 	}
 
 	if err := rpcHost.Register(config.ChainService); err != nil {
-		log.Printf("[rpc] err registering the chain service\n%v", err)
+		log.Errorf("[rpc] err registering the chain service\n%v", err)
 		return nil, err
 	}
 
 	if err := rpcHost.Register(config.AuthorService); err != nil {
-		log.Printf("[rpc] err registering the author service\n%v", err)
+		log.Errorf("[rpc] err registering the author service\n%v", err)
 		return nil, err
 	}
 

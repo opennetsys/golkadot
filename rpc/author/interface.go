@@ -9,7 +9,7 @@ type ServiceInterface interface {
 	// SubmitExtrinsic submits a hex-encoded extrinsic for inclusion in block.
 	SubmitExtrinsic(extrinsic []byte, response *string) error
 	// PendingExtrinsics returns all pending extrinsics, potentially grouped by sender.
-	PendingExtrinsics(args rpc.NilArgs, response [][]byte) error
+	PendingExtrinsics(args rpctypes.NilArgs, response [][]byte) error
 	// SubmitAndWatchExtrinsic submits an extrinsic to watch.
 	SubmitAndWatchExtrinsic(args *SubmitAndWatchExtrinsicArgs, response rpctypes.NilResponse) error
 	// UnwatchExtrinsic unsubscribes from extrinsic watching.
