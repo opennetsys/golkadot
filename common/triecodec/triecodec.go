@@ -19,7 +19,6 @@ func CreateBranch(value []uint8, hasChildren []bool) []uint8 {
 		}
 
 		cursor = cursor << 1
-		bitmap = cursor
 	}
 
 	var branchNode uint8
@@ -52,18 +51,18 @@ func CreateExtension(key []uint8) []uint8 {
 // CreateLeaf ...
 func CreateLeaf(key []uint8, value []uint8) []uint8 {
 	return u8util.Concat(
-		FuseNibbles(key, false),
+		FuseNibbles(key, true),
 		CreateValue(value),
 	)
 }
 
 // CreateSubstream ...
 func CreateSubstream(value []uint8) []uint8 {
-	if len(value) < 32 {
-		return CreateValue(value)
+	if len(value) >= 32 {
+		value = Hashing(value)
 	}
 
-	return Hashing(value)
+	return CreateValue(value)
 }
 
 // CreateValue ...
@@ -82,5 +81,5 @@ func EndBranch() []uint8 {
 
 // Hashing ...
 func Hashing(value []byte) []byte {
-	return crypto.NewBlake2b512(value)
+	return crypto.NewBlake2b256(value)
 }

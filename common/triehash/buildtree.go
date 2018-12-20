@@ -75,9 +75,7 @@ func BuildTrie(input [][][]uint8, cursor int) []uint8 {
 
 	var hasChildren []bool
 	for _, val := range sharedNibbleCounts {
-		if val > 0 {
-			hasChildren = append(hasChildren, true)
-		}
+		hasChildren = append(hasChildren, val > 0)
 	}
 
 	var stream [][]uint8
@@ -94,19 +92,19 @@ func BuildTrie(input [][][]uint8, cursor int) []uint8 {
 		stream = append(stream, result)
 	}
 
+	var val []uint8
 	val, ok := value.([]uint8)
 	if !ok {
 		val = nil
-		//panic("not ok")
 	}
 
-	var col [][]uint8
-	col = append(col,
-		triecodec.CreateBranch(
-			val,
-			hasChildren,
-		),
+	branch := triecodec.CreateBranch(
+		val,
+		hasChildren,
 	)
+
+	var col [][]uint8
+	col = append(col, branch)
 	col = append(col, stream...)
 	col = append(col, triecodec.EndBranch())
 
