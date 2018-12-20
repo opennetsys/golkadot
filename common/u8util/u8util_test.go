@@ -108,6 +108,27 @@ func TestToHex(t *testing.T) {
 	}
 }
 
+func TestFromHex(t *testing.T) {
+	for i, tt := range []struct {
+		in  string
+		out []uint8
+	}{
+		{"0x68656c6c0f", []uint8{0x68, 0x65, 0x6c, 0x6c, 0xf}},
+		{"68656c6c0f", []uint8{0x68, 0x65, 0x6c, 0x6c, 0xf}},
+		{"", []uint8{}},
+		{"0x", []uint8{}},
+		{"0001000000000000", []uint8{0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+		{"0x0001000000000000", []uint8{0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := FromHex(tt.in)
+			if !reflect.DeepEqual(result, tt.out) {
+				t.Errorf("want %v; got %v", tt.out, result)
+			}
+		})
+	}
+}
+
 func TestToBN(t *testing.T) {
 	type input struct {
 		value          []uint8
