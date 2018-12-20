@@ -1,13 +1,19 @@
 package u8util
 
 import (
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"log"
 	"math"
 	"math/big"
 
 	"github.com/c3systems/go-substrate/common/bnutil"
+	"github.com/c3systems/go-substrate/common/hexutil"
 )
 
+// ErrInvalidHex ...
+var ErrInvalidHex = errors.New("Invalid hex string")
 var alphabet = "0123456789abcdef"
 
 // Concat concatenates multiple uint8 slices into a new slice
@@ -71,6 +77,16 @@ func ToHex(value []uint8, bitLength int, isPrefixed bool) string {
 	}
 
 	return result
+}
+
+// FromHex creates a uint8 slice from a hex string
+func FromHex(hexStr string) []uint8 {
+	decoded, err := hex.DecodeString(hexutil.StripPrefix(hexStr))
+	if err != nil {
+		log.Fatal(ErrInvalidHex)
+	}
+
+	return decoded
 }
 
 // ToBN creates a utf-8 string from a uint8 slice.

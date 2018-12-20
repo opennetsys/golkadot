@@ -1,10 +1,29 @@
 package triehash
 
-import "github.com/c3systems/go-substrate/common/triecodec"
+import (
+	"math/big"
+
+	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/c3systems/go-substrate/common/u8compact"
+)
 
 // TrieRoot creates a trie hash from the supplied pairs.
 func TrieRoot(input []*TriePair) []uint8 {
 	return triecodec.Hashing(
 		UnhashedTrie(input),
 	)
+}
+
+// TrieRootOrdered creates a trie hash from the supplied pairs.
+func TrieRootOrdered(input [][]uint8) []uint8 {
+	var values []*TriePair
+	for index, value := range input {
+		values = append(values, &TriePair{
+			K: u8compact.CompactToUint8Slice(big.NewInt(int64(index)), 32),
+			V: value,
+		})
+
+	}
+
+	return TrieRoot(values)
 }
