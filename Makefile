@@ -56,6 +56,10 @@ test/common/u8util:
 test/common/triecodec:
 	@go test -v common/triecodec/*.go $(ARGS)
 
+.PHONY test/common/triehash:
+test/common/triehash:
+	@go test -v common/triehash/*.go $(ARGS)
+
 .PHONY test/common/crypto:
 test/common/crypto:
 	@go test -v common/crypto/*.go
