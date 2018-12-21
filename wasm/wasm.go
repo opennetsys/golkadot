@@ -3,7 +3,7 @@ package wasm
 import (
 	"errors"
 
-	"github.com/c3systems/go-substrate/log"
+	"github.com/c3systems/go-substrate/logger"
 	"github.com/perlin-network/life/compiler"
 	"github.com/perlin-network/life/exec"
 )
@@ -35,7 +35,7 @@ func NewVM(config *Config) *VM {
 
 	vm, err := exec.NewVirtualMachine(config.Input, exec.VMConfig{}, &exec.NopResolver{}, gasPolicy)
 	if err != nil {
-		log.Fatalf("[wasm] bytecode is invalid; %s", err)
+		logger.Fatalf("[wasm] bytecode is invalid; %s", err)
 		panic(err)
 	}
 
@@ -67,7 +67,7 @@ func (vm *VM) Execute(input ...interface{}) (interface{}, error) {
 
 	ret, err := vm.client.Run(entryID, args...)
 	if err != nil {
-		log.Fatalf("[wasm] execution error; %s", err)
+		logger.Fatalf("[wasm] execution error; %s", err)
 		vm.client.PrintStackTrace()
 		return nil, err
 	}

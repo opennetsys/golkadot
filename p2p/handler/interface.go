@@ -8,5 +8,8 @@ import (
 
 // Interface describes the methods of the handler package
 type Interface interface {
+	// Func handles the message
 	Func(p p2p.Interface, pr peer.Interface, msg message.Interface) error
+	// Type returns the handler type
+	Type() FuncEnum
 }

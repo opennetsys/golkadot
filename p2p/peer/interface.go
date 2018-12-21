@@ -2,6 +2,7 @@ package peer
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/c3systems/go-substrate/p2p/message"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
@@ -23,4 +24,6 @@ type Interface interface {
 	On(event EventEnum, cb EventCallback) (interface{}, error)
 	// Send is used to send the peer a message
 	Send(msg message.Interface) (bool, error)
+	// SetBest sets a new block
+	SetBest(blockNumber *big.Int, hash []byte) error
 }
