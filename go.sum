@@ -90,3 +90,7 @@ golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20181219203629-2240b23956e7 h1:r0Sb0jo1Ndqllqo6tctC80bZ7REH+EKKhmDoH3mJrjE=
 golang.org/x/tools v0.0.0-20181219203629-2240b23956e7/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+golang.org/x/tools v0.0.0-20181220191307-f344c7530cd8 h1:OfQxq97HuG2P/j78Cei5bLypHjVkHpfUvWVQMI5tChs=
+golang.org/x/tools v0.0.0-20181220191307-f344c7530cd8/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+golang.org/x/tools v0.0.0-20181220221020-d12035dfdc6d h1:cL/lF7XqkxWlCsolMvLzUBOpD7aXRWEzr5gxfBVkGFY=
+golang.org/x/tools v0.0.0-20181220221020-d12035dfdc6d/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=

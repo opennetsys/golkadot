@@ -1,7 +1,7 @@
 GO:=$(shell command type go 2> /dev/null)
 STRINGER:=$(shell command type stringer 2> /dev/null)
 
-all: check sync-status peer-interface-event peers-interface-event p2p-interface-event
+all: check sync-status-enum peer-event-enum peers-event-enum p2p-event-enum
 
 .PHONY: check
 check: check/go check/stringer
@@ -25,18 +25,22 @@ endif
 install/stringer: check/go
 	@go get -u golang.org/x/tools/cmd/stringer
 
-.PHONY: sync-status
-sync-status:
-	@stringer -type=syncStatus && echo "made syncStatus enum"
+.PHONY: sync-status-enum
+sync-status-enum:
+	@(cd ./sync && stringer -type=statusEnum && echo "made p2p syncStatus enum")
 
-.PHONY: peer-interface-event
-peer-interface-event:
-	@stringer -type=peerInterfaceEvent && echo "made peerInterfaceEvent enum"
+.PHONY: sync-event-enum
+sync-event-enum:
+	@(cd ./sync && stringer -type=eventEnum && echo "made p2p syncEvent enum")
 
-.PHONY: peers-interface-event
-peers-interface-event:
-	@stringer -type=peersInterfaceEvent && echo "made peersInterfaceEvent enum"
+.PHONY: peer-event-enum
+peer-event-enum:
+	@(cd ./peer && stringer -type=eventEnum && echo "made peer event enum")
 
-.PHONY: p2p-interface-event
-p2p-interface-event:
-	@stringer -type=p2pInterfaceEvent && echo "made p2pInterfaceEvent enum"
+.PHONY: peers-event-enum
+peers-event-enum:
+	@(cd ./peers && stringer -type=eventEnum && echo "made peers event enum")
+
+.PHONY: p2p-event-enum
+p2p-event-enum:
+	@stringer -type=eventEnum && echo "made p2p event enum"

@@ -15,8 +15,8 @@ require (
 	github.com/libp2p/go-libp2p-host v3.0.15+incompatible
 	github.com/libp2p/go-libp2p-interface-connmgr v0.0.21 // indirect
 	github.com/libp2p/go-libp2p-net v3.0.15+incompatible // indirect
-	github.com/libp2p/go-libp2p-peer v2.4.0+incompatible // indirect
-	github.com/libp2p/go-libp2p-peerstore v2.0.6+incompatible // indirect
+	github.com/libp2p/go-libp2p-peer v2.4.0+incompatible
+	github.com/libp2p/go-libp2p-peerstore v2.0.6+incompatible
 	github.com/libp2p/go-libp2p-protocol v1.0.0
 	github.com/libp2p/go-stream-muxer v3.0.1+incompatible // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
@@ -36,5 +36,5 @@ require (
 	github.com/whyrusleeping/go-logging v0.0.0-20170515211332-0457bb6b88fc // indirect
 	golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
 	golang.org/x/net v0.0.0-20181217023233-e147a9138326 // indirect
-	golang.org/x/tools v0.0.0-20181219203629-2240b23956e7 // indirect
+	golang.org/x/tools v0.0.0-20181220221020-d12035dfdc6d // indirect
 )
