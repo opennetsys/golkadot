@@ -10,6 +10,7 @@ import (
 type BlockAnnounceHandler struct{}
 
 // Func handles incoming block announce messages
+// TODO ...
 func (b *BlockAnnounceHandler) Func(p p2p.Interface, pr peer.Interface, msg message.Interface) error {
 	return nil
 }

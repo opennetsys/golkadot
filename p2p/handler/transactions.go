@@ -10,6 +10,7 @@ import (
 type TransactionsHandler struct{}
 
 // Func handles incoming transactions messages
+// TODO ...
 func (t *TransactionsHandler) Func(p p2p.Interface, pr peer.Interface, msg message.Interface) error {
 	return nil
 }

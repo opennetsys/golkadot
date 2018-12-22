@@ -10,6 +10,7 @@ import (
 type BFTHandler struct{}
 
 // Func handles incoming bft messages
+// TODO ...
 func (b *BFTHandler) Func(p p2p.Interface, pr peer.Interface, msg message.Interface) error {
 	return nil
 }

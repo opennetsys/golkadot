@@ -10,6 +10,7 @@ import (
 type StatusHandler struct{}
 
 // Func handles incoming status messages
+// TODO ...
 func (s *StatusHandler) Func(p p2p.Interface, pr peer.Interface, msg message.Interface) error {
 	return nil
 }
