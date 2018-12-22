@@ -7,6 +7,8 @@ type Service struct{}
 
 // SubmitAndWatchExtrinsicArgs is passed to the SubmitAndWatchExtrinsic method
 type SubmitAndWatchExtrinsicArgs struct {
+	// Subscriber ...
 	Subscriber pubsub.Subscriber
-	Extrinsic  []byte
+	// Extrinsic ...
+	Extrinsic []byte
 }

@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/c3systems/go-substrate/log"
-)
+import "github.com/c3systems/go-substrate/logger"
 
 func main() {
-	log.Set(log.ContextHook{}, false)
+	logger.Set(logger.ContextHook{}, false)
 }
