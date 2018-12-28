@@ -98,7 +98,7 @@ func (n *NodeHeader) EncodedLength() int {
 	} else if n.nodeType == NODE_TYPE_EXT {
 		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 
 		nibbleCount := header.value
@@ -111,7 +111,7 @@ func (n *NodeHeader) EncodedLength() int {
 	} else if n.nodeType == NODE_TYPE_LEAF {
 		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 
 		nibbleCount := header.value
@@ -134,7 +134,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_BRANCH {
 		header, ok := n.value.(*BranchHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 
 		if header.value == 1 {
@@ -144,7 +144,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_EXT {
 		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 
 		nibbleCount := header.value
@@ -156,7 +156,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_LEAF {
 		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 
 		nibbleCount := header.value
@@ -235,7 +235,7 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 	} else if len(input) == 2 {
 		value, ok := input[0].([]uint8)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion)
 		}
 		nibbles := DecodeNibbles(value)
 		isTerminated := IsNibblesTerminated(nibbles)
