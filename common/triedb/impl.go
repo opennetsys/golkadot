@@ -2,12 +2,6 @@ package triedb
 
 import "github.com/c3systems/go-substrate/db"
 
-// TrieDB ...
-type TrieDB struct{}
-
-// Node ...
-type Node struct{}
-
 // Impl ...
 type Impl struct {
 	checkpoint *Checkpoint
