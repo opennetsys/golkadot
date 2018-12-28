@@ -1,13 +1,15 @@
 package db
 
-/*
-export default class DiskDb extends TransactionDb {
-  constructor (base: string, name: string, options?: BaseDbOptions) {
-    super(
-      new LruDb(
-        new FileFlatDb(base, name, options)
-      )
-    );
-  }
+// DiskDB ...
+type DiskDB struct {
+	TransactionDB
 }
-*/
+
+// NewDiskDB ...
+func NewDiskDB(base, name string, options *BaseDBOptions) *DiskDB {
+	//flatdb := NewFileFlatDB(base, name, options)
+	//lrudb : NewLruDB(flatdb)
+	return &DiskDB{
+		// db: lrudb,
+	}
+}
