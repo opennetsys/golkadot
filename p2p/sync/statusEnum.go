@@ -8,22 +8,22 @@ import (
 type statusEnum int
 
 const (
-	// Idle ...
+	// Idle TODO
 	Idle statusEnum = iota
-	// Sync ...
+	// Sync TODO
 	Sync
 )
 
 // ErrUnknownStatus is thrown when an unknown sync status is encountered.
 var ErrUnknownStatus = errors.New("sync status: unknown")
 
-// StatusEnum are the available sync statuses of the node
+// StatusEnum are the exported sync statuses of the node
 type StatusEnum interface {
 	Type() statusEnum
 	String() string
 }
 
-// every base must fullfill the supported interface
+// Type returns the internal, package level sync status enum
 func (s statusEnum) Type() statusEnum {
 	return s
 }

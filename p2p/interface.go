@@ -6,6 +6,8 @@ import "context"
 type Interface interface {
 	// IsStarted returns true if the p2p interface has started
 	IsStarted() bool
+	// GetNumPeers returns the number of connected peers
+	GetNumPeers() (uint, error)
 	// On handles messages
 	On(event EventEnum, cb EventCallback) (interface{}, error)
 	// Start starts the p2p service

@@ -24,6 +24,16 @@ func Error(s string) {
 	logrus.Errorf(s)
 }
 
+// Infof ...
+func Infof(s string, i ...interface{}) {
+	logrus.Infof(s, i...)
+}
+
+// Info ...
+func Info(s string) {
+	logrus.Infof(s)
+}
+
 // Printf ...
 func Printf(s string, i ...interface{}) {
 	logrus.Infof(s, i...)

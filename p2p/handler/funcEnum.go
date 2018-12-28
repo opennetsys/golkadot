@@ -31,7 +31,7 @@ type FuncEnum interface {
 	String() string
 }
 
-// Type returns the enum
+// Type returns the private handler func enum
 func (f funcEnum) Type() funcEnum {
 	return f
 }

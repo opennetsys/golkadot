@@ -8,7 +8,7 @@ import (
 type eventEnum int
 
 const (
-	// Imported ...
+	// Imported TODO
 	Imported eventEnum = iota
 )
 

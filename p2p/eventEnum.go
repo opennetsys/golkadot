@@ -8,22 +8,22 @@ import (
 type eventEnum int
 
 const (
-	// Started ...
+	// Started TODO
 	Started eventEnum = iota
-	// Stopped ...
+	// Stopped TODO
 	Stopped
 )
 
 // ErrUnknownEvent is thrown when an unknown p2p interface event is encountered.
 var ErrUnknownEvent = errors.New("p2p interface event: unknown")
 
-// EventEnum are the available p2p interface events.
+// EventEnum are the exported event enums.
 type EventEnum interface {
 	Type() eventEnum
 	String() string
 }
 
-// Type is used to return the enum.
+// Type is used to return the private type.
 func (e eventEnum) Type() eventEnum {
 	return e
 }

@@ -27,13 +27,13 @@ const (
 // ErrUnknownEvent is thrown when an unknown peers interface event is encountered.
 var ErrUnknownEvent = errors.New("peers interface event: unknown")
 
-// EventEnum are the available peers interface events.
+// EventEnum are the exported peers events enums.
 type EventEnum interface {
 	Type() eventEnum
 	String() string
 }
 
-// every base must fullfill the supported interface.
+// Type returns the private peers event enum.
 func (e eventEnum) Type() eventEnum {
 	return e
 }
