@@ -8,62 +8,70 @@ deps:
 build:
 	@go build
 
-.PHONY test:
+.PHONY: test
 test:
 	@go test -v ./... && echo "ALL PASS" || echo "FAILURE"
 
-.PHONY test/wasm:
+.PHONY: test/wasm
 test/wasm:
 	@go test -v wasm/*.go
 
-.PHONY test/common:
+.PHONY: test/common
 test/common:
 	@go test -v $$(go list ./... | grep common/)
 
-.PHONY test/common/hexutil:
+.PHONY: test/common/hexutil
 test/common/hexutil:
 	@go test -v common/hexutil/*.go
 
-.PHONY test/common/stringutil:
+.PHONY: test/common/stringutil
 test/common/stringutil:
 	@go test -v common/stringutil/*.go
 
-.PHONY test/common/assert:
+.PHONY: test/common/assert
 test/common/assert:
 	@go test -v common/assert/*.go
 
-.PHONY test/common/ext:
+.PHONY: test/common/ext
 test/common/ext:
 	@go test -v common/ext/*.go
 
-.PHONY test/common/bnutil:
+.PHONY: test/common/bnutil
 test/common/bnutil:
 	@go test -v common/bnutil/*.go
 
-.PHONY test/common/chainspec:
+.PHONY: test/common/chainspec
 test/common/chainspec:
 	@go test -v common/chainspec/*.go
 
-.PHONY test/common/u8compact:
+.PHONY: test/common/u8compact
 test/common/u8compact:
 	@go test -v common/u8compact/*.go
 
-.PHONY test/common/u8util:
+.PHONY: test/common/u8util
 test/common/u8util:
 	@go test -v common/u8util/*.go
 
-.PHONY test/common/triecodec:
+.PHONY: test/common/triecodec
 test/common/triecodec:
 	@go test -v common/triecodec/*.go $(ARGS)
 
-.PHONY test/common/triehash:
+.PHONY: test/common/triehash
 test/common/triehash:
 	@go test -v common/triehash/*.go $(ARGS)
 
-.PHONY test/common/crypto:
+.PHONY: test/common/triedb
+test/common/triedb:
+	@go test -v common/triedb/*.go $(ARGS)
+
+.PHONY: test/common/crypto
 test/common/crypto:
 	@go test -v common/crypto/*.go
 
-.PHONY test/common/mathutil:
+.PHONY: test/common/mathutil
 test/common/mathutil:
 	@go test -v common/mathutil/*.go
+
+.PHONY: test/db
+test/db:
+	@go test -v db/*.go

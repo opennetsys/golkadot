@@ -69,7 +69,7 @@ func encodeBranch(header *NodeHeader, input []interface{}) []uint8 {
 func encodeKv(header *NodeHeader, input []interface{}) []uint8 {
 	key, ok := input[0].([]uint8)
 	if !ok {
-		log.Fatal(ErrCastingType)
+		log.Fatal(ErrTypeAssertion)
 	}
 
 	value := input[1]

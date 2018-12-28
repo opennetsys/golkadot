@@ -31,7 +31,7 @@ func decodeBranch(header *NodeHeader, input []uint8) []interface{} {
 	offset := header.EncodedLength()
 	branch, ok := header.value.(*BranchHeader)
 	if !ok {
-		log.Fatal(ErrCastingType)
+		log.Fatal(ErrTypeAssertion)
 	}
 	bitmap := int(input[offset]) + (int(input[offset+1]) * 256)
 	var value []uint8

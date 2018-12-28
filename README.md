@@ -20,6 +20,10 @@ Please follow the [golang-standards project-layout](https://github.com/golang-st
 
 For contributions please create a new branch and submit a pull request for review.
 
+### Commit messages
+
+Please follow [best practices](https://chris.beams.io/posts/git-commit/) such as using [present-tense](https://stackoverflow.com/a/3580764/1439168) commit messages.
+
 ## License
 
 [GNU GPLv3](LICENSE)
