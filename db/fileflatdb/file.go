@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/c3systems/go-substrate/db"
@@ -76,8 +77,9 @@ func (f *File) AssertOpen(open bool) {
 // Close ...
 func (f *File) Close() {
 	// close file descriptor
-	fd := os.NewFile(uintptr(f.fd), "temp")
-	fd.Close()
+	if err := syscall.Close(int(f.fd)); err != nil {
+		log.Fatal(err)
+	}
 
 	f.fd = -1
 }

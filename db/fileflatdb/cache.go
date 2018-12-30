@@ -44,7 +44,6 @@ func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 
 		fd := os.NewFile(uintptr(c.fd), "temp")
 		defer fd.Close()
-		// TODO: this isn't correct
 		_, err := fd.ReadAt(branch, branchAt)
 		if err != nil {
 			log.Fatal(err)
@@ -64,7 +63,6 @@ func (c *Cache) GetCachedData(dataAt int64, length int) []byte {
 
 		fd := os.NewFile(uintptr(c.fd), "temp")
 		defer fd.Close()
-		// TODO: this isn't correct
 		_, err := fd.ReadAt(data, dataAt)
 		if err != nil {
 			log.Fatal(err)
