@@ -75,3 +75,7 @@ test/common/mathutil:
 .PHONY: test/db
 test/db:
 	@go test -v db/*.go
+
+.PHONY: test/db/fileflatdb
+test/db/fileflatdb:
+	@go test -v db/fileflatdb/*.go

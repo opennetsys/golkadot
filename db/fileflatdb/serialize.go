@@ -48,19 +48,17 @@ func (s *Serializer) SerializeValue(value []uint8) []byte {
 	return value
 }
 
-var defaultKeySize = 32
-
 // SerializeKey ...
 func (s *Serializer) SerializeKey(value []uint8) *NibbleBuffer {
-	if len(value) <= defaultKeySize {
+	if len(value) <= keySize {
 		log.Fatal("too large, expected <= 32 bytes")
 	}
 
 	var b []byte
-	if len(value) == defaultKeySize {
+	if len(value) == keySize {
 		b = value
 	} else {
-		tmp := make([]byte, defaultKeySize)
+		tmp := make([]byte, keySize)
 		for i := range value {
 			tmp[i] = value[i]
 		}

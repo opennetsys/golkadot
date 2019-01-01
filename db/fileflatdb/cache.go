@@ -12,7 +12,7 @@ type LruMap map[int64][]byte
 
 // Cache ...
 type Cache struct {
-	File
+	*File
 	lruBranch LruMap
 	lruData   LruMap
 }
@@ -40,7 +40,7 @@ func (c *Cache) CacheData(dataAt int64, data []byte) {
 func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 	branch, found := c.lruBranch[branchAt]
 	if !found {
-		branch := make([]byte, defaultBranchSize)
+		branch := make([]byte, branchSize)
 
 		fd := os.NewFile(uintptr(c.fd), "temp")
 		defer fd.Close()
@@ -56,7 +56,7 @@ func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 }
 
 // GetCachedData ...
-func (c *Cache) GetCachedData(dataAt int64, length int) []byte {
+func (c *Cache) GetCachedData(dataAt int64, length int64) []byte {
 	data, found := c.lruData[dataAt]
 	if !found {
 		data := make([]byte, length)

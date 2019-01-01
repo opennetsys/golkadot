@@ -37,7 +37,7 @@ func NewCompact(file string) *Compact {
 }
 
 // Maintain ...
-func (c *Compact) Maintain(fn db.ProgressCB) {
+func (c *Compact) Maintain(fn *db.ProgressCB) {
 	if c.fd != -1 {
 		log.Fatal("database cannot be open for compacting")
 	}
@@ -46,7 +46,7 @@ func (c *Compact) Maintain(fn db.ProgressCB) {
 	newFile := fmt.Sprintf("%s.compacted", c.file)
 	newFd := c.Open(newFile, true)
 	oldFd := c.Open(c.file, false)
-	keys := c.Compact(fn, newFd, oldFd)
+	keys := c.Compact(*fn, newFd, oldFd)
 
 	closeFd(oldFd)
 	closeFd(newFd)
@@ -80,7 +80,7 @@ func (c *Compact) Open(file string, startEmpty bool) int {
 	_, err := os.Stat(file)
 	isExisting := !os.IsNotExist(err)
 	if !isExisting || startEmpty {
-		data := make([]byte, defaultBranchSize)
+		data := make([]byte, branchSize)
 		err := ioutil.WriteFile(file, data, os.ModePerm)
 		if err != nil {
 			log.Fatal(err)
@@ -97,9 +97,9 @@ func (c *Compact) Open(file string, startEmpty bool) int {
 
 // doCompact ...
 func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, oldFd int, newAt int, oldAt int, depth int) {
-	increment := (100 / float64(defaultEntryNum)) / math.Pow(float64(defaultEntryNum), float64(depth))
+	increment := (100 / float64(entryNum)) / math.Pow(float64(entryNum), float64(depth))
 
-	for index := 0; index < defaultEntryNum; index++ {
+	for index := 0; index < entryNum; index++ {
 		entry := c.CompactReadEntry(oldFd, oldAt, index)
 		dataAt := new(big.Int)
 		dataAt.SetBytes(entry[1 : 1+uintSize])
@@ -125,7 +125,7 @@ func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, old
 		}
 
 		var isCompleted bool
-		if depth == 0 && index == defaultEntryNum-1 {
+		if depth == 0 && index == entryNum-1 {
 			isCompleted = true
 		}
 
@@ -151,8 +151,8 @@ func (c *Compact) Compact(fn db.ProgressCB, newFd, oldFd int) int {
 
 // CompactReadEntry ...
 func (c *Compact) CompactReadEntry(fd int, at int, index int) []byte {
-	entry := make([]byte, defaultEntrySize)
-	entryAt := at + (index * defaultEntrySize)
+	entry := make([]byte, entrySize)
+	entryAt := at + (index * entrySize)
 
 	file := os.NewFile(uintptr(fd), "temp")
 	_, err := file.ReadAt(entry, int64(entryAt))
@@ -208,8 +208,8 @@ func (c *Compact) CompactWriteKey(fd int, key, value []byte) int64 {
 
 // CompactUpdateLink ...
 func (c *Compact) CompactUpdateLink(fd int, at int, index int, pointer int64, kind int) {
-	entry := make([]byte, defaultEntrySize)
-	entryAt := at + (index * defaultEntrySize)
+	entry := make([]byte, entrySize)
+	entryAt := at + (index * entrySize)
 
 	entry[0] = byte(kind)
 	entry[uintSize] = byte(pointer)
@@ -230,7 +230,7 @@ func (c *Compact) CompactWriteHeader(fd int, at int, index int) int64 {
 	}
 	headerAt := stat.Size()
 
-	header := make([]byte, defaultBranchSize)
+	header := make([]byte, branchSize)
 	_, err = file.WriteAt(header, headerAt)
 	if err != nil {
 		log.Fatal(err)

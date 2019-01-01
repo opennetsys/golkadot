@@ -14,9 +14,9 @@ import (
 var uintSize = 5
 var keySize = 32
 var keyTotalSize = keySize + uintSize + uintSize
-var defaultEntryNum = 16 // nibbles, 256 for bytes (where serialize would be noop)
-var defaultEntrySize = 1 + uintSize
-var defaultBranchSize = defaultEntryNum * defaultEntrySize
+var entryNum = 16 // nibbles, 256 for bytes (where serialize would be noop)
+var entrySize = 1 + uintSize
+var branchSize = entryNum * entrySize
 var defaultFile = "store.db"
 var lruBranchCount = 16384 // * 96 = bytes
 var lruDataCount = 8192
@@ -94,7 +94,7 @@ func (f *File) Open(filepath string, startEmpty bool) {
 			os.Rename(filepath, fmt.Sprintf("%s.%d", filepath, time.Now().Unix()))
 		}
 
-		b := make([]byte, defaultBranchSize)
+		b := make([]byte, branchSize)
 		ioutil.WriteFile(filepath, b, 0644)
 	}
 
