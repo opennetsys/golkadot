@@ -12,7 +12,12 @@ type MemoryDB struct {
 	storage Storage
 }
 
-// NewMemoryDB ...
+// NewMemoryDB creates a MemoryDB database extending TransactionDB
+// options argument (optional) used to specifies whether
+// to use compression.
+// - Enable compression when storing "blocks" since they compress well.
+// - Disable compression when storing "state" Transactions Trie
+// data structure serialised with Recursive Length Prefix (RLP) encoding
 func NewMemoryDB(options *BaseOptions) *MemoryDB {
 	return &MemoryDB{
 		storage: Storage{},
