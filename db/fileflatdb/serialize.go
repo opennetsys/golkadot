@@ -50,8 +50,8 @@ func (s *Serializer) SerializeValue(value []uint8) []byte {
 
 // SerializeKey ...
 func (s *Serializer) SerializeKey(value []uint8) *NibbleBuffer {
-	if len(value) <= keySize {
-		log.Fatal("too large, expected <= 32 bytes")
+	if len(value) > keySize {
+		log.Fatalf("too large, expected <= 32 bytes, got %d", len(value))
 	}
 
 	var b []byte

@@ -24,3 +24,5 @@
 Session.vim
 
 .bin
+
+db/fileflatdb/test

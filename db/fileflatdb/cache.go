@@ -3,8 +3,6 @@ package fileflatdb
 import (
 	"log"
 	"os"
-
-	"github.com/c3systems/go-substrate/db"
 )
 
 // LruMap ...
@@ -12,15 +10,15 @@ type LruMap map[int64][]byte
 
 // Cache ...
 type Cache struct {
-	*File
+	file      *File
 	lruBranch LruMap
 	lruData   LruMap
 }
 
 // NewCache ...
-func NewCache(base, file string, options *db.BaseDBOptions) *Cache {
-	//super(base, file, options)
+func NewCache(file *File) *Cache {
 	return &Cache{
+		file:      file,
 		lruBranch: make(LruMap, lruBranchCount),
 		lruData:   make(LruMap, lruDataCount),
 	}
@@ -40,10 +38,8 @@ func (c *Cache) CacheData(dataAt int64, data []byte) {
 func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 	branch, found := c.lruBranch[branchAt]
 	if !found {
-		branch := make([]byte, branchSize)
-
-		fd := os.NewFile(uintptr(c.fd), "temp")
-		defer fd.Close()
+		branch = make([]byte, branchSize)
+		fd := os.NewFile(uintptr(c.file.fd), "temp")
 		_, err := fd.ReadAt(branch, branchAt)
 		if err != nil {
 			log.Fatal(err)
@@ -59,10 +55,8 @@ func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 func (c *Cache) GetCachedData(dataAt int64, length int64) []byte {
 	data, found := c.lruData[dataAt]
 	if !found {
-		data := make([]byte, length)
-
-		fd := os.NewFile(uintptr(c.fd), "temp")
-		defer fd.Close()
+		data = make([]byte, length)
+		fd := os.NewFile(uintptr(c.file.fd), "temp")
 		_, err := fd.ReadAt(data, dataAt)
 		if err != nil {
 			log.Fatal(err)

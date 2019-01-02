@@ -13,15 +13,6 @@ import (
 	"github.com/c3systems/go-substrate/db"
 )
 
-// SlotEmpty ...
-var SlotEmpty = 0
-
-// SlotBranch ...
-var SlotBranch = 1
-
-// SlotLeaf ...
-var SlotLeaf = 2
-
 // Compact ...
 type Compact struct {
 	fd   int64
@@ -197,11 +188,16 @@ func (c *Compact) CompactWriteKey(fd int, key, value []byte) int64 {
 	valueAt := stat.Size()
 	keyAt := valueAt + int64(len(value))
 
-	k := key[:keyTotalSize]
-	k[keyTotalSize-(keySize+uintSize)-1] = byte(valueAt)
+	writeUIntBE(key, int64(valueAt), int64(keySize)+int64(uintSize), int64(uintSize))
 
-	file.WriteAt(value, valueAt)
-	file.WriteAt(k, keyAt)
+	_, err = file.WriteAt(value, valueAt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = file.WriteAt(key, keyAt)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return keyAt
 }
@@ -212,7 +208,7 @@ func (c *Compact) CompactUpdateLink(fd int, at int, index int, pointer int64, ki
 	entryAt := at + (index * entrySize)
 
 	entry[0] = byte(kind)
-	entry[uintSize] = byte(pointer)
+	writeUIntBE(entry, int64(pointer), int64(1), int64(uintSize))
 
 	file := os.NewFile(uintptr(fd), "temp")
 	_, err := file.WriteAt(entry, int64(entryAt))

@@ -27,17 +27,19 @@ type ValueInfo struct {
 
 // Impl ...
 type Impl struct {
-	Cache
+	cache *Cache
 }
 
 // NewImpl ...
-func NewImpl() *Impl {
-	return &Impl{}
+func NewImpl(cache *Cache) *Impl {
+	return &Impl{
+		cache: cache,
+	}
 }
 
 // GetKeyValue ...
 func (i *Impl) GetKeyValue(keyAt int64) []byte {
-	return i.GetCachedData(keyAt, int64(keyTotalSize))
+	return i.cache.GetCachedData(keyAt, int64(keyTotalSize))
 }
 
 // RetrieveBranch ...
@@ -50,6 +52,7 @@ func (i *Impl) RetrieveBranch(doCreate bool, branch []byte, entryIndex int, keyI
 
 // RetrieveEmpty ...
 func (i *Impl) RetrieveEmpty(doCreate bool, branch []byte, branchAt int64, entryIndex int64, key *NibbleBuffer) *Key {
+
 	if doCreate {
 		return i.WriteNewLeaf(branch, branchAt, entryIndex, key)
 	}
@@ -61,8 +64,9 @@ func (i *Impl) RetrieveEmpty(doCreate bool, branch []byte, branchAt int64, entry
 func (i *Impl) RetrieveLeaf(doCreate bool, branch []byte, branchAt int, entryIndex int, keyIndex int, key *NibbleBuffer) *Key {
 	keyAt := new(big.Int)
 	keyAt.SetBytes(branch[entryIndex+1 : entryIndex+1+uintSize])
+
 	keyValue := i.GetKeyValue(int64(keyAt.Uint64()))
-	prevKey := i.SerializeKey(keyValue[0:keySize])
+	prevKey := i.cache.file.serializer.SerializeKey(keyValue[0:keySize])
 	matchIndex := keyIndex
 
 	for matchIndex < keySize {
@@ -91,7 +95,7 @@ func (i *Impl) RetrieveLeaf(doCreate bool, branch []byte, branchAt int, entryInd
 // FindKey ...
 func (i *Impl) FindKey(key *NibbleBuffer, doCreate bool, keyIndex, branchAt int64) *Key {
 	entryIndex := int(key.Nibbles[keyIndex]) * entrySize
-	branch := i.GetCachedBranch(branchAt)
+	branch := i.cache.GetCachedBranch(branchAt)
 	entryType := branch[entryIndex]
 	switch int(entryType) {
 	case SlotBranch:
@@ -123,7 +127,7 @@ func (i *Impl) ExtractValueInfo(keyValue []byte) *ValueInfo {
 // ReadValue ...
 func (i *Impl) ReadValue(keyValue []byte) *Value {
 	valueInfo := i.ExtractValueInfo(keyValue)
-	value := i.GetCachedData(valueInfo.ValueAt, valueInfo.ValueLength)
+	value := i.cache.GetCachedData(valueInfo.ValueAt, valueInfo.ValueLength)
 	return &Value{
 		Value:   value,
 		ValueAt: valueInfo.ValueAt,
@@ -140,12 +144,13 @@ func (i *Impl) WriteValue(keyAt int, keyValue []byte, value []byte) *Value {
 		valueAt = int64(i.WriteUpdatedBuffer(value, current.ValueAt))
 	}
 
-	keyValue[len(keyValue)-(keySize+uintSize)-1] = byte(len(value))
-	keyValue[len(keyValue)-(keySize+uintSize+uintSize)-1] = byte(valueAt)
-
-	file := os.NewFile(uintptr(i.fd), "temp")
-	kv := keyValue[keySize : keySize+2*uintSize]
-	file.WriteAt(kv, int64(keyAt)+int64(keySize))
+	writeUIntBE(keyValue, int64(len(value)), int64(keySize), int64(uintSize))
+	writeUIntBE(keyValue, int64(valueAt), int64(keySize)+int64(uintSize), int64(uintSize))
+	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	_, err := file.WriteAt(keyValue[keySize:keySize+2*uintSize], int64(keyAt)+int64(keySize))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &Value{
 		Value:   value,
@@ -176,13 +181,15 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 	keyIndex := int(key.Nibbles[matchIndex]) * entrySize
 	prevIndex := int(prevKey.Nibbles[matchIndex]) * entrySize
 	var buffers [][]byte
-	newBranchAt := i.fileSize
+	newBranchAt := i.cache.file.fileSize
 	newBranch := make([]byte, branchSize)
 
 	newBranch[keyIndex] = byte(SlotLeaf)
-	newBranch[len(newBranch)-keyIndex+1+uintSize] = byte(newKey.KeyAt)
+	writeUIntBE(newBranch, int64(newKey.KeyAt), int64(keyIndex)+1, int64(uintSize))
+
 	newBranch[prevIndex] = byte(SlotLeaf)
-	newBranch[len(newBranch)-prevIndex+1+uintSize] = byte(prevAt)
+	writeUIntBE(newBranch, int64(prevAt), int64(prevIndex)+1, int64(uintSize))
+
 	buffers = append(buffers, newBranch)
 
 	var offset int64 = 1
@@ -191,7 +198,9 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 
 		newBranch = make([]byte, branchSize)
 		newBranch[branchIndex] = byte(SlotBranch)
-		newBranch[int64(len(newBranch))-branchIndex+1+int64(uintSize)] = byte(newBranchAt)
+
+		writeUIntBE(newBranch, int64(newBranchAt), int64(branchIndex)+1, int64(uintSize))
+
 		buffers = append(buffers, newBranch)
 		newBranchAt += int64(branchSize)
 
@@ -202,10 +211,14 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 	i.WriteNewBuffers(buffers)
 
 	branch[entryIndex] = byte(SlotBranch)
-	branch[int64(len(branch))-entryIndex+1+int64(uintSize)] = byte(newBranchAt)
 
-	file := os.NewFile(uintptr(i.fd), "temp")
-	file.WriteAt(branch[entryIndex:entryIndex+int64(entrySize)], int64(branchAt)+int64(entryIndex))
+	writeUIntBE(branch, int64(newBranchAt), int64(entryIndex)+1, int64(uintSize))
+
+	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	_, err := file.WriteAt(branch[entryIndex:entryIndex+int64(entrySize)], int64(branchAt)+int64(entryIndex))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &Key{
 		Key:      key,
@@ -217,12 +230,14 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 // WriteNewLeaf ...
 func (i *Impl) WriteNewLeaf(branch []byte, branchAt int64, entryIndex int64, key *NibbleBuffer) *Key {
 	newKey := i.WriteNewKey(key)
-	branch[entryIndex] = byte(SlotLeaf)
-	branch[entryIndex+1] = byte(newKey.KeyAt)
 
-	file := os.NewFile(uintptr(i.fd), "temp")
-	b := branch[entryIndex : entryIndex+int64(entrySize)]
-	file.WriteAt(b, int64(newKey.KeyAt)+int64(keySize))
+	branch[entryIndex] = byte(SlotLeaf)
+	writeUIntBE(branch, int64(newKey.KeyAt), int64(entryIndex)+1, int64(uintSize))
+	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	_, err := file.WriteAt(branch[entryIndex:entryIndex+int64(entrySize)], int64(branchAt)+int64(entryIndex))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &Key{
 		Key:      key,
@@ -234,35 +249,40 @@ func (i *Impl) WriteNewLeaf(branch []byte, branchAt int64, entryIndex int64, key
 // WriteUpdatedBuffer  ...
 func (i *Impl) WriteUpdatedBuffer(buffer []byte, bufferAt int64) int64 {
 
-	file := os.NewFile(uintptr(i.fd), "temp")
-	file.WriteAt(buffer, bufferAt)
+	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	_, err := file.WriteAt(buffer, bufferAt)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	i.CacheData(bufferAt, buffer)
+	i.cache.CacheData(bufferAt, buffer)
 	return bufferAt
 }
 
 // WriteNewBuffer  ...
 func (i *Impl) WriteNewBuffer(buffer []byte, withCache bool) int64 {
-	startAt := i.fileSize
-
-	file := os.NewFile(uintptr(i.fd), "temp")
-	file.WriteAt(buffer, startAt)
-
-	if withCache {
-		i.CacheData(startAt, buffer)
+	startAt := i.cache.file.fileSize
+	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	_, err := file.WriteAt(buffer, startAt)
+	if err != nil {
+		log.Fatal(err, "1")
 	}
 
-	i.fileSize += int64(len(buffer))
+	if withCache {
+		i.cache.CacheData(startAt, buffer)
+	}
+
+	i.cache.file.fileSize += int64(len(buffer))
 
 	return startAt
 }
 
 // WriteNewBuffers  ...
 func (i *Impl) WriteNewBuffers(buffers [][]byte) int64 {
-	bufferAt := i.fileSize
+	bufferAt := i.cache.file.fileSize
 
 	for _, buffer := range buffers {
-		i.CacheData(bufferAt, buffer)
+		i.cache.CacheData(bufferAt, buffer)
 		bufferAt += int64(len(buffer))
 	}
 

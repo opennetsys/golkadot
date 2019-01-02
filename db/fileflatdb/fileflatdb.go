@@ -8,6 +8,15 @@ import (
 	"github.com/c3systems/go-substrate/db"
 )
 
+// SlotEmpty ...
+var SlotEmpty = 0
+
+// SlotBranch ...
+var SlotBranch = 1
+
+// SlotLeaf ...
+var SlotLeaf = 2
+
 // FileFlatDB ...
 type FileFlatDB struct {
 	impl       *Impl
@@ -18,10 +27,12 @@ type FileFlatDB struct {
 
 // NewFileFlatDB ...
 func NewFileFlatDB(base, file string) *FileFlatDB {
+	fileInstance := NewFile(base, file, nil)
+	cacheInstance := NewCache(fileInstance)
 	return &FileFlatDB{
-		impl:       NewImpl(),
-		cache:      NewCache(base, file, nil),
-		file:       NewFile(base, file, nil),
+		impl:       NewImpl(cacheInstance),
+		cache:      cacheInstance,
+		file:       fileInstance,
 		serializer: NewSerializer(),
 	}
 }
@@ -37,7 +48,7 @@ func (f *FileFlatDB) Open() {
 
 // Close ...
 func (f *FileFlatDB) Close() {
-	f.file.AssertOpen(false)
+	f.file.AssertOpen(true)
 
 	f.file.Close()
 	f.cache.lruBranch = make(LruMap)
@@ -86,7 +97,7 @@ func (f *FileFlatDB) Del(key []uint8) {
 
 // Get ...
 func (f *FileFlatDB) Get(key []uint8) []uint8 {
-	f.file.AssertOpen(false)
+	f.file.AssertOpen(true)
 
 	k := f.FindKey(f.serializer.SerializeKey(key), false)
 	if k == nil {
@@ -104,14 +115,15 @@ func (f *FileFlatDB) Get(key []uint8) []uint8 {
 
 // Put ...
 func (f *FileFlatDB) Put(key, value []uint8) {
-	f.file.AssertOpen(false)
-	k := f.FindKey(f.serializer.SerializeKey(key), true)
-
+	f.file.AssertOpen(true)
+	serializedKey := f.serializer.SerializeKey(key)
+	k := f.FindKey(serializedKey, true)
 	if k == nil {
 		log.Fatal("Unable to create key")
 	}
 
-	f.WriteValue(k, f.serializer.SerializeValue(value))
+	serializedValue := f.serializer.SerializeValue(value)
+	f.WriteValue(k, serializedValue)
 }
 
 // FindKey ...

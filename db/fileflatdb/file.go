@@ -23,15 +23,18 @@ var lruDataCount = 8192
 
 // File ...
 type File struct {
-	Serializer
-	fd       int
-	fileSize int64
-	path     string
-	file     string
+	serializer *Serializer
+	fd         int
+	fileSize   int64
+	path       string
+	file       string
 }
 
 // NewFile ...
 func NewFile(base, file string, options *db.BaseDBOptions) *File {
+	if file == "" {
+		file = defaultFile
+	}
 
 	var isCompressed bool
 	if options != nil && options.IsCompressed {
@@ -39,13 +42,14 @@ func NewFile(base, file string, options *db.BaseDBOptions) *File {
 	}
 
 	f := &File{
-		fd:       -1,
-		fileSize: 0,
-		path:     fmt.Sprintf("%s/%s", base, file),
-		file:     file,
+		serializer: NewSerializer(),
+		fd:         -1,
+		fileSize:   0,
+		path:       fmt.Sprintf("%s/%s", base, file),
+		file:       file,
 	}
 
-	f.IsCompressed = isCompressed
+	f.serializer.IsCompressed = isCompressed
 
 	if _, err := os.Stat(base); os.IsNotExist(err) {
 		if err := os.MkdirAll(base, os.ModePerm); err != nil {
@@ -98,7 +102,7 @@ func (f *File) Open(filepath string, startEmpty bool) {
 		ioutil.WriteFile(filepath, b, 0644)
 	}
 
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0755)
+	file, err := os.OpenFile(filepath, os.O_RDWR, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
