@@ -72,10 +72,14 @@ test/common/crypto:
 test/common/mathutil:
 	@go test -v common/mathutil/*.go
 
-.PHONY: test/db
-test/db:
-	@go test -v db/*.go
+.PHONY: test/common/db
+test/common/db:
+	@go test -v common/db/*.go
 
-.PHONY: test/db/fileflatdb
-test/db/fileflatdb:
-	@go test -v db/fileflatdb/*.go
+.PHONY: test/common/fileflatdb
+test/common/fileflatdb:
+	@go test -v common/fileflatdb/*.go
+
+.PHONY: test/common/diskdb
+test/common/diskdb:
+	@go test -v common/diskdb/*.go

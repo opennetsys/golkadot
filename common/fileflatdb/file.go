@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/c3systems/go-substrate/db"
+	"github.com/c3systems/go-substrate/common/db"
 )
 
 var uintSize = 5

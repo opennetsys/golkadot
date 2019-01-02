@@ -1,6 +1,6 @@
 package triedb
 
-import "github.com/c3systems/go-substrate/db"
+import "github.com/c3systems/go-substrate/common/db"
 
 // Impl ...
 type Impl struct {

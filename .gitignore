@@ -25,4 +25,7 @@ Session.vim
 
 .bin
 
-db/fileflatdb/test
+# test dirs
+common/db/test
+common/diskdb/test
+common/fileflatdb/test

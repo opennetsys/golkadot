@@ -14,7 +14,7 @@ type Overlay map[string]*KV
 // TransactionDB ...
 type TransactionDB struct {
 	TXDB
-	backing   BaseDB
+	Backing   BaseDB
 	txOverlay Overlay
 	txStarted bool
 }
@@ -22,7 +22,7 @@ type TransactionDB struct {
 // NewTransactionDB ...
 func NewTransactionDB(backing *BaseDB) *TransactionDB {
 	return &TransactionDB{
-		backing:   *backing,
+		Backing:   *backing,
 		txOverlay: Overlay{},
 		txStarted: false,
 	}
@@ -46,27 +46,27 @@ func (t *TransactionDB) Transaction(fn func() bool) (bool, error) {
 
 // Close ...
 func (t *TransactionDB) Close() {
-	t.backing.Close()
+	t.Backing.Close()
 }
 
 // Open ...
 func (t *TransactionDB) Open() {
-	t.backing.Open()
+	t.Backing.Open()
 }
 
 // Drop ...
 func (t *TransactionDB) Drop() {
-	t.backing.Drop()
+	t.Backing.Drop()
 }
 
 // Empty ...
 func (t *TransactionDB) Empty() {
-	t.backing.Empty()
+	t.Backing.Empty()
 }
 
 // Rename ...
 func (t *TransactionDB) Rename(base, file string) {
-	t.backing.Rename(base, file)
+	t.Backing.Rename(base, file)
 }
 
 // Maintain ...
@@ -75,12 +75,12 @@ func (t *TransactionDB) Maintain(fn *ProgressCB) error {
 		return errors.New("cannot maintain inside an open transaction")
 	}
 
-	return t.backing.Maintain(fn)
+	return t.Backing.Maintain(fn)
 }
 
 // Size ...
 func (t *TransactionDB) Size() int {
-	return t.backing.Size()
+	return t.Backing.Size()
 }
 
 // Del ...
@@ -93,7 +93,7 @@ func (t *TransactionDB) Del(key []uint8) {
 		return
 	}
 
-	t.backing.Del(key)
+	t.Backing.Del(key)
 }
 
 // Get ...
@@ -106,7 +106,7 @@ func (t *TransactionDB) Get(key []uint8) []uint8 {
 		}
 	}
 
-	return t.backing.Get(key)
+	return t.Backing.Get(key)
 }
 
 // Put ...
@@ -120,7 +120,7 @@ func (t *TransactionDB) Put(key, value []uint8) {
 		return
 	}
 
-	t.backing.Put(key, value)
+	t.Backing.Put(key, value)
 }
 
 // CreateTx ...
@@ -142,9 +142,9 @@ func (t *TransactionDB) CommitTx() error {
 
 	for _, kv := range t.txOverlay {
 		if kv.Value == nil {
-			t.backing.Del(kv.Key)
+			t.Backing.Del(kv.Key)
 		} else {
-			t.backing.Put(kv.Key, kv.Value)
+			t.Backing.Put(kv.Key, kv.Value)
 		}
 	}
 

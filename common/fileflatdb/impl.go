@@ -70,6 +70,9 @@ func (i *Impl) RetrieveLeaf(doCreate bool, branch []byte, branchAt int, entryInd
 	matchIndex := keyIndex
 
 	for matchIndex < keySize {
+		if matchIndex >= len(prevKey.Nibbles) || matchIndex >= len(key.Nibbles) {
+			break
+		}
 		if prevKey.Nibbles[matchIndex] != key.Nibbles[matchIndex] {
 			break
 		}
@@ -178,6 +181,11 @@ func (i *Impl) WriteNewKey(key *NibbleBuffer) *Key {
 func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, key *NibbleBuffer, prevAt int64, prevKey *NibbleBuffer, matchIndex int64, depth int64) *Key {
 
 	newKey := i.WriteNewKey(key)
+
+	if matchIndex >= int64(len(key.Nibbles)) {
+		matchIndex = int64(len(key.Nibbles) - 1)
+	}
+
 	keyIndex := int(key.Nibbles[matchIndex]) * entrySize
 	prevIndex := int(prevKey.Nibbles[matchIndex]) * entrySize
 	var buffers [][]byte

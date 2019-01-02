@@ -22,5 +22,5 @@ func writeUIntBE(buffer []byte, value, offset, byteLength int64) {
 	slice = buf.Bytes()
 	slice = slice[int64(len(slice))-byteLength : len(slice)]
 
-	copy(buffer[offset:], slice[:])
+	copy(buffer[offset:], slice)
 }
