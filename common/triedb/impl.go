@@ -1,23 +1,33 @@
 package triedb
 
-import "github.com/c3systems/go-substrate/common/db"
+import (
+	"log"
+	"math"
+
+	"github.com/c3systems/go-substrate/common/db"
+	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/c3systems/go-substrate/common/u8util"
+)
+
+// TODO: tests (not working yet)
 
 // Impl ...
 type Impl struct {
 	checkpoint *Checkpoint
-	db         *TxDB
+	db         *db.MemoryDB
 }
 
 // TxDB ...
-type TxDB interface {
+type TxDB struct {
+	db.MemoryDB
 }
 
 // NewImpl ...
-func NewImpl(db *TxDB, rootHash []uint8) *Impl {
+func NewImpl(db *db.MemoryDB, rootHash []uint8) *Impl {
 	checkpoint := NewCheckpoint(rootHash)
-
 	return &Impl{
 		checkpoint: checkpoint,
+		db:         db,
 	}
 }
 
@@ -31,370 +41,415 @@ func (i *Impl) Snapshot(dest TrieDB, fn db.ProgressCB, root []uint8, keys int, p
 
 	keys++
 
-	// TODO
-	/*
-	   dest.db.Put(root, encodeNode(node))
-	   fn({ keys, percent })
+	dest.db.Put(root, EncodeNode(node))
 
-	   node.forEach((u8a) => {
-	     if (u8a != nil && len(u8a) == 32) {
-	       keys = i._snapshot(dest, fn, u8a, keys, percent, depth + 1)
-	     }
+	fn(&db.ProgressValue{
+		IsCompleted: false,
+		Keys:        keys,
+		Percent:     percent,
+	})
 
-	     percent += (100 / len(node)) / mathutil.Pow(16, depth)
-	   })
+	vals, ok := node.([][]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	for _, val := range vals {
+		if val != nil && len(val) == 32 {
+			keys = i.Snapshot(dest, fn, val, keys, percent, depth+1)
+		}
 
-	   return keys
-	*/
-	return 0
+		percent += int((float64(100) / float64(len(vals))) / math.Pow(float64(16), float64(depth)))
+	}
+
+	return keys
 }
 
 // GetNode ...
-func (i *Impl) GetNode(hash []uint8) *Node {
-	// TODO
-	/*
-	    if hash == nil || len(hash) == 0 || keyEquals(hash, i.constants.EMPTY_HASH) {
-	      return nil
-	    } else if len(hash) < 32 {
-	      return decodeNode(hash)
-	    }
+func (i *Impl) GetNode(hash []uint8) Node {
+	if hash == nil || len(hash) == 0 || KeyEquals(hash, []uint8{}) {
+		return nil
+	} else if len(hash) < 32 {
+		return DecodeNode(hash)
+	}
 
-	    return decodeNode(i.db.Get(hash))
-	  }
-	*/
-	return nil
+	return DecodeNode(i.db.Get(hash))
 }
 
 // Del ...
-func (i *Impl) Del(node *Node, trieKey []uint8) *Node {
-	// TODO
-	/*
-	   if isEmptyNode(node) {
-	     return nil
-	   } else if isBranchNode(node) {
-	     return i._delBranchNode(node, trieKey)
-	   } else if isKvNode(node) {
-	     return i._delKvNode(node, trieKey)
-	   }
+func (i *Impl) Del(node Node, trieKey []uint8) Node {
+	if IsEmptyNode(node) {
+		return nil
+	} else if IsBranchNode(node) {
+		nodeBranch, ok := node.(NodeBranch)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		return i.DelBranchNode(nodeBranch, trieKey)
+	} else if IsKvNode(node) {
+		nodekv, ok := node.(NodeKv)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		return i.DelKvNode(nodekv, trieKey)
+	}
 
-	   log.Fatal('Unreachable')
-	*/
-	return nil
+	log.Fatal("Unreachable")
+	return NewNode(nil)
 }
 
 // DelBranchNode ...
-func (i *Impl) DelBranchNode(node *NodeBranch, trieKey []uint8) *Node {
-	// TODO
-	/*
-		   if len(trieKey) == 0 {
-		     node[len(node) - 1] = nil
+func (i *Impl) DelBranchNode(node NodeBranch, trieKey []uint8) Node {
+	if len(trieKey) == 0 {
+		node[len(node)-1] = nil
 
-		     return i._normaliseBranchNode(node)
-		   }
+		return i.NormalizeBranchNode(node)
+	}
 
-			 nodeToDelete := i._getNode(node[trieKey[0]])
-			 subNode := i._del(nodeToDelete, trieKey.subarray(1))
-			 encodedSubNode := i._persistNode(subNode)
+	k, ok := node[trieKey[0]].([]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	nodeToDelete := i.GetNode(k)
+	subNode := i.Del(nodeToDelete, trieKey[1:])
+	encodedSubNode := i.PersistNode(subNode)
+	esn, ok := encodedSubNode.([]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	if KeyEquals(esn, k) {
+		return node
+	}
 
-		   if keyEquals(encodedSubNode, node[trieKey[0]]) {
-		     return node
-		   }
+	node[trieKey[0]] = encodedSubNode
 
-		   node[trieKey[0]] = encodedSubNode
+	if IsNull(encodedSubNode) {
+		return i.NormalizeBranchNode(node)
+	}
 
-		   if isNull(encodedSubNode) {
-		     return i._normaliseBranchNode(node)
-			 }
-
-		  return node
-	*/
-	return nil
+	return node
 }
 
 // DelKvNode ...
-func (i *Impl) DelKvNode(node *NodeNotEmpty, trieKey []uint8) *Node {
-	// TODO
-	/*
-		   const currentKey = extractNodeKey(node)
-		   const nodeType = getNodeType(node)
+func (i *Impl) DelKvNode(node Node, trieKey []uint8) Node {
+	n, ok := node.([][]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	currentKey := triecodec.ExtractNodeKey(n)
+	nodeType := GetNodeType(node)
 
-		   if !keyStartsWith(trieKey, currentKey) {
-		     return node
-		   } else if nodeType == NodeType.LEAF {
-		     if keyEquals(trieKey, currentKey) {
-					 return nil
-				 } else {
-					 reutrn node
-				 }
-		   }
+	if !KeyStartsWith(trieKey, currentKey) {
+		return node
+	} else if nodeType == NodeTypeLeaf {
+		if KeyEquals(trieKey, currentKey) {
+			return nil
+		}
 
-			 subKey := trieKey.subarray(len(currentKey))
-			 subNode := i._getNode(node[1])
-			 newSub := i._del(subNode, subKey)
-			 encodedNewSub := i._persistNode(newSub)
+		return node
+	}
 
-		   if keyEquals(encodedNewSub, node[1]) {
-		     return node
-		   } else if isNull(newSub) {
-		     return nil
-		   }
+	subKey := trieKey[len(currentKey):]
+	subNode := i.GetNode(n[1])
+	newSub := i.Del(subNode, subKey)
+	encodedNewSub := i.PersistNode(newSub)
 
-		   if isKvNode(newSub) {
-		     const subNibbles = decodeNibbles(newSub[0])
-		     const newKey = u8aConcat(currentKey, subNibbles)
+	ens, ok := encodedNewSub.([]uint8)
+	if KeyEquals(ens, n[1]) {
+		return node
+	} else if IsNull(newSub) {
+		return nil
+	}
 
-		     return [encodeNibbles(newKey), newSub[1]]
-		   } else if (isBranchNode(newSub)) {
-		     return [encodeNibbles(currentKey), encodedNewSub]
-		   }
+	if IsKvNode(newSub) {
+		ns, ok := newSub.([][]uint8)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		subNibbles := triecodec.DecodeNibbles(ns[0])
+		newKey := u8util.Concat(currentKey, subNibbles)
 
-		   log.Fatal('Unreachable')
-	*/
-	return nil
+		return NewNode([][]uint8{triecodec.EncodeNibbles(newKey), ns[1]})
+	} else if IsBranchNode(newSub) {
+		return NewNode([][]uint8{triecodec.EncodeNibbles(currentKey), ens})
+	}
+
+	log.Fatal("Unreachable")
+	return NewNode(nil)
 }
 
 // Get ...
-func (i *Impl) Get(node *Node, trieKey []uint8) *NodeEncodedOrEmpty {
-	// TODO
-	/*
-	   if isEmptyNode(node) {
-	     return nil
-	   } else if isBranchNode(node) {
-	     return i._getBranchNode(node, trieKey)
-	   } else if isKvNode(node) {
-	     return i._getKvNode(node, trieKey)
-	   }
+func (i *Impl) Get(node Node, trieKey []uint8) Node {
+	if IsEmptyNode(node) {
+		return nil
+	} else if IsBranchNode(node) {
+		nodeBranch, ok := node.(NodeBranch)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		return i.GetBranchNode(nodeBranch, trieKey)
+	} else if IsKvNode(node) {
+		nodekv, ok := node.(NodeKv)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		return i.GetKvNode(nodekv, trieKey)
+	}
 
-	   log.Fatal('Invalid NodeType')
-	*/
-	return nil
+	log.Fatal("Invalid NodeType")
+	return NewNode(nil)
 }
 
 // GetBranchNode ...
-func (i *Impl) GetBranchNode(node *NodeBranch, trieKey []uint8) *NodeEncodedOrEmpty {
-	// TODO
-	/*
-		   if len(trieKey) == 0 {
-		     return node[16]
-		   }
+func (i *Impl) GetBranchNode(node NodeBranch, trieKey []uint8) Node {
+	if len(trieKey) == 0 {
+		return node[16]
+	}
 
-			 subNode := i._getNode(node[trieKey[0]])
+	n, ok := node[trieKey[0]].([]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	subNode := i.GetNode(n)
 
-		   return i._get(subNode, trieKey.subarray(1))
-	*/
-	return nil
+	return i.Get(subNode, trieKey[1:])
 }
 
 // GetKvNode ...
-func (i *Impl) GetKvNode(node *NodeKv, trieKey []uint8) *NodeEncodedOrEmpty {
-	// TODO
-	/*
-			currentKey := extractNodeKey(node)
-			nodeType := getNodeType(node)
+func (i *Impl) GetKvNode(node NodeKv, trieKey []uint8) Node {
+	currentKey := triecodec.ExtractNodeKey(node)
+	nodeType := GetNodeType(node)
 
-		   if nodeType == NodeType.LEAF {
-		     if keyEquals(trieKey, currentKey) {
-					 return node[1]
-				 } else {
-		       return null
-				 }
-		   } else if nodeType == NodeType.EXTENSION {
-		     if keyStartsWith(trieKey, currentKey) {
-					 subNode := i._getNode(node[1])
+	if nodeType == NodeTypeLeaf {
+		if KeyEquals(trieKey, currentKey) {
+			return node[1]
+		}
 
-					 var start int
-					 if currentKey {
-						 start = len(currentKey)
-					}
+		return nil
+	} else if nodeType == NodeTypeExtension {
+		if KeyStartsWith(trieKey, currentKey) {
+			subNode := i.GetNode(node[1])
 
-		       return i._get(subNode, trieKey.subarray(start))
-		     }
+			var start int
+			if currentKey != nil {
+				start = len(currentKey)
+			}
 
-		     return null
-		   }
+			return i.Get(subNode, trieKey[start:])
+		}
 
-		   log.Fatal('Unreachable')
-	*/
-	return nil
+		return nil
+	}
+
+	log.Fatal("Unreachable")
+	return NewNode(nil)
 }
 
 // NodeToDBMapping ...
-func (i *Impl) NodeToDBMapping(node *Node) *NodeNotEmpty {
-	// TODO
-	/*
-		   if isEmptyNode(node) {
-		     return [null, null]
-		   }
+func (i *Impl) NodeToDBMapping(node Node) Node {
+	if IsEmptyNode(node) {
+		return NewNode([][]uint8{nil, nil})
+	}
 
-			 encoded := encodeNode(node)
+	encoded := EncodeNode(node)
+	if len(encoded) < 32 {
+		return NewNode([][]uint8{nil, nil})
+	}
 
-		   if len(encoded) < 32 {
-		     return [node as any, null]
-			 } else {
-		     return [i.codec.hashing(encoded), encoded]
-			 }
-	*/
-	return nil
+	return NewNode([][]uint8{triecodec.Hashing(encoded), encoded})
 }
 
 // NormalizeBranchNode ...
-func (i *Impl) NormalizeBranchNode(node *NodeNotEmpty) *Node {
-	// TODO
-	/*
-		mapped := node
-		     .map((value, index) => ({ index, value }))
-		     .filter(({ value }) => !!value && len(value) !== 0)
+func (i *Impl) NormalizeBranchNode(node Node) Node {
+	n, ok := node.([][]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	var indexed []struct {
+		index int
+		value []uint8
+	}
+	for i, val := range n {
+		indexed[i] = struct {
+			index int
+			value []uint8
+		}{
+			index: i,
+			value: val,
+		}
+	}
 
-		   if len(mapped) >= 2 {
-		     return node
-		   } else if node[16] != nil {
-		     return [computeLeafKey(new Uint8Array()), node[16]]
-		   }
+	var mapped []struct {
+		index int
+		value []uint8
+	}
 
-		   const [{ index, value }] = mapped
-			 subNode := i._getNode(value)
+	for _, entry := range indexed {
+		if entry.value != nil && len(entry.value) > 0 {
+			mapped = append(mapped, entry)
+		}
+	}
 
-		   if isBranchNode(subNode) {
-		     return [encodeNibbles(new Uint8Array([index])), i._persistNode(subNode)]
-		   } else if isKvNode(subNode) {
-				 subNibbles := decodeNibbles(subNode[0])
-				 newKey := u8aConcat(new Uint8Array([index]), subNibbles)
+	if len(mapped) >= 2 {
+		return node
+	} else if n[16] != nil {
+		return NewNode([][]uint8{ComputeLeafKey([]byte{}), n[16]})
+	}
 
-		     return [encodeNibbles(newKey), subNode[1]]
-		   }
+	index := mapped[0].index
+	value := mapped[0].value
 
-		   throw new Error('Unreachable')
-	*/
-	return nil
+	subNode := i.GetNode(value)
+
+	if IsBranchNode(subNode) {
+		pn := i.PersistNode(subNode)
+		return [][]uint8{triecodec.EncodeNibbles([]uint8{uint8(index)}), pn.([]uint8)}
+	} else if IsKvNode(subNode) {
+		sn := subNode.([][]uint8)
+		subNibbles := triecodec.DecodeNibbles(sn[0])
+		newKey := u8util.Concat([]uint8{uint8(index)}, subNibbles)
+
+		return [][]uint8{triecodec.EncodeNibbles(newKey), sn[1]}
+	}
+
+	log.Fatal("Unreachable")
+	return NewNode(nil)
 }
 
 // PersistNode ...
-func (i *Impl) PersistNode(node *Node) *NodeEncodedOrEmpty {
-	// TODO
-	/*
-	   const [key, value] = i._nodeToDbMapping(node)
+func (i *Impl) PersistNode(node Node) Node {
+	n1 := i.NodeToDBMapping(node)
+	n, ok := n1.([][]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	key := n[0]
+	value := n[1]
 
-	   if value != nil {
-	     i.db.Put(key as Uint8Array, value)
-	   }
+	if value != nil {
+		i.db.Put(key, value)
+	}
 
-	   return key
-	*/
-	return nil
+	return key
 }
 
 // Put ...
-func (i *Impl) Put(node *Node, trieKey []uint8, value []uint8) *NodeNotEmpty {
-	// TODO
-	/*
+func (i *Impl) Put(node Node, trieKey []uint8, value []uint8) Node {
+	if IsEmptyNode(node) {
+		return NewNode([][]uint8{ComputeLeafKey(trieKey), value})
+	} else if IsKvNode(node) {
+		nodekv, ok := node.(NodeKv)
+		if !ok {
+			log.Fatal("not ok")
+		}
+		return i.PutKvNode(nodekv, trieKey, value)
+	} else if IsBranchNode(node) {
+		return i.PutBranchNode(node, trieKey, value)
+	}
 
-	   if isEmptyNode(node) {
-	     return [computeLeafKey(trieKey), value]
-	   } else if isKvNode(node) {
-	     return i._putKvNode(node, trieKey, value)
-	   } else if isBranchNode(node) {
-	     return i._putBranchNode(node, trieKey, value)
-	   }
-
-	   log.Fatal('Unreachable')
-	*/
-	return nil
+	log.Fatal("Unreachable")
+	return NewNode(nil)
 }
 
 // PutBranchNode ...
-func (i *Impl) PutBranchNode(node *Node, trieKey []uint8, value []uint8) *NodeNotEmpty {
-	// TODO
-	/*
-		   if (trieKey && len(trieKey)) {
-				 subNode := i._getNode(node[trieKey[0]])
-				 newNode := i._put(subNode, trieKey.subarray(1), value)
+func (i *Impl) PutBranchNode(node Node, trieKey []uint8, value []uint8) Node {
+	n, ok := node.([][]uint8)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	if trieKey != nil && len(trieKey) > 0 {
+		subNode := i.GetNode(n[trieKey[0]])
+		newNode := i.Put(subNode, trieKey[1:], value)
 
-		     node[trieKey[0]] = i._persistNode(newNode)
-		   } else {
-		     node[len(node) - 1] = value
-		   }
+		pn := i.PersistNode(newNode)
+		n[trieKey[0]] = pn.([]uint8)
+	} else {
+		n[len(n)-1] = value
+	}
 
-		   return node
-	*/
-	return nil
+	return n
 }
 
 // PutKvNode ...
-func (i *Impl) PutKvNode(node *NodeKv, trieKey []uint8, value []uint8) *NodeNotEmpty {
-	// TODO
-	/*
-			currentKey := extractNodeKey(node)
-		   var [commonPrefix, currentRemainder, trieRemainder] = consumeCommonPrefix(currentKey, trieKey)
-			 isExtension := isExtensionNode(node)
-			 isLeaf := isLeafNode(node)
-		   var newNode NodeNotEmpty
+func (i *Impl) PutKvNode(node NodeKv, trieKey []uint8, value []uint8) Node {
+	currentKey := triecodec.ExtractNodeKey(node)
 
-		   if len(currentRemainder) == 0 && len(trieRemainder) == 0 {
-		     if isLeaf {
-		       return [node[0], value]
-		     }
+	ccp := ConsumeCommonPrefix(currentKey, trieKey)
+	commonPrefix := ccp[0]
+	currentRemainder := ccp[1]
+	trieRemainder := ccp[2]
 
-				 subNode := i._getNode(node[1])
+	isExtension := IsExtensionNode(node)
+	isLeaf := IsLeafNode(node)
+	var newNode [][]uint8
 
-		     newNode = i._put(subNode, trieRemainder, value)
-		   } else if len(currentRemainder) == 0 {
-		     if isExtension {
-					 subNode := i._getNode(node[1])
+	if len(currentRemainder) == 0 && len(trieRemainder) == 0 {
+		if isLeaf {
+			return [][]uint8{node[0], value}
+		}
 
-		       newNode = i._put(subNode, trieRemainder, value)
-		     } else {
-					 subPosition := trieRemainder[0]
-					 subKey := computeLeafKey(trieRemainder.subarray(1))
-		       var subNode: NodeKv = [subKey, value]
+		subNode := i.GetNode(node[1])
 
-		       newNode = BLANK_BRANCH.concat(node[1]) as NodeNotEmpty
-		       newNode[subPosition] = i._persistNode(subNode)
-		     }
-		   } else {
-		     newNode = BLANK_BRANCH.concat(null) as NodeNotEmpty
+		nn := i.Put(subNode, trieRemainder, value)
+		newNode = nn.([][]uint8)
+	} else if len(currentRemainder) == 0 {
+		if isExtension {
+			subNode := i.GetNode(node[1])
 
-		     if len(currentRemainder) == 1 && isExtension {
-		       newNode[currentRemainder[0]] = node[1]
-		     } else {
-					 var computedKey
-					 if isExtension {
-						 computedKey = computeExtensionKey(currentRemainder.subarray(1))
-					 } else {
-		         computedKey = computeLeafKey(currentRemainder.subarray(1))
-					 }
+			nn := i.Put(subNode, trieRemainder, value)
+			newNode = nn.([][]uint8)
+		} else {
+			subPosition := trieRemainder[0]
+			subKey := ComputeLeafKey(trieRemainder[1:])
+			subNode := NodeKv([][]uint8{subKey, value})
 
-		       newNode[currentRemainder[0]] = i._persistNode([computedKey, node[1]])
-		     }
+			blankBranch := make([][]uint8, 16)
+			newNode = append(blankBranch, node[1])
+			n := i.PersistNode(subNode)
+			newNode[subPosition] = n.([]uint8)
+		}
+	} else {
+		newNode = make([][]uint8, 17)
 
-		     if len(trieRemainder) {
-		       newNode[trieRemainder[0]] = i._persistNode([computeLeafKey(trieRemainder.subarray(1)), value])
-		     } else {
-		       newNode[16] = value
-		     }
-		   }
+		if len(currentRemainder) == 1 && isExtension {
+			newNode[currentRemainder[0]] = node[1]
+		} else {
+			var computedKey EncodedPath
+			if isExtension {
+				computedKey = ComputeExtensionKey(currentRemainder[1:])
+			} else {
+				computedKey = ComputeLeafKey(currentRemainder[1:])
+			}
 
-		   if len(commonPrefix) != 0 {
-		     return [computeExtensionKey(commonPrefix), i._persistNode(newNode)]
-		   }
+			n := i.PersistNode([][]uint8{computedKey, node[1]})
+			newNode[currentRemainder[0]] = n.([]uint8)
+		}
 
-		   return newNode
-	*/
-	return nil
+		if len(trieRemainder) > 0 {
+			n := i.PersistNode([][]uint8{ComputeLeafKey(trieRemainder[1:]), value})
+			newNode[trieRemainder[0]] = n.([]uint8)
+		} else {
+			newNode[16] = value
+		}
+	}
+
+	if len(commonPrefix) != 0 {
+		n := i.PersistNode(newNode)
+		return [][]uint8{ComputeExtensionKey(commonPrefix), n.([]uint8)}
+	}
+
+	return newNode
 }
 
 // SetRootNode ...
-func (i *Impl) SetRootNode(node *Node) {
-	// TODO
-	/*
-		   if isEmptyNode(node) {
-		     i.rootHash = i.constants.EMPTY_HASH
-		   } else {
-				 encoded := encodeNode(node)
-				 rootHash := codec.hashing(encoded)
+func (i *Impl) SetRootNode(node Node) {
+	if IsEmptyNode(node) {
+		i.checkpoint.rootHash = []byte{}
+	} else {
+		encoded := EncodeNode(node)
+		rootHash := triecodec.Hashing(encoded)
 
-		     i.db.Put(rootHash, encoded)
+		i.db.Put(rootHash, encoded)
 
-		     i.rootHash = rootHash
-		   }
-	*/
+		i.checkpoint.rootHash = rootHash
+	}
 }

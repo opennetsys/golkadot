@@ -6,9 +6,6 @@ import "github.com/c3systems/go-substrate/common/db"
 type Trie struct {
 }
 
-// TrieDB ...
-type TrieDB db.MemoryDB
-
 // NewTrie ...
 func NewTrie() *Trie {
 	/*

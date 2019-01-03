@@ -2,6 +2,8 @@ package triedb
 
 import "github.com/c3systems/go-substrate/common/db"
 
+// TODO: clean up + tests
+
 // NodeType ...
 type NodeType int
 
@@ -30,6 +32,11 @@ type NodeEncoded struct{}
 // NodeEncodedOrEmpty ...
 type NodeEncodedOrEmpty struct{}
 
+// NewNodeEncodedOrEmpty ...
+func NewNodeEncodedOrEmpty(value []uint8) NodeEncodedOrEmpty {
+	return NodeEncodedOrEmpty{}
+}
+
 // NodeEncoded | NodeEmpty
 
 // NodeBranch ...
@@ -55,6 +62,28 @@ func NewNodeBranch(nodes []Node) NodeBranch {
 	return NodeBranch(nodes)
 }
 
+// NewBlankBranch ...
+func NewBlankBranch() []EncodedPath {
+	return []EncodedPath{
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+		NewEncodedPath(nil),
+	}
+}
+
 // EncodedPath ...
 type EncodedPath []uint8
 
@@ -66,12 +95,17 @@ func NewEncodedPath(value []uint8) EncodedPath {
 // Uint8Array
 
 // NodeKv ...
-type NodeKv struct{}
+type NodeKv [][]uint8
 
 // [EncodedPath, NodeEncodedOrEmpty];
 
 // NodeNotEmpty ...
 type NodeNotEmpty struct{}
+
+// NewNodeNotEmpty ...
+func NewNodeNotEmpty(value []uint8) NodeNotEmpty {
+	return NodeNotEmpty{}
+}
 
 // NodeKv | NodeBranch;
 
@@ -84,6 +118,12 @@ func NewNode(value interface{}) Node {
 }
 
 // NodeEmpty | NodeNotEmpty;
+
+// TrieDB ...
+type TrieDB struct {
+	//db.MemoryDB
+	db db.TXDB
+}
 
 // InterfaceTrieDB ....
 type InterfaceTrieDB interface {

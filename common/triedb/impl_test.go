@@ -9,9 +9,8 @@ import (
 func TestImpl(t *testing.T) {
 	// TODO: table tests
 
-	memDB := db.NewMemoryDB(&db.BaseOptions{})
-	txDB := TxDB(memDB)
-	impl := NewImpl(&txDB, []uint8{0x1})
+	memdb := db.NewMemoryDB(&db.BaseOptions{})
+	impl := NewImpl(memdb, []uint8{0x1})
 
 	_ = impl
 }
