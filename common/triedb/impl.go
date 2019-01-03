@@ -82,9 +82,6 @@ func (i *Impl) Del(node *Node, trieKey []uint8) *Node {
 	return nil
 }
 
-// NodeBranch ...
-type NodeBranch struct{}
-
 // DelBranchNode ...
 func (i *Impl) DelBranchNode(node *NodeBranch, trieKey []uint8) *Node {
 	// TODO
@@ -113,9 +110,6 @@ func (i *Impl) DelBranchNode(node *NodeBranch, trieKey []uint8) *Node {
 	*/
 	return nil
 }
-
-// NodeNotEmpty ...
-type NodeNotEmpty struct{}
 
 // DelKvNode ...
 func (i *Impl) DelKvNode(node *NodeNotEmpty, trieKey []uint8) *Node {
@@ -159,9 +153,6 @@ func (i *Impl) DelKvNode(node *NodeNotEmpty, trieKey []uint8) *Node {
 	return nil
 }
 
-// NodeEncodedOrEmpty ...
-type NodeEncodedOrEmpty struct{}
-
 // Get ...
 func (i *Impl) Get(node *Node, trieKey []uint8) *NodeEncodedOrEmpty {
 	// TODO
@@ -193,9 +184,6 @@ func (i *Impl) GetBranchNode(node *NodeBranch, trieKey []uint8) *NodeEncodedOrEm
 	*/
 	return nil
 }
-
-// NodeKv ...
-type NodeKv struct{}
 
 // GetKvNode ...
 func (i *Impl) GetKvNode(node *NodeKv, trieKey []uint8) *NodeEncodedOrEmpty {

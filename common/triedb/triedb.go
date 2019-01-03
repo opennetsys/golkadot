@@ -130,9 +130,6 @@ func (t *Trie) GetRoot() []uint8 {
 	return nil
 }
 
-// Node ..
-type Node struct{}
-
 // GetNode ...
 func (t *Trie) GetNode(hash []uint8) *Node {
 	//return this._getNode(hash || this.rootHash);

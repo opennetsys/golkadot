@@ -14,6 +14,14 @@ NOTE: go-substrate is a very early work-in-progress.
 
 TODO
 
+## Tests
+
+Run all tests:
+
+```bash
+make test
+```
+
 ## Contributing
 
 Please follow the [golang-standards project-layout](https://github.com/golang-standards/project-layout) and [examples of package patterns](https://github.com/golang-standards/project-layout/tree/master/pkg) when contributing code.
