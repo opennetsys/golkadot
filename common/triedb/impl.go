@@ -14,7 +14,7 @@ import (
 // Impl ...
 type Impl struct {
 	checkpoint *Checkpoint
-	db         *db.MemoryDB
+	db         db.TXDB
 }
 
 // TxDB ...
@@ -23,7 +23,7 @@ type TxDB struct {
 }
 
 // NewImpl ...
-func NewImpl(db *db.MemoryDB, rootHash []uint8) *Impl {
+func NewImpl(db db.TXDB, rootHash []uint8) *Impl {
 	checkpoint := NewCheckpoint(rootHash)
 	return &Impl{
 		checkpoint: checkpoint,
@@ -32,7 +32,7 @@ func NewImpl(db *db.MemoryDB, rootHash []uint8) *Impl {
 }
 
 // Snapshot ...
-func (i *Impl) Snapshot(dest TrieDB, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
+func (i *Impl) Snapshot(dest Trie, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
 	node := i.GetNode(root)
 
 	if node == nil {
@@ -41,7 +41,7 @@ func (i *Impl) Snapshot(dest TrieDB, fn db.ProgressCB, root []uint8, keys int, p
 
 	keys++
 
-	dest.db.Put(root, EncodeNode(node))
+	dest.impl.db.Put(root, EncodeNode(node))
 
 	fn(&db.ProgressValue{
 		IsCompleted: false,

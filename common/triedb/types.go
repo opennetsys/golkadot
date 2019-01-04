@@ -119,17 +119,11 @@ func NewNode(value interface{}) Node {
 
 // NodeEmpty | NodeNotEmpty;
 
-// TrieDB ...
-type TrieDB struct {
-	//db.MemoryDB
-	db db.TXDB
-}
-
 // InterfaceTrieDB ....
 type InterfaceTrieDB interface {
 	GetRoot() []uint8
 	SetRoot(rootHash []uint8)
-	Snapshot(dest TrieDB, fn db.ProgressCB) int64
+	Snapshot(dest Trie, fn db.ProgressCB) int64
 }
 
 //type TrieDB interface TrieDb extends TxDb {

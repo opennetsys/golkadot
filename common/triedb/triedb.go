@@ -1,168 +1,152 @@
 package triedb
 
-import "github.com/c3systems/go-substrate/common/db"
+import (
+	"log"
+	"time"
+
+	"github.com/c3systems/go-substrate/common/db"
+	"github.com/c3systems/go-substrate/common/triecodec"
+)
 
 // Trie ...
 type Trie struct {
+	impl *Impl
 }
 
 // NewTrie ...
-func NewTrie() *Trie {
-	/*
-	   export default class Trie extends Impl implements TrieDb {
-	     constructor (db: TxDb = new MemoryDb(), rootHash?: Uint8Array, codec?: Codec) {
-	       super(db, rootHash, codec);
-	*/
-
-	return &Trie{}
+func NewTrie(db db.TXDB, rootHash []byte) *Trie {
+	impl := NewImpl(db, rootHash)
+	return &Trie{
+		impl: impl,
+	}
 }
 
 // Transaction ...
 func (t *Trie) Transaction(fn func() bool) bool {
-	/*
-	   try {
-	     this.createCheckpoint();
+	t.impl.checkpoint.CreateCheckpoint()
 
-	     const result = this.db.transaction(fn);
+	result := t.impl.db.Transaction(fn)
 
-	     if (result) {
-	       this.commitCheckpoint();
-	     } else {
-	       this.revertCheckpoint();
-	     }
+	if result {
+		t.impl.checkpoint.CommitCheckpoint()
+	} else {
+		t.impl.checkpoint.RevertCheckpoint()
+	}
 
-	     return result;
-	   } catch (error) {
-	     this.revertCheckpoint();
-
-	     throw error;
-	   }
-	*/
-	return true
+	return result
 }
 
 // Open ...
 func (t *Trie) Open() {
-	//t.db.Open()
+	t.impl.db.Open()
 }
 
 // Close ...
 func (t *Trie) Close() {
-	//t.db.Close()
+	t.impl.db.Close()
 }
 
 // Empty ...
 func (t *Trie) Empty() {
-	//t.db.Empty()
+	t.impl.db.Empty()
 }
 
 // Drop ...
 func (t *Trie) Drop() {
-	//t.db.Drop()
+	t.impl.db.Drop()
 }
 
 // Maintain ...
-func (t *Trie) Maintain(progressCb func()) {
-	//t.db.Maintain(progressCb)
+func (t *Trie) Maintain(fn *db.ProgressCB) {
+	t.impl.db.Maintain(fn)
 }
 
 // Rename ...
 func (t *Trie) Rename(base, file string) {
-	//t.db.Rename(base, file)
+	t.impl.db.Rename(base, file)
 }
 
 // Size ...
 func (t *Trie) Size() int {
-	return 0
-	//return t.db.Size()
+	return t.impl.db.Size()
 }
 
 // Delete ...
 func (t *Trie) Delete(key []uint8) {
-	/*
-	   this._setRootNode(
-	     this._del(
-	       this._getNode(this.rootHash),
-	       toNibbles(key)
-	     )
-	   );
-	*/
+	node := t.impl.Del(
+		t.impl.GetNode(t.impl.checkpoint.rootHash),
+		triecodec.ToNibbles(key),
+	)
+
+	t.impl.SetRootNode(node)
 }
 
 // Get ...
 func (t *Trie) Get(key []uint8) []uint8 {
-	/*
-	   return this._get(
-	     this._getNode(this.rootHash),
-	     toNibbles(key)
-	   );
-	*/
-	return nil
+	value := t.impl.Get(
+		t.impl.GetNode(t.impl.checkpoint.rootHash),
+		triecodec.ToNibbles(key),
+	)
+
+	return value.([]uint8)
 }
 
 // Put ...
-func (t *Trie) Put(key, value []uint8) []uint8 {
-	/*
-	   this._setRootNode(
-	     this._put(
-	       this._getNode(this.rootHash),
-	       toNibbles(key),
-	       value
-	     )
-	   );
-	*/
-	return nil
+func (t *Trie) Put(key, value []uint8) {
+	node := t.impl.Put(
+		t.impl.GetNode(t.impl.checkpoint.rootHash),
+		triecodec.ToNibbles(key),
+		value,
+	)
+
+	t.impl.SetRootNode(node)
 }
 
 // GetRoot ...
 func (t *Trie) GetRoot() []uint8 {
-	/*
-		rootnode := this.GetNode()
-		if isNull(rootNode) {
-			return []uint8{}
-		}
+	rootnode := t.GetNode(nil)
 
-		return this.rootHash
-	*/
-	return nil
+	if IsNull(rootnode) {
+		return []uint8{}
+	}
+
+	return t.impl.checkpoint.rootHash
 }
 
 // GetNode ...
-func (t *Trie) GetNode(hash []uint8) *Node {
-	//return this._getNode(hash || this.rootHash);
-	return nil
+func (t *Trie) GetNode(hash []uint8) Node {
+	if hash == nil {
+		hash = t.impl.checkpoint.rootHash
+	}
+
+	return t.impl.GetNode(hash)
 }
 
 // SetRoot ...
 func (t *Trie) SetRoot(rootHash []uint8) {
-	//this.rootHash = rootHash
+	t.impl.checkpoint.rootHash = rootHash
 }
 
 // Snapshot ...
-func (t *Trie) Snapshot(dest *TrieDB, fn db.ProgressCB) int {
-	/*
-	   const start = Date.now();
+func (t *Trie) Snapshot(dest Trie, fn db.ProgressCB) int {
+	start := time.Now().Unix()
 
-	   l.log('creating current state snapshot');
+	keys := t.impl.Snapshot(dest, fn, t.impl.checkpoint.rootHash, 0, 0, 0)
+	elapsed := time.Now().Unix() - start
 
-	   const keys = this._snapshot(dest, fn, this.rootHash, 0, 0, 0);
-	   const elapsed = (Date.now() - start) / 1000;
+	dest.SetRoot(t.impl.checkpoint.rootHash)
 
-	   dest.setRoot(this.rootHash);
+	newSize := dest.impl.db.Size()
+	percentage := 100 * (newSize / t.impl.db.Size())
+	sizeMB := newSize / (1024 * 1024)
 
-	   const newSize = dest.db.size();
-	   const percentage = 100 * (newSize / this.db.size());
-	   const sizeMB = newSize / (1024 * 1024);
+	log.Printf("snapshot created in %d, %dk keys, %dMB (%d%%)", elapsed, keys/1e3, sizeMB, percentage)
 
-	   l.log(`snapshot created in ${elapsed.toFixed(2)}s, ${(keys / 1000).toFixed(2)}k keys, ${sizeMB.toFixed(2)}MB (${percentage.toFixed(2)}%)`);
+	fn(&db.ProgressValue{
+		IsCompleted: true,
+		Keys:        keys,
+		Percent:     100,
+	})
 
-	   fn({
-	     isCompleted: true,
-	     keys,
-	     percent: 100
-	   });
-
-	   return keys;
-	*/
-	return 0
+	return keys
 }
