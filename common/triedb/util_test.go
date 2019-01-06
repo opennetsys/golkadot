@@ -8,7 +8,7 @@ import (
 func TestUtils(t *testing.T) {
 	// TODO: table tests
 
-	branchNode := NewNodeBranch([]Node{
+	branchNode := []Node{
 		NewNodeEmpty(),
 		NewNodeEmpty(),
 		NewNodeEmpty(),
@@ -26,15 +26,15 @@ func TestUtils(t *testing.T) {
 		NewNodeEmpty(),
 		NewNodeEmpty(),
 		NewNodeEmpty(),
-	})
+	}
 
 	if IsBranchNode(branchNode) != true {
 		t.Error("expected branch node")
 	}
 
-	branchNode2 := NewNodeBranch([]Node{
+	branchNode2 := []Node{
 		NewNodeEmpty(),
-	})
+	}
 
 	if IsBranchNode(branchNode2) != false {
 		t.Error("expected not a branch node")

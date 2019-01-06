@@ -37,5 +37,5 @@ type BaseDB interface {
 // TXDB ...
 type TXDB interface {
 	BaseDB
-	Transaction(fn func() bool) bool
+	Transaction(fn func() bool) (bool, error)
 }

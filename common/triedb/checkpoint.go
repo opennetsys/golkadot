@@ -1,5 +1,10 @@
 package triedb
 
+import (
+	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/c3systems/go-substrate/common/triehash"
+)
+
 // Checkpoint ...
 type Checkpoint struct {
 	rootHash []uint8
@@ -8,6 +13,10 @@ type Checkpoint struct {
 
 // NewCheckpoint ...
 func NewCheckpoint(rootHash []uint8) *Checkpoint {
+	if rootHash == nil {
+		rootHash = triecodec.Hashing(triehash.TrieRoot(nil))
+	}
+
 	return &Checkpoint{
 		rootHash: rootHash,
 		txRoot:   rootHash,

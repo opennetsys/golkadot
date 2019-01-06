@@ -1,8 +1,13 @@
 package triedb
 
-import "github.com/c3systems/go-substrate/common/db"
+import (
+	"fmt"
 
-// TODO: clean up + tests
+	"github.com/c3systems/go-substrate/common/db"
+	"github.com/davecgh/go-spew/spew"
+)
+
+// TODO: refactor
 
 // NodeType ...
 type NodeType int
@@ -19,47 +24,12 @@ var NodeTypeExtension = 2
 // NodeTypeBranch ...
 var NodeTypeBranch = 3
 
-// NodeEmpty ...
-type NodeEmpty struct{}
-
-// null
-
 // NodeEncoded ...
 type NodeEncoded struct{}
 
-// Uint8Array
-
-// NodeEncodedOrEmpty ...
-type NodeEncodedOrEmpty struct{}
-
-// NewNodeEncodedOrEmpty ...
-func NewNodeEncodedOrEmpty(value []uint8) NodeEncodedOrEmpty {
-	return NodeEncodedOrEmpty{}
-}
-
-// NodeEncoded | NodeEmpty
-
-// NodeBranch ...
-type NodeBranch []Node
-
-/*
-type NodeBranch = [
-  NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty,
-  NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty,
-  NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty,
-  NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty, NodeEncodedOrEmpty,
-  NodeEncodedOrEmpty
-];
-*/
-
 // NewNodeEmpty ...
 func NewNodeEmpty() Node {
-	return Node(NodeEmpty{})
-}
-
-// NewNodeBranch ...
-func NewNodeBranch(nodes []Node) NodeBranch {
-	return NodeBranch(nodes)
+	return Node(nil)
 }
 
 // NewBlankBranch ...
@@ -92,23 +62,6 @@ func NewEncodedPath(value []uint8) EncodedPath {
 	return EncodedPath(value)
 }
 
-// Uint8Array
-
-// NodeKv ...
-type NodeKv [][]uint8
-
-// [EncodedPath, NodeEncodedOrEmpty];
-
-// NodeNotEmpty ...
-type NodeNotEmpty struct{}
-
-// NewNodeNotEmpty ...
-func NewNodeNotEmpty(value []uint8) NodeNotEmpty {
-	return NodeNotEmpty{}
-}
-
-// NodeKv | NodeBranch;
-
 // Node ..
 type Node interface{}
 
@@ -117,7 +70,107 @@ func NewNode(value interface{}) Node {
 	return Node(value)
 }
 
-// NodeEmpty | NodeNotEmpty;
+// NewNodeListFromUint8 ...
+func NewNodeListFromUint8(values [][]uint8) []Node {
+	var ret []Node
+	for _, x := range values {
+		ret = append(ret, NewNode(x))
+	}
+	return ret
+}
+
+// NewNodeListFromNode ...
+func NewNodeListFromNode(node Node) []Node {
+	var ret []Node
+	switch v := node.(type) {
+	case []Node:
+		for _, x := range v {
+			ret = append(ret, NewNode(x))
+		}
+	case [][]uint8:
+		for _, x := range v {
+			ret = append(ret, x)
+		}
+	case []uint8:
+		if v != nil || len(v) != 0 {
+			ret = append(ret, v)
+		}
+	case []interface{}:
+		for _, x := range v {
+			ret = append(ret, NewNode(x))
+		}
+	}
+
+	return ret
+}
+
+// NewUint8FromNode ...
+func NewUint8FromNode(value interface{}) []uint8 {
+	switch v := value.(type) {
+	case []Node:
+		return v[0].([]uint8)
+	case Node:
+		switch u := v.(type) {
+		case []interface{}:
+			return u[0].([]uint8)
+		}
+		if u, ok := v.([]uint8); ok {
+			return u
+		}
+	case []uint8:
+		return v
+	case []interface{}:
+		return v[0].([]uint8)
+	}
+
+	return nil
+}
+
+// NewUint8ListFromNode ...
+func NewUint8ListFromNode(value interface{}) [][]uint8 {
+	spew.Dump(value)
+	var ret [][]uint8
+	switch v := value.(type) {
+	case [][]uint8:
+		return v
+	case []Node:
+		for _, x := range v {
+			ret = append(ret, x.([]uint8))
+		}
+	case Node:
+		switch u := v.(type) {
+		case []Node:
+			for _, x := range u {
+				ret = append(ret, x.([]uint8))
+			}
+		case []interface{}:
+			spew.Dump(u)
+			for _, x := range u {
+				ret = append(ret, x.([]uint8))
+			}
+		}
+	case []interface{}:
+		for _, x := range v {
+			ret = append(ret, x.([]uint8))
+		}
+	default:
+		fmt.Println("!!")
+	}
+
+	return ret
+}
+
+// NewFirstUint8ListFromNode ...
+func NewFirstUint8ListFromNode(node Node) []uint8 {
+	switch v := node.(type) {
+	case []Node:
+		return v[0].([]uint8)
+	case [][]uint8:
+		return v[0]
+	}
+
+	return nil
+}
 
 // InterfaceTrieDB ....
 type InterfaceTrieDB interface {
@@ -125,5 +178,3 @@ type InterfaceTrieDB interface {
 	SetRoot(rootHash []uint8)
 	Snapshot(dest Trie, fn db.ProgressCB) int64
 }
-
-//type TrieDB interface TrieDb extends TxDb {

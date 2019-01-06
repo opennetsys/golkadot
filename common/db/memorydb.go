@@ -84,6 +84,6 @@ func (m *MemoryDB) Get(key []uint8) []uint8 {
 }
 
 // Put ...
-func (m *MemoryDB) Put(key, value []uint8) {
+func (m *MemoryDB) Put(key []uint8, value []uint8) {
 	m.storage[string(key)] = value
 }

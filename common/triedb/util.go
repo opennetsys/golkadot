@@ -1,10 +1,12 @@
 package triedb
 
 import (
+	"fmt"
 	"log"
 	"math"
 
 	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // GetNodeType ...
@@ -12,11 +14,7 @@ func GetNodeType(node Node) int {
 	if IsEmptyNode(node) {
 		return NodeTypeEmpty
 	} else if IsKvNode(node) {
-		nodekv, ok := node.([][]uint8)
-		if !ok {
-			log.Fatal("not ok")
-		}
-		key := nodekv[0]
+		key := NewFirstUint8ListFromNode(node)
 		nibbles := triecodec.DecodeNibbles(key)
 
 		if triecodec.IsNibblesTerminated(nibbles) {
@@ -35,13 +33,18 @@ func GetNodeType(node Node) int {
 // IsKvNode ...
 func IsKvNode(node Node) bool {
 	switch v := node.(type) {
-	case [][]uint8:
-		if !IsEmptyNode(node) {
-			if len(v) == 2 {
-				return true
-			}
+	case []Node:
+		if IsEmptyNode(node) {
+			return false
 		}
-		return false
+		return len(v) == 2
+	case [][]uint8:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 2
+	case []interface{}:
+		return len(v) == 2
 	default:
 		return false
 	}
@@ -50,18 +53,21 @@ func IsKvNode(node Node) bool {
 // IsBranchNode ...
 func IsBranchNode(node Node) bool {
 	switch v := node.(type) {
-	case NodeBranch:
-		if len(v) == 17 {
-			return true
-		}
-		return false
 	case [][]uint8:
-		if !IsEmptyNode(node) {
-			if len(v) == 17 {
-				return true
-			}
+		if IsEmptyNode(v) {
+			return false
 		}
-		return false
+		return len(v) == 17
+	case []Node:
+		if IsEmptyNode(v) {
+			return false
+		}
+		return len(v) == 17
+	case []interface{}:
+		if IsEmptyNode(v) {
+			return false
+		}
+		return len(v) == 17
 	default:
 		return false
 	}
@@ -80,18 +86,20 @@ func IsLeafNode(node Node) bool {
 // IsEmptyNode ...
 func IsEmptyNode(node Node) bool {
 	switch v := node.(type) {
-	case NodeEmpty:
+	case nil:
 		return true
+	case Node:
+		switch u := v.(type) {
+		case []Node:
+			return u == nil || len(u) == 0
+		}
+		return v == nil
 	case [][]uint8:
-		if v == nil {
-			return true
-		}
-		return false
+		return v == nil
 	case []uint8:
-		if v == nil {
-			return true
-		}
-		return false
+		return v == nil
+	case []Node:
+		return v == nil
 	default:
 		return false
 	}
@@ -100,27 +108,14 @@ func IsEmptyNode(node Node) bool {
 // IsNull ...
 func IsNull(node Node) bool {
 	switch v := node.(type) {
-	case NodeEmpty:
-		return true
 	case nil:
 		return true
 	case []uint8:
-		if v == nil {
-			return true
-		}
-		return false
-	default:
-		return false
-	}
-}
-
-// IsSlice ...
-func IsSlice(value interface{}) bool {
-	switch value.(type) {
-	case []uint8:
-		return true
+		return v == nil
 	case [][]uint8:
-		return true
+		return v == nil
+	case []Node:
+		return v == nil
 	default:
 		return false
 	}
@@ -129,10 +124,14 @@ func IsSlice(value interface{}) bool {
 // Size ...
 func Size(value interface{}) int {
 	switch v := value.(type) {
+	case nil:
+		return 0
 	case []uint8:
 		return len(v)
 	case []Node:
 		return len(v)
+	case Node:
+		return 1
 	case []interface{}:
 		return len(v)
 	default:
@@ -142,40 +141,109 @@ func Size(value interface{}) int {
 
 // DecodeNode ...
 func DecodeNode(encoded Node) Node {
+	fmt.Println("Debug: DecodedNode, encoded input", encoded)
 	if IsNull(encoded) || Size(encoded) == 0 {
+		fmt.Println("Debug: DecodedNode, is null, returning nil")
 		return nil
-	} else if IsSlice(encoded) {
+	}
+
+	// replaces above isSlice func
+	// TODO: refactor
+	encodedSlice := NewUint8FromNode(encoded)
+	if len(encodedSlice) == 0 {
+		fmt.Println("Debug: DecodeNode is array, returning", encoded)
 		return encoded
 	}
 
-	encodedSlice, ok := encoded.([]uint8)
-	if !ok {
-		log.Fatal("not ok")
-	}
-	node := triecodec.Decode(encodedSlice)
+	fmt.Println("Debug: DecodeNode, encoded arg to rlp", encoded)
 
-	decodedSlice, ok := node.([][]uint8)
-	if !ok {
-		log.Fatal("not ok")
+	var decoded []interface{}
+	err := rlp.DecodeBytes(encodedSlice, &decoded)
+	if err != nil {
+		log.Println("Debug: DecodedNode, DecodeBytes err", err)
+		return encoded
 	}
+
+	fmt.Println("Debug: DecodeNode, decoded bytes from rlp", decoded)
 
 	var nodes []Node
-	for _, value := range decodedSlice {
-		if value != nil && len(value) > 0 {
-			nodes = append(nodes, NewNode(value))
-		} else {
-			nodes = append(nodes, NewNodeEmpty())
-		}
+	for _, s := range decoded {
+		nodes = append(nodes, NewNode(s))
 	}
+
+	fmt.Println("Debug: DecodeNode, decoded bytes to Node type", nodes)
 
 	return nodes
 }
 
 // EncodeNode ...
 func EncodeNode(node Node) []uint8 {
+	fmt.Println("Debug: EncodeNode, node input", node)
 	var i []interface{}
-	i = append(i, node)
-	return triecodec.Encode(i)
+
+	// TODO: refactor this
+	slice, ok := node.([]Node)
+	if ok {
+		for _, s := range slice {
+			if s == nil {
+				// NOTE: empty string is required for nil values
+				i = append(i, "")
+			} else {
+				slice, ok := s.([]Node)
+				if ok {
+					var n []Node
+					for _, s := range slice {
+						if s == nil {
+							// NOTE: empty string is required for nil values
+							n = append(n, "")
+						} else {
+							n = append(n, s)
+						}
+					}
+					i = append(i, n)
+				} else {
+					i = append(i, s)
+				}
+			}
+		}
+	} else {
+		slice, ok := node.([][][]uint8)
+		if ok {
+			for _, s := range slice {
+				if s == nil {
+					// NOTE: empty string is required for nil values
+					i = append(i, "")
+				} else {
+					i = append(i, s)
+				}
+			}
+		} else {
+			slice, ok := node.([][]uint8)
+			if ok {
+				for _, s := range slice {
+					if s == nil {
+						// NOTE: empty string is required for nil values
+						i = append(i, "")
+					} else {
+						i = append(i, s)
+					}
+				}
+			} else {
+				i = append(i, slice)
+			}
+		}
+	}
+
+	fmt.Println("Debug: EncodeNode, decoded arg to rlp", i)
+
+	encoded, err := rlp.EncodeToBytes(&i)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Debug: EncodedNode, encoded bytes from rlp", encoded)
+
+	return encoded
 }
 
 // KeyEquals ...
