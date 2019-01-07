@@ -4,23 +4,17 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triehash"
 )
 
-func newTrie() *Trie {
-	memdb := db.NewMemoryDB(&db.BaseOptions{})
-	basedb := db.BaseDB(memdb)
-	txdbt := db.NewTransactionDB(&basedb)
-	txdb := db.TXDB(txdbt)
-	trie := NewTrie(txdb, nil)
-	return trie
-}
-
 func TestSnapshots(t *testing.T) {
+	codec := NewRLPCodec()
+	// TODO: use this codec for tests
+	//codec := NewTrieCodec()
+
 	t.Run("creates a snapshot of the (relevant) trie data", func(t *testing.T) {
-		trie := newTrie()
-		back := newTrie()
+		trie := newTrie(codec)
+		back := newTrie(codec)
 
 		values := []*triehash.TriePair{
 			&triehash.TriePair{K: []uint8("test"), V: []uint8("one")},
@@ -41,10 +35,10 @@ func TestSnapshots(t *testing.T) {
 		//fmt.Println("trie root", trie.GetRoot())
 		//fmt.Println("triehash root", root)
 
-		// TODO: fix
+		// TODO: fix, must to triecodec
 		/*
 			if hex.EncodeToString(back.GetRoot()) != hex.EncodeToString(root) {
-				t.Fail(
+				t.Fail()
 			}
 		*/
 
@@ -54,8 +48,8 @@ func TestSnapshots(t *testing.T) {
 	})
 
 	t.Run("creates a snapshot of the (relevant) data", func(t *testing.T) {
-		trie := newTrie()
-		back := newTrie()
+		trie := newTrie(codec)
+		back := newTrie(codec)
 
 		values := []*triehash.TriePair{
 			&triehash.TriePair{K: []uint8("one"), V: []uint8("testing")},

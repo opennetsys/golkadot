@@ -7,13 +7,20 @@ import (
 	"github.com/c3systems/go-substrate/common/db"
 )
 
+func newTrie(codec InterfaceCodec) *Trie {
+	memdb := db.NewMemoryDB(&db.BaseOptions{})
+	basedb := db.BaseDB(memdb)
+	txdbt := db.NewTransactionDB(&basedb)
+	txdb := db.TXDB(txdbt)
+	trie := NewTrie(txdb, nil, codec)
+	return trie
+}
+
 func TestTrieDB(t *testing.T) {
+	codec := NewRLPCodec()
+
 	t.Run("test 1: simple save and retrieve", func(t *testing.T) {
-		memdb := db.NewMemoryDB(&db.BaseOptions{})
-		basedb := db.BaseDB(memdb)
-		txdbt := db.NewTransactionDB(&basedb)
-		txdb := db.TXDB(txdbt)
-		trie := NewTrie(txdb, nil)
+		trie := newTrie(codec)
 
 		t.Run("starts with a valid root", func(t *testing.T) {
 			root := trie.GetRoot()
@@ -106,11 +113,7 @@ func TestTrieDB(t *testing.T) {
 	})
 
 	t.Run("test 2: storing longer values", func(t *testing.T) {
-		memdb := db.NewMemoryDB(&db.BaseOptions{})
-		basedb := db.BaseDB(memdb)
-		txdbt := db.NewTransactionDB(&basedb)
-		txdb := db.TXDB(txdbt)
-		trie := NewTrie(txdb, nil)
+		trie := newTrie(codec)
 
 		longString := "this will be a really really really long value"
 		longStringRoot := []uint8{23, 204, 252, 0, 51, 163, 54, 163, 91, 210, 76, 17, 64, 20, 221, 47, 231, 80, 223, 210, 146, 205, 224, 233, 94, 124, 55, 100, 172, 218, 10, 231}
@@ -164,11 +167,7 @@ func TestTrieDB(t *testing.T) {
 	})
 
 	t.Run("test 3: testing Extentions and branches", func(t *testing.T) {
-		memdb := db.NewMemoryDB(&db.BaseOptions{})
-		basedb := db.BaseDB(memdb)
-		txdbt := db.NewTransactionDB(&basedb)
-		txdb := db.TXDB(txdbt)
-		trie := NewTrie(txdb, nil)
+		trie := newTrie(codec)
 
 		t.Run("should store a value", func(t *testing.T) {
 			trie.Put([]uint8("doge"), []uint8("coin"))
@@ -196,11 +195,7 @@ func TestTrieDB(t *testing.T) {
 	})
 
 	t.Run("test 4: testing Extentions and branches - reverse", func(t *testing.T) {
-		memdb := db.NewMemoryDB(&db.BaseOptions{})
-		basedb := db.BaseDB(memdb)
-		txdbt := db.NewTransactionDB(&basedb)
-		txdb := db.TXDB(txdbt)
-		trie := NewTrie(txdb, nil)
+		trie := newTrie(codec)
 
 		t.Run("should create extention to store this value", func(t *testing.T) {
 			trie.Put([]uint8("do"), []uint8("verb"))
@@ -224,11 +219,7 @@ func TestTrieDB(t *testing.T) {
 	})
 
 	t.Run("test 5: testing deletions cases", func(t *testing.T) {
-		memdb := db.NewMemoryDB(&db.BaseOptions{})
-		basedb := db.BaseDB(memdb)
-		txdbt := db.NewTransactionDB(&basedb)
-		txdb := db.TXDB(txdbt)
-		trie := NewTrie(txdb, nil)
+		trie := newTrie(codec)
 
 		t.Run("should delete from a branch->branch-branch", func(t *testing.T) {
 			trie.Put([]uint8{11, 11, 11}, []uint8("first"))

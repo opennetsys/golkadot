@@ -6,7 +6,6 @@ import (
 	"math"
 
 	"github.com/c3systems/go-substrate/common/triecodec"
-	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // GetNodeType ...
@@ -140,7 +139,7 @@ func Size(value interface{}) int {
 }
 
 // DecodeNode ...
-func DecodeNode(encoded Node) Node {
+func DecodeNode(encoded Node, codec InterfaceCodec) Node {
 	fmt.Println("Debug: DecodedNode, encoded input", encoded)
 	if IsNull(encoded) || Size(encoded) == 0 {
 		fmt.Println("Debug: DecodedNode, is null, returning nil")
@@ -155,16 +154,15 @@ func DecodeNode(encoded Node) Node {
 		return encoded
 	}
 
-	fmt.Println("Debug: DecodeNode, encoded arg to rlp", encoded)
+	fmt.Println("Debug: DecodeNode, encoded arg to codec decoder", encoded)
 
 	var decoded []interface{}
-	err := rlp.DecodeBytes(encodedSlice, &decoded)
-	if err != nil {
+	if err := codec.Decode(encodedSlice, &decoded); err != nil {
 		log.Println("Debug: DecodedNode, DecodeBytes err", err)
 		return encoded
 	}
 
-	fmt.Println("Debug: DecodeNode, decoded bytes from rlp", decoded)
+	fmt.Println("Debug: DecodeNode, decoded bytes from codec decoder", decoded)
 
 	var nodes []Node
 	for _, s := range decoded {
@@ -177,7 +175,7 @@ func DecodeNode(encoded Node) Node {
 }
 
 // EncodeNode ...
-func EncodeNode(node Node) []uint8 {
+func EncodeNode(node Node, codec InterfaceCodec) []uint8 {
 	fmt.Println("Debug: EncodeNode, node input", node)
 	var i []interface{}
 
@@ -234,14 +232,14 @@ func EncodeNode(node Node) []uint8 {
 		}
 	}
 
-	fmt.Println("Debug: EncodeNode, decoded arg to rlp", i)
+	fmt.Println("Debug: EncodeNode, decoded arg to codec encoder", i)
 
-	encoded, err := rlp.EncodeToBytes(&i)
+	encoded, err := codec.Encode(&i)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Debug: EncodedNode, encoded bytes from rlp", encoded)
+	fmt.Println("Debug: EncodedNode, encoded bytes from codec encoder", encoded)
 
 	return encoded
 }

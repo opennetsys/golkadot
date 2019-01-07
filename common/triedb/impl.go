@@ -17,6 +17,7 @@ import (
 type Impl struct {
 	checkpoint *Checkpoint
 	db         db.TXDB
+	codec      InterfaceCodec
 	Debug      bool
 }
 
@@ -26,11 +27,12 @@ type TxDB struct {
 }
 
 // NewImpl ...
-func NewImpl(db db.TXDB, rootHash []uint8) *Impl {
+func NewImpl(db db.TXDB, rootHash []uint8, codec InterfaceCodec) *Impl {
 	checkpoint := NewCheckpoint(rootHash)
 	return &Impl{
 		checkpoint: checkpoint,
 		db:         db,
+		codec:      codec,
 		Debug:      true,
 	}
 }
@@ -57,7 +59,7 @@ func (i *Impl) Snapshot(dest *Trie, fn db.ProgressCB, root []uint8, keys int, pe
 	keys++
 
 	i.DebugLog("Snapshot, call Put with root", root)
-	encodedNode := EncodeNode(node)
+	encodedNode := EncodeNode(node, i.codec)
 	i.DebugLog("Snapshot, call Put with encoded node", encodedNode)
 	dest.impl.db.Put(root, encodedNode)
 
@@ -114,7 +116,7 @@ func (i *Impl) GetNode(nhash Node) Node {
 	} else if l < 32 { // it's encoded key if len 32
 		// is encodeed bel if less than 32?
 		i.DebugLog("GetNode, less than 32")
-		x := DecodeNode(nhash)
+		x := DecodeNode(nhash, i.codec)
 		i.DebugLog("GetNode, less than 32, decoded", x)
 		return x
 	}
@@ -122,7 +124,7 @@ func (i *Impl) GetNode(nhash Node) Node {
 	i.DebugLog("GetNode, get hash", shash)
 	x := i.db.Get(shash)
 	i.DebugLog("GetNode, get hash result", x)
-	y := DecodeNode(x)
+	y := DecodeNode(x, i.codec)
 	i.DebugLog("GetNode, decode node result", y)
 	return y
 }
@@ -168,7 +170,7 @@ func (i *Impl) DelBranchNode(inode Node, trieKey []uint8) Node {
 	var nodeToDelete Node
 	// TODO: refactor
 	if n := NewUint8ListFromNode(node[trieKey[0]]); len(n) == 2 {
-		nodeToDelete = DecodeNode(n)
+		nodeToDelete = DecodeNode(n, i.codec)
 	} else {
 		nodeToDelete = i.GetNode(NewUint8FromNode(node[trieKey[0]]))
 	}
@@ -356,7 +358,7 @@ func (i *Impl) NodeToDBMapping(node Node) (interface{}, []uint8) {
 		return nil, nil
 	}
 
-	encoded := EncodeNode(node)
+	encoded := EncodeNode(node, i.codec)
 	if len(encoded) < 32 {
 		i.DebugLog("NodeToDBMapping, is less than 32, returning")
 		return node, nil
@@ -635,7 +637,7 @@ func (i *Impl) SetRootNode(node Node) {
 		i.checkpoint.rootHash = []byte{}
 	} else {
 		i.DebugLog("SetRootNode, encode")
-		encoded := EncodeNode(node)
+		encoded := EncodeNode(node, i.codec)
 		i.DebugLog("SetRootNode, encoded", encoded)
 		rootHash := triecodec.Hashing(encoded)
 		i.DebugLog("SetRootNode, root hash", rootHash)

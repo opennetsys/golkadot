@@ -17,8 +17,8 @@ type Trie struct {
 }
 
 // NewTrie ...
-func NewTrie(db db.TXDB, rootHash []byte) *Trie {
-	impl := NewImpl(db, rootHash)
+func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *Trie {
+	impl := NewImpl(db, rootHash, codec)
 	return &Trie{
 		impl:  impl,
 		Debug: true,

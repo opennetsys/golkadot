@@ -14,7 +14,8 @@ func TestImpl(t *testing.T) {
 	txdbt := db.NewTransactionDB(&basedb)
 	txdb := db.TXDB(txdbt)
 	rootHash := []uint8{0x1}
-	impl := NewImpl(txdb, rootHash)
+	codec := NewRLPCodec()
+	impl := NewImpl(txdb, rootHash, codec)
 
 	_ = impl
 }
