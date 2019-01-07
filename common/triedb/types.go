@@ -176,5 +176,5 @@ func NewFirstUint8ListFromNode(node Node) []uint8 {
 type InterfaceTrieDB interface {
 	GetRoot() []uint8
 	SetRoot(rootHash []uint8)
-	Snapshot(dest Trie, fn db.ProgressCB) int64
+	Snapshot(dest *Trie, fn db.ProgressCB) int64
 }

@@ -44,33 +44,43 @@ func (i *Impl) DebugLog(ifcs ...interface{}) {
 }
 
 // Snapshot ...
-func (i *Impl) Snapshot(dest Trie, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
+func (i *Impl) Snapshot(dest *Trie, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
+	i.DebugLog("Snapshot, root", root)
 	node := i.GetNode(root)
+	i.DebugLog("Snapshot, GetNode result", node)
 
-	if node == nil {
+	if IsNull(node) {
+		i.DebugLog("Snapshot, node is null", node)
 		return keys
 	}
 
 	keys++
 
-	dest.impl.db.Put(root, EncodeNode(node))
+	i.DebugLog("Snapshot, call Put with root", root)
+	encodedNode := EncodeNode(node)
+	i.DebugLog("Snapshot, call Put with encoded node", encodedNode)
+	dest.impl.db.Put(root, encodedNode)
 
-	fn(&db.ProgressValue{
-		IsCompleted: false,
-		Keys:        keys,
-		Percent:     percent,
-	})
+	if fn != nil {
+		fn(&db.ProgressValue{
+			IsCompleted: false,
+			Keys:        keys,
+			Percent:     percent,
+		})
+	}
 
-	vals := NewUint8ListFromNode(node)
-	if len(vals) == 0 {
+	nodes := NewNodeListFromNode(node)
+	if len(nodes) == 0 {
 		log.Fatal("Snapshot: not ok")
 	}
-	for _, val := range vals {
-		if val != nil && len(val) == 32 {
-			keys = i.Snapshot(dest, fn, val, keys, percent, depth+1)
+
+	for _, val := range nodes {
+		v := NewUint8FromNode(val)
+		if v != nil && len(v) == 32 {
+			keys = i.Snapshot(dest, fn, v, keys, percent, depth+1)
 		}
 
-		percent += int((float64(100) / float64(len(vals))) / math.Pow(float64(16), float64(depth)))
+		percent += int((float64(100) / float64(len(nodes))) / math.Pow(float64(16), float64(depth)))
 	}
 
 	return keys

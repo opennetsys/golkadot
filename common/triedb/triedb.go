@@ -176,7 +176,7 @@ func (t *Trie) SetRoot(rootHash []uint8) {
 }
 
 // Snapshot ...
-func (t *Trie) Snapshot(dest Trie, fn db.ProgressCB) int {
+func (t *Trie) Snapshot(dest *Trie, fn db.ProgressCB) int {
 	start := time.Now().Unix()
 
 	keys := t.impl.Snapshot(dest, fn, t.impl.checkpoint.rootHash, 0, 0, 0)
@@ -185,16 +185,21 @@ func (t *Trie) Snapshot(dest Trie, fn db.ProgressCB) int {
 	dest.SetRoot(t.impl.checkpoint.rootHash)
 
 	newSize := dest.impl.db.Size()
-	percentage := 100 * (newSize / t.impl.db.Size())
+	t.DebugLog("Snapshot, new size", newSize)
+	currentSize := t.impl.db.Size()
+	t.DebugLog("Snapshot, current size", currentSize)
+	percentage := 100 * (newSize / currentSize)
 	sizeMB := newSize / (1024 * 1024)
 
 	log.Printf("snapshot created in %d, %dk keys, %dMB (%d%%)", elapsed, keys/1e3, sizeMB, percentage)
 
-	fn(&db.ProgressValue{
-		IsCompleted: true,
-		Keys:        keys,
-		Percent:     100,
-	})
+	if fn != nil {
+		fn(&db.ProgressValue{
+			IsCompleted: true,
+			Keys:        keys,
+			Percent:     100,
+		})
+	}
 
 	return keys
 }

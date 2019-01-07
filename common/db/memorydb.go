@@ -1,6 +1,8 @@
 package db
 
 import (
+	"bytes"
+	"encoding/gob"
 	"log"
 )
 
@@ -64,8 +66,14 @@ func (m *MemoryDB) Maintain(fn *ProgressCB) error {
 
 // Size ...
 func (m *MemoryDB) Size() int {
-	log.Println("size is not implemented")
-	return 0
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+
+	if err := enc.Encode(m.storage); err != nil {
+		log.Fatal(err)
+	}
+
+	return len(buf.Bytes())
 }
 
 // Del ...
