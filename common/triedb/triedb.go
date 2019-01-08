@@ -21,8 +21,14 @@ func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *Trie {
 	impl := NewImpl(db, rootHash, codec)
 	return &Trie{
 		impl:  impl,
-		Debug: true,
+		Debug: false,
 	}
+}
+
+// SetDebug ...
+func (t *Trie) SetDebug(enabled bool) {
+	t.Debug = enabled
+	t.impl.Debug = enabled
 }
 
 // DebugLog ...

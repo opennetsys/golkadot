@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // GetNodeType ...
@@ -148,13 +149,18 @@ func DecodeNode(encoded Node, codec InterfaceCodec) Node {
 
 	// replaces above isSlice func
 	// TODO: refactor
-	encodedSlice := NewUint8FromNode(encoded)
-	if len(encodedSlice) == 0 {
-		fmt.Println("Debug: DecodeNode is array, returning", encoded)
+	if IsMultiSlice(encoded) {
+		fmt.Println("Debug: DecodeNode is 'array', returning", encoded)
 		return encoded
 	}
 
-	fmt.Println("Debug: DecodeNode, encoded arg to codec decoder", encoded)
+	encodedSlice := NewUint8FromNode(encoded)
+
+	fmt.Println(encodedSlice)
+	spew.Dump(encodedSlice)
+
+	fmt.Println("Debug: DecodeNode is not 'array'")
+	fmt.Println("Debug: DecodeNode, encoded arg to codec decoder", encodedSlice)
 
 	var decoded []interface{}
 	if err := codec.Decode(encodedSlice, &decoded); err != nil {
@@ -177,69 +183,13 @@ func DecodeNode(encoded Node, codec InterfaceCodec) Node {
 // EncodeNode ...
 func EncodeNode(node Node, codec InterfaceCodec) []uint8 {
 	fmt.Println("Debug: EncodeNode, node input", node)
-	var i []interface{}
 
-	// TODO: refactor this
-	slice, ok := node.([]Node)
-	if ok {
-		for _, s := range slice {
-			if s == nil {
-				// NOTE: empty string is required for nil values
-				i = append(i, "")
-			} else {
-				slice, ok := s.([]Node)
-				if ok {
-					var n []Node
-					for _, s := range slice {
-						if s == nil {
-							// NOTE: empty string is required for nil values
-							n = append(n, "")
-						} else {
-							n = append(n, s)
-						}
-					}
-					i = append(i, n)
-				} else {
-					i = append(i, s)
-				}
-			}
-		}
-	} else {
-		slice, ok := node.([][][]uint8)
-		if ok {
-			for _, s := range slice {
-				if s == nil {
-					// NOTE: empty string is required for nil values
-					i = append(i, "")
-				} else {
-					i = append(i, s)
-				}
-			}
-		} else {
-			slice, ok := node.([][]uint8)
-			if ok {
-				for _, s := range slice {
-					if s == nil {
-						// NOTE: empty string is required for nil values
-						i = append(i, "")
-					} else {
-						i = append(i, s)
-					}
-				}
-			} else {
-				i = append(i, slice)
-			}
-		}
-	}
-
-	fmt.Println("Debug: EncodeNode, decoded arg to codec encoder", i)
-
-	encoded, err := codec.Encode(&i)
+	encoded, err := codec.Encode(node)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Debug: EncodedNode, encoded bytes from codec encoder", encoded)
+	fmt.Println("Debug: EncodeNode, encoded bytes from codec encoder", encoded)
 
 	return encoded
 }
@@ -305,5 +255,30 @@ func ConsumeCommonPrefix(left []uint8, right []uint8) [][]uint8 {
 		left[0:length],
 		left[length:],
 		right[length:],
+	}
+}
+
+// IsMultiSlice ...
+func IsMultiSlice(value interface{}) bool {
+	switch v := value.(type) {
+	case []Node:
+		return len(v) > 1
+	case [][]uint8:
+		return len(v) > 1
+	case Node:
+		switch u := v.(type) {
+		case []uint8:
+			return false
+		case [][]uint8:
+			return len(u) > 1
+		case []interface{}:
+			return len(u) > 1
+		default:
+			return false
+		}
+	case []interface{}:
+		return len(v) > 1
+	default:
+		return false
 	}
 }

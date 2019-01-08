@@ -1,8 +1,6 @@
 package triedb
 
 import (
-	"fmt"
-
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -32,6 +30,9 @@ func NewNodeEmpty() Node {
 	return Node(nil)
 }
 
+// EncodedPath ...
+type EncodedPath []uint8
+
 // NewBlankBranch ...
 func NewBlankBranch() []EncodedPath {
 	return []EncodedPath{
@@ -53,9 +54,6 @@ func NewBlankBranch() []EncodedPath {
 		NewEncodedPath(nil),
 	}
 }
-
-// EncodedPath ...
-type EncodedPath []uint8
 
 // NewEncodedPath ...
 func NewEncodedPath(value []uint8) EncodedPath {
@@ -112,7 +110,9 @@ func NewUint8FromNode(value interface{}) []uint8 {
 	case Node:
 		switch u := v.(type) {
 		case []interface{}:
-			return u[0].([]uint8)
+			if u[0] != nil {
+				return u[0].([]uint8)
+			}
 		}
 		if u, ok := v.([]uint8); ok {
 			return u
@@ -120,7 +120,9 @@ func NewUint8FromNode(value interface{}) []uint8 {
 	case []uint8:
 		return v
 	case []interface{}:
-		return v[0].([]uint8)
+		if len(v) > 0 {
+			return v[0].([]uint8)
+		}
 	}
 
 	return nil
@@ -153,8 +155,6 @@ func NewUint8ListFromNode(value interface{}) [][]uint8 {
 		for _, x := range v {
 			ret = append(ret, x.([]uint8))
 		}
-	default:
-		fmt.Println("!!")
 	}
 
 	return ret

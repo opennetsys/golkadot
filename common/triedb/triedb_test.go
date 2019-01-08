@@ -13,6 +13,7 @@ func newTrie(codec InterfaceCodec) *Trie {
 	txdbt := db.NewTransactionDB(&basedb)
 	txdb := db.TXDB(txdbt)
 	trie := NewTrie(txdb, nil, codec)
+	trie.SetDebug(true)
 	return trie
 }
 

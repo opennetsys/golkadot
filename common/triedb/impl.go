@@ -33,8 +33,13 @@ func NewImpl(db db.TXDB, rootHash []uint8, codec InterfaceCodec) *Impl {
 		checkpoint: checkpoint,
 		db:         db,
 		codec:      codec,
-		Debug:      true,
+		Debug:      false,
 	}
+}
+
+// SetDebug ...
+func (i *Impl) SetDebug(enabled bool) {
+	i.Debug = enabled
 }
 
 // DebugLog ...
@@ -280,7 +285,7 @@ func (i *Impl) Get(node Node, trieKey []uint8) Node {
 // GetBranchNode ...
 func (i *Impl) GetBranchNode(node []Node, trieKey []uint8) Node {
 	i.DebugLog("GetBranchNode, node", node)
-	i.DebugLog("GetBranchNode, ", trieKey)
+	i.DebugLog("GetBranchNode, trieKey", trieKey)
 	if len(trieKey) == 0 {
 		i.DebugLog("GetBranchNode, triekey len is 0, returning", node[16])
 		return node[16]
@@ -291,6 +296,7 @@ func (i *Impl) GetBranchNode(node []Node, trieKey []uint8) Node {
 	if len(s) >= 2 {
 		subNode = s
 	} else {
+		i.DebugLog("GetBranchNode, call GetNode with trie key", trieKey[0])
 		subNode = i.GetNode(NewUint8FromNode(node[trieKey[0]]))
 	}
 	i.DebugLog("GetBranchNode, call Get with sub node", subNode)
@@ -456,11 +462,11 @@ func (i *Impl) NormalizeBranchNode(node []Node) Node {
 // PersistNode ...
 // NOTE: Node should nil or single dimension array
 func (i *Impl) PersistNode(node Node) Node {
-	i.DebugLog("PersistNdoe, node", node)
+	i.DebugLog("PersistNode, node", node)
 	ikey, value := i.NodeToDBMapping(node)
 
 	i.DebugLog("PersistNode, key", ikey)
-	i.DebugLog("PersistNdoe, value", value)
+	i.DebugLog("PersistNode, value", value)
 
 	if value != nil {
 		k := NewUint8FromNode(ikey)
@@ -632,11 +638,13 @@ func (i *Impl) PutKvNode(node []Node, trieKey []uint8, value []uint8) Node {
 
 // SetRootNode ...
 func (i *Impl) SetRootNode(node Node) {
+	i.DebugLog("SetRootNode, node", node)
+
 	if IsEmptyNode(node) {
 		i.DebugLog("SetRootNode, is empty")
 		i.checkpoint.rootHash = []byte{}
 	} else {
-		i.DebugLog("SetRootNode, encode")
+		i.DebugLog("SetRootNode, call EncodeNode")
 		encoded := EncodeNode(node, i.codec)
 		i.DebugLog("SetRootNode, encoded", encoded)
 		rootHash := triecodec.Hashing(encoded)

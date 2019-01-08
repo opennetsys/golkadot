@@ -78,7 +78,15 @@ func decodeKv(header *NodeHeader, input []uint8) []interface{} {
 	offset := header.EncodedLength()
 	nibbleCount := header.Value()
 	nibbleLength := int(math.Floor(float64(nibbleCount+1) / float64(2)))
-	nibbleData := input[offset : offset+nibbleLength]
+
+	var endoffset int
+	if (offset + nibbleLength) < len(input) {
+		endoffset = offset + nibbleLength
+	} else {
+		endoffset = len(input)
+	}
+
+	nibbleData := input[offset:endoffset]
 
 	// for odd, ignore the first nibble, data starts at offset 1
 	nibbles := ToNibbles(nibbleData)[(nibbleCount % 2):]
