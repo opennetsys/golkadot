@@ -93,3 +93,8 @@ func FromHex(hexStr string) []uint8 {
 func ToBN(value []uint8, isLittleEndian bool) *big.Int {
 	return bnutil.ToBN(value, isLittleEndian)
 }
+
+// TODO: need to implement from https://github.com/polkadot-js/common/tree/master/packages/util
+func ToBuffer(value []uint8) ([]byte, error) {
+	return nil, nil
+}

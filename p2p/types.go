@@ -87,6 +87,8 @@ var (
 	ErrNoConfig = errors.New("a config is required")
 	// ErrNoChainService ...
 	ErrNoChainService = errors.New("a chain service is required")
+	// ErrNoHost ...
+	ErrNoHost = errors.New("the p2p service has no host")
 )
 
 // Nodes is a list of p2p nodes

@@ -27,6 +27,7 @@ var _ Interface = (*Service)(nil)
 
 // New builds a new p2p service
 func New(cfg *Config, c chain.Interface) (*Service, error) {
+	// 1. check inputs
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}
@@ -34,18 +35,21 @@ func New(cfg *Config, c chain.Interface) (*Service, error) {
 		return nil, ErrNoChainService
 	}
 
+	// 2. parse the public key for the pid
 	pid, err := libpeer.IDFromPublicKey(cfg.Pub)
 	if err != nil {
 		logger.Errorf("[p2p] err generating peer id from public key\n%v", err)
 		return nil, err
 	}
 
+	// 3. parse the address
 	listen, err := ma.NewMultiaddr(cfg.Address)
 	if err != nil {
 		logger.Errorf("[p2p] err parsing address\n%v", err)
 		return nil, err
 	}
 
+	// 4. build the peerstore and save the keys
 	// TODO: pass in pstore?
 	ps := pstoremem.NewPeerstore()
 	if err := ps.AddPrivKey(pid, cfg.Priv); err != nil {
@@ -57,6 +61,7 @@ func New(cfg *Config, c chain.Interface) (*Service, error) {
 		return nil, err
 	}
 
+	// 5. build the swarm network
 	// TODO ...
 	swarmNet := swarm.NewSwarm(cfg.Context, pid, ps, nil)
 	tcpTransport := tcp.NewTCPTransport(genUpgrader(swarmNet))
@@ -70,6 +75,7 @@ func New(cfg *Config, c chain.Interface) (*Service, error) {
 	}
 	bNode := bhost.New(swarmNet)
 
+	// 6. build the dht
 	// TODO ...
 	dhtSvc, err := dht.New(cfg.Context, bNode)
 	if err != nil {
@@ -81,11 +87,13 @@ func New(cfg *Config, c chain.Interface) (*Service, error) {
 		return nil, err
 	}
 
+	// 7. build the host
 	newNode := rhost.Wrap(bNode, dhtSvc)
 	for i, addr := range newNode.Addrs() {
 		logger.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
 	}
 
+	// 8. build the discovery service
 	// TODO ...
 	// note: https://libp2p.io/implementations/#discovery
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
@@ -176,19 +184,26 @@ func (s *Service) On(event EventEnum, cb EventCallback) (interface{}, error) {
 }
 
 // Start starts the p2p service
-func (s *Service) Start(ctx context.Context, ch chan interface{}) error {
-	//if err := n.listenForEvents(); err != nil {
-	//return nil, fmt.Errorf("error starting listener\n%v", err)
-	//}
+// note: not necessary with go-libp2p?
+//func (s *Service) Start(ctx context.Context, ch chan interface{}) error {
+////if err := n.listenForEvents(); err != nil {
+////return nil, fmt.Errorf("error starting listener\n%v", err)
+////}
 
-	// TODO
-	return nil
-}
+//// TODO
+//return nil
+//}
 
 // Stop stops the p2p service
-func (s *Service) Stop(ch chan interface{}) error {
-	// TODO
-	return nil
+func (s *Service) Stop() error {
+	if s.state == nil {
+		return ErrUninitializedService
+	}
+	if s.state.Host == nil {
+		return ErrNoHost
+	}
+
+	return s.state.Host.Stop()
 }
 
 func (s *Service) onConn(network net.Network, conn net.Conn) {

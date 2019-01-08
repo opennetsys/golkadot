@@ -1,17 +1,16 @@
 package peer
 
 import (
-	"context"
 	"math/big"
 
 	"github.com/c3systems/go-substrate/p2p/message"
-	pstore "github.com/libp2p/go-libp2p-peerstore"
+	transport "github.com/libp2p/go-libp2p-transport"
 )
 
 // Interface defines the methods of peer
 type Interface interface {
 	// AddConnection is used to add a connection
-	AddConnection(ctx context.Context, peerInfo pstore.PeerInfo, isWritable bool) (uint, error)
+	AddConnection(conn transport.Conn, isWritable bool) (uint, error)
 	// Disconnect disconnects from the peer
 	Disconnect() error
 	// IsActive returns whether the peer is active or not

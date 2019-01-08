@@ -3,9 +3,13 @@ package peer
 import (
 	"math/big"
 
+	"github.com/c3systems/go-substrate/chain"
+	"github.com/c3systems/go-substrate/client"
 	"github.com/c3systems/go-substrate/p2p/message"
+
 	libp2ppeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
+	transport "github.com/libp2p/go-libp2p-transport"
 )
 
 // Config is passed to New to create a new peer
@@ -31,4 +35,26 @@ type KnownPeer struct {
 	Peer Interface
 	// IsConnected is true if the peer is connected
 	IsConnected bool
+}
+
+// Connection ...
+type Connection struct {
+	Connection transport.Conn
+	Pushable   chan<- interface{} // note: a write only channel
+}
+
+// Service ...
+type Service struct {
+	Map        map[pstore.PeerInfo]*KnownPeer
+	BestHash   []byte
+	BestNumber *math.Big
+	Chain      chain.Interface
+	//Config       *Config
+	Config      *client.Config
+	ID          string
+	Connections map[int]*Connection
+	NextID      int
+	NextConnID  int
+	PeerInfo    pstore.PeerInfo
+	ShortID     string
 }

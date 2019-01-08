@@ -8,15 +8,15 @@ import (
 // Interface defines the methods of the peers
 type Interface interface {
 	// Add adds a peer to peers
-	Add(peerInfo pstore.PeerInfo) (peer.Interface, error)
+	Add(pi pstore.PeerInfo) (*peer.KnownPeer, error)
 	// Count returns the number of connected peers
-	Count() uint
+	Count() (int, error)
 	// Get returns a peer
-	Get(peerInfo pstore.PeerInfo) (*peer.KnownPeer, error)
+	Get(pi pstore.PeerInfo) (*peer.KnownPeer, error)
 	// Log TODO
-	Log(event EventEnum, p peer.Interface) error
+	Log(event EventEnum, p *peer.KnownPeer) error
 	// On handles peers events
 	On(event EventEnum, cb EventCallback) (interface{}, error)
 	// Peers returns the peers
-	Peers() []peer.Interface
+	Peers() ([]*peer.KnownPeer, error)
 }
