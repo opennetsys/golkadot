@@ -8,6 +8,10 @@ deps:
 build:
 	@go build
 
+.PHONY: start
+start:
+	@go run cmd/node/node.go
+
 .PHONY: test
 test:
 	@go test -v ./... && echo "ALL PASS" || echo "FAILURE"
