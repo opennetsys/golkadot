@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"math/big"
 	"time"
 )
@@ -176,4 +177,20 @@ func (c *Client) RunInformant() {
 		// TODO: implement
 		// c.telemetry.intervalInfo(numPeers, status)
 	}
+}
+
+// ID ...
+func ID() string {
+	// TODO: dynamic
+	version := "0.0.1"
+	name := "go-substrate"
+	var stability string
+	isDevelopment := true
+	if isDevelopment {
+		stability = "development"
+	} else {
+		stability = "release"
+	}
+
+	return fmt.Sprintf("%s/%s-%s", name, version, stability)
 }
