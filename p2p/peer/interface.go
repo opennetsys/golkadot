@@ -25,4 +25,6 @@ type Interface interface {
 	Send(msg message.Interface) (bool, error)
 	// SetBest sets a new block
 	SetBest(blockNumber *big.Int, hash []byte) error
+	// Cfg returns the peer config
+	Cfg() Config
 }

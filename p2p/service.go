@@ -206,6 +206,15 @@ func (s *Service) Stop() error {
 	return s.state.Host.Stop()
 }
 
+// Cfg returns the cfg
+func (s *Service) Cfg() Config {
+	if s.Config == nil {
+		return Config
+	}
+
+	return *s.Config
+}
+
 func (s *Service) onConn(network net.Network, conn net.Conn) {
 	logger.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 

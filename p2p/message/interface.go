@@ -12,4 +12,6 @@ type Interface interface {
 	Marshal() ([]byte, error)
 	// Unmarshal converts json to a message
 	Unmarshal(bytes []byte) error
+	// Header ...
+	Header() Header
 }

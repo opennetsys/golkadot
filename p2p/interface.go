@@ -12,4 +12,6 @@ type Interface interface {
 	//Start(ctx context.Context, ch chan interface{}) error
 	// Stop stops the p2p service
 	Stop() error
+	// Cfg returns the config
+	Cfg() Config
 }

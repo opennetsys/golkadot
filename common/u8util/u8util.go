@@ -98,3 +98,8 @@ func ToBN(value []uint8, isLittleEndian bool) *big.Int {
 func ToBuffer(value []uint8) ([]byte, error) {
 	return nil, nil
 }
+
+// TODO: need to implement from https://github.com/polkadot-js/common/tree/master/packages/util
+func IsU8a(value interface{}) bool {
+	return false
+}

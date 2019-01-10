@@ -152,6 +152,15 @@ func (s *Service) SetBest(blockNumber *big.Int, hash []byte) error {
 	return nil
 }
 
+// Cfg ...
+func (s *Serivice) Cfg() Config {
+	if s.Config == nil {
+		return Config{}
+	}
+
+	return *s.Config
+}
+
 func (s *Service) clearConnection(connID int) {
 	delete(s.Connections, connId)
 

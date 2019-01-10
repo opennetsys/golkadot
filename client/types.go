@@ -18,3 +18,26 @@ type Config struct {
 	//Telemetry TelemetryConfig
 	//Wasm WasmConfig
 }
+
+// BlockNumber ...
+// note: required by sync.provideBlocks
+type BlockNumber struct{}
+
+// BlockRequest ...
+// note: required by sync.provideBlocks
+// see: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockRequest.ts
+type BlockRequest struct {
+	ID        uint64
+	FromValue *math.Big // note: or BlockNumber???
+	Max       int
+	From      int
+	Direction string // note: create enums?
+}
+
+// BlockResponse ...
+// note: required by sync.provideBlocks
+// see: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockResponse.ts
+type BlockResponse struct {
+	Blocks []interface{} // TODO: change...
+	ID     uint64
+}
