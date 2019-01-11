@@ -2,7 +2,7 @@ all: build
 
 .PHONY: deps
 deps:
-	@go mod vendor
+	@GO111MODULE=on go mod vendor
 
 .PHONY: build
 build:
