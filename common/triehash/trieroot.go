@@ -9,14 +9,14 @@ import (
 )
 
 // TrieRoot creates a trie hash from the supplied pairs.
-func TrieRoot(input []*TriePair) crypto.Blake2b256Hash {
+func TrieRoot(input []*TriePair) *crypto.Blake2b256Hash {
 	return triecodec.Hashing(
 		UnhashedTrie(input),
 	)
 }
 
 // TrieRootOrdered creates a trie hash from the supplied pairs.
-func TrieRootOrdered(input [][]uint8) crypto.Blake2b256Hash {
+func TrieRootOrdered(input [][]uint8) *crypto.Blake2b256Hash {
 	var values []*TriePair
 	for index, value := range input {
 		values = append(values, &TriePair{

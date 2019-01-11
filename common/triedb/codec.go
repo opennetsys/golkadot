@@ -5,6 +5,7 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/triecodec"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -128,9 +129,15 @@ func enc(input interface{}) interface{} {
 			return a
 		case []uint8:
 			return u
-		case Node:
+		case *crypto.Blake2b256Hash:
+			return u[:]
+		case *crypto.Blake2b512Hash:
+			return u[:]
+		case *crypto.Hash:
+			return u[:]
+		case []Node:
 			var a []interface{}
-			for _, x := range u.([]Node) {
+			for _, x := range u {
 				a = append(a, enc(x))
 			}
 			return a
@@ -147,8 +154,26 @@ func enc(input interface{}) interface{} {
 		for _, x := range v {
 			output = append(output, x)
 		}
+	case []*crypto.Blake2b256Hash:
+		for _, x := range v {
+			output = append(output, x[:])
+		}
+	case []*crypto.Blake2b512Hash:
+		for _, x := range v {
+			output = append(output, x[:])
+		}
+	case []*crypto.Hash:
+		for _, x := range v {
+			output = append(output, x[:])
+		}
 	case []uint8:
 		return v
+	case *crypto.Blake2b256Hash:
+		return v[:]
+	case *crypto.Blake2b512Hash:
+		return v[:]
+	case *crypto.Hash:
+		return v[:]
 	case []interface{}:
 		for _, x := range v {
 			result := enc(x)
@@ -188,6 +213,18 @@ func (r *TrieCodec) Encode(value interface{}) ([]uint8, error) {
 		for _, x := range v {
 			input = append(input, x)
 		}
+	case []*crypto.Blake2b256Hash:
+		for _, x := range v {
+			input = append(input, x)
+		}
+	case []*crypto.Blake2b512Hash:
+		for _, x := range v {
+			input = append(input, x)
+		}
+	case []*crypto.Hash:
+		for _, x := range v {
+			input = append(input, x)
+		}
 	case []interface{}:
 		for _, x := range v {
 			result := enc(x)
@@ -212,6 +249,24 @@ func (r *TrieCodec) Decode(encoded []byte, result interface{}) error {
 
 	switch v := decoded.(type) {
 	case []uint8:
+		var a []interface{}
+		for _, x := range v {
+			a = append(a, x)
+		}
+		reflect.ValueOf(result).Elem().Set(reflect.ValueOf(a))
+	case *crypto.Blake2b256Hash:
+		var a []interface{}
+		for _, x := range v {
+			a = append(a, x)
+		}
+		reflect.ValueOf(result).Elem().Set(reflect.ValueOf(a))
+	case *crypto.Blake2b512Hash:
+		var a []interface{}
+		for _, x := range v {
+			a = append(a, x)
+		}
+		reflect.ValueOf(result).Elem().Set(reflect.ValueOf(a))
+	case *crypto.Hash:
 		var a []interface{}
 		for _, x := range v {
 			a = append(a, x)

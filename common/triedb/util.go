@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/triecodec"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -43,6 +44,21 @@ func IsKvNode(node Node) bool {
 			return false
 		}
 		return len(v) == 2
+	case []*crypto.Blake2b256Hash:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 2
+	case []*crypto.Blake2b512Hash:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 2
+	case []*crypto.Hash:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 2
 	case []interface{}:
 		return len(v) == 2
 	default:
@@ -55,6 +71,21 @@ func IsBranchNode(node Node) bool {
 	switch v := node.(type) {
 	case [][]uint8:
 		if IsEmptyNode(v) {
+			return false
+		}
+		return len(v) == 17
+	case []*crypto.Blake2b256Hash:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 17
+	case []*crypto.Blake2b512Hash:
+		if IsEmptyNode(node) {
+			return false
+		}
+		return len(v) == 17
+	case []*crypto.Hash:
+		if IsEmptyNode(node) {
 			return false
 		}
 		return len(v) == 17
@@ -96,7 +127,19 @@ func IsEmptyNode(node Node) bool {
 		return v == nil
 	case [][]uint8:
 		return v == nil
+	case []*crypto.Blake2b256Hash:
+		return v == nil
+	case []*crypto.Blake2b512Hash:
+		return v == nil
+	case []*crypto.Hash:
+		return v == nil
 	case []uint8:
+		return v == nil
+	case *crypto.Blake2b256Hash:
+		return v == nil
+	case *crypto.Blake2b512Hash:
+		return v == nil
+	case *crypto.Hash:
 		return v == nil
 	case []Node:
 		return v == nil
@@ -112,7 +155,19 @@ func IsNull(node Node) bool {
 		return true
 	case []uint8:
 		return v == nil
+	case *crypto.Blake2b256Hash:
+		return v == nil
+	case *crypto.Blake2b512Hash:
+		return v == nil
+	case *crypto.Hash:
+		return v == nil
 	case [][]uint8:
+		return v == nil
+	case []*crypto.Blake2b256Hash:
+		return v == nil
+	case []*crypto.Blake2b512Hash:
+		return v == nil
+	case []*crypto.Hash:
 		return v == nil
 	case []Node:
 		return v == nil
@@ -127,6 +182,12 @@ func Size(value interface{}) int {
 	case nil:
 		return 0
 	case []uint8:
+		return len(v)
+	case *crypto.Blake2b256Hash:
+		return len(v)
+	case *crypto.Blake2b512Hash:
+		return len(v)
+	case *crypto.Hash:
 		return len(v)
 	case []Node:
 		return len(v)
@@ -265,11 +326,29 @@ func IsMultiSlice(value interface{}) bool {
 		return len(v) > 1
 	case [][]uint8:
 		return len(v) > 1
+	case []*crypto.Blake2b256Hash:
+		return len(v) > 1
+	case []*crypto.Blake2b512Hash:
+		return len(v) > 1
+	case []*crypto.Hash:
+		return len(v) > 1
 	case Node:
 		switch u := v.(type) {
 		case []uint8:
 			return false
+		case *crypto.Blake2b256Hash:
+			return false
+		case *crypto.Blake2b512Hash:
+			return false
+		case *crypto.Hash:
+			return false
 		case [][]uint8:
+			return len(u) > 1
+		case []*crypto.Blake2b256Hash:
+			return len(u) > 1
+		case []*crypto.Blake2b512Hash:
+			return len(u) > 1
+		case []*crypto.Hash:
 			return len(u) > 1
 		case []interface{}:
 			return len(u) > 1

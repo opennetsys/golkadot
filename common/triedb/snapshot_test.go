@@ -71,7 +71,7 @@ func TestSnapshots(t *testing.T) {
 			t.Fail()
 		}
 
-		if hex.EncodeToString(back.GetRoot()) != hex.EncodeToString(root) {
+		if hex.EncodeToString(back.GetRoot()[:]) != hex.EncodeToString(root[:]) {
 			t.Fail()
 		}
 
