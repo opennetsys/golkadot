@@ -6,8 +6,12 @@ require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/btcsuite/btcd v0.0.0-20181130015935-7d2daa5bfef2 // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1
+	github.com/ethereum/go-ethereum v1.8.20
 	github.com/gogo/protobuf v1.2.0 // indirect
+	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/gxed/hashland v0.0.0-20180221191214-d9f6b97f8db2 // indirect
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/ipfs/go-log v1.5.7 // indirect
 	github.com/jbenet/goprocess v0.0.0-20160826012719-b497e2f366b8 // indirect
 	github.com/libp2p/go-libp2p-crypto v2.0.1+incompatible // indirect
@@ -32,9 +36,11 @@ require (
 	github.com/perlin-network/life v0.0.0-20181118045116-6bf6615afaa9
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 // indirect
+	github.com/spf13/cobra v0.0.3
+	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
 	github.com/whyrusleeping/go-logging v0.0.0-20170515211332-0457bb6b88fc // indirect
-	golang.org/x/crypto v0.0.0-20180904163835-0709b304e793
+	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
 	golang.org/x/net v0.0.0-20181217023233-e147a9138326 // indirect
 	golang.org/x/tools v0.0.0-20181220221020-d12035dfdc6d // indirect
 )

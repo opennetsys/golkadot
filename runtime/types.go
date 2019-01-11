@@ -33,8 +33,43 @@ type Version struct {
 	APIS map[uint8]uint32
 }
 
-// Header...
+// Header ...
 type Header struct{}
 
-// SignedBlock...
+// SignedBlock ...
 type SignedBlock struct{}
+
+// MemoryBuffer ...
+type MemoryBuffer map[int64]int64 // offset -> size
+
+// Memory ...
+type Memory struct {
+	Allocated   MemoryBuffer
+	Deallocated MemoryBuffer
+	IsResized   bool
+	Offset      int64
+	End         int64
+	Size        int64
+	Buffer      []uint8
+}
+
+// Pointer ...
+type Pointer int64
+
+// SizeUsed ...
+type SizeUsed struct {
+	Allocated   int64
+	Deallocated int64
+}
+
+// PageSize ...
+var PageSize = 64 * 1024
+
+// WasmMemory ...
+type WasmMemory struct {
+	Buffer []byte
+}
+
+// EnvHeap ...
+type EnvHeap struct {
+}
