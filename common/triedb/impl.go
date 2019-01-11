@@ -51,7 +51,7 @@ func (i *Impl) DebugLog(ifcs ...interface{}) {
 }
 
 // Snapshot ...
-func (i *Impl) Snapshot(dest *Trie, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
+func (i *Impl) Snapshot(dest *TrieDB, fn db.ProgressCB, root []uint8, keys int, percent int, depth int) int {
 	i.DebugLog("Snapshot, root", root)
 	node := i.GetNode(root)
 	i.DebugLog("Snapshot, GetNode result", node)

@@ -10,29 +10,29 @@ import (
 	"github.com/c3systems/go-substrate/common/triehash"
 )
 
-// Trie ...
-type Trie struct {
+// TrieDB ...
+type TrieDB struct {
 	impl  *Impl
 	Debug bool
 }
 
 // NewTrie ...
-func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *Trie {
+func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *TrieDB {
 	impl := NewImpl(db, rootHash, codec)
-	return &Trie{
+	return &TrieDB{
 		impl:  impl,
 		Debug: false,
 	}
 }
 
 // SetDebug ...
-func (t *Trie) SetDebug(enabled bool) {
+func (t *TrieDB) SetDebug(enabled bool) {
 	t.Debug = enabled
 	t.impl.Debug = enabled
 }
 
 // DebugLog ...
-func (t *Trie) DebugLog(i ...interface{}) {
+func (t *TrieDB) DebugLog(i ...interface{}) {
 	if t.Debug {
 		i = append([]interface{}{"Debug: triedb"}, i...)
 		fmt.Println(i...)
@@ -40,7 +40,7 @@ func (t *Trie) DebugLog(i ...interface{}) {
 }
 
 // Transaction ...
-func (t *Trie) Transaction(fn func() bool) (bool, error) {
+func (t *TrieDB) Transaction(fn func() bool) (bool, error) {
 	t.impl.checkpoint.CreateCheckpoint()
 
 	result, err := t.impl.db.Transaction(fn)
@@ -59,42 +59,42 @@ func (t *Trie) Transaction(fn func() bool) (bool, error) {
 }
 
 // Open ...
-func (t *Trie) Open() {
+func (t *TrieDB) Open() {
 	t.impl.db.Open()
 }
 
 // Close ...
-func (t *Trie) Close() {
+func (t *TrieDB) Close() {
 	t.impl.db.Close()
 }
 
 // Empty ...
-func (t *Trie) Empty() {
+func (t *TrieDB) Empty() {
 	t.impl.db.Empty()
 }
 
 // Drop ...
-func (t *Trie) Drop() {
+func (t *TrieDB) Drop() {
 	t.impl.db.Drop()
 }
 
 // Maintain ...
-func (t *Trie) Maintain(fn *db.ProgressCB) {
+func (t *TrieDB) Maintain(fn *db.ProgressCB) {
 	t.impl.db.Maintain(fn)
 }
 
 // Rename ...
-func (t *Trie) Rename(base, file string) {
+func (t *TrieDB) Rename(base, file string) {
 	t.impl.db.Rename(base, file)
 }
 
 // Size ...
-func (t *Trie) Size() int {
+func (t *TrieDB) Size() int {
 	return t.impl.db.Size()
 }
 
 // Del ...
-func (t *Trie) Del(key []uint8) {
+func (t *TrieDB) Del(key []uint8) {
 	t.DebugLog("Del, root hash", t.impl.checkpoint.rootHash)
 	n := t.impl.GetNode(t.impl.checkpoint.rootHash)
 	t.DebugLog("Del, get node", n)
@@ -111,7 +111,7 @@ func (t *Trie) Del(key []uint8) {
 }
 
 // Get ...
-func (t *Trie) Get(key []uint8) []uint8 {
+func (t *TrieDB) Get(key []uint8) []uint8 {
 	t.DebugLog("Get, key str", string(key))
 	t.DebugLog("Get, root hash", t.impl.checkpoint.rootHash)
 	x := t.impl.GetNode(t.impl.checkpoint.rootHash)
@@ -132,7 +132,7 @@ func (t *Trie) Get(key []uint8) []uint8 {
 }
 
 // Put ...
-func (t *Trie) Put(key, value []uint8) {
+func (t *TrieDB) Put(key, value []uint8) {
 	t.DebugLog("Put, key str", string(key))
 	t.DebugLog("Put, value", string(value))
 	n := t.impl.GetNode(t.impl.checkpoint.rootHash)
@@ -151,7 +151,7 @@ func (t *Trie) Put(key, value []uint8) {
 }
 
 // GetRoot ...
-func (t *Trie) GetRoot() []uint8 {
+func (t *TrieDB) GetRoot() []uint8 {
 	t.DebugLog("get root")
 	rootnode := t.GetNode(nil)
 	t.DebugLog("get root, root node", rootnode)
@@ -165,7 +165,7 @@ func (t *Trie) GetRoot() []uint8 {
 }
 
 // GetNode ...
-func (t *Trie) GetNode(hash []uint8) Node {
+func (t *TrieDB) GetNode(hash []uint8) Node {
 	t.DebugLog("get node, input hash", hash)
 	if hash == nil {
 		hash = t.impl.checkpoint.rootHash
@@ -176,13 +176,13 @@ func (t *Trie) GetNode(hash []uint8) Node {
 }
 
 // SetRoot ...
-func (t *Trie) SetRoot(rootHash []uint8) {
+func (t *TrieDB) SetRoot(rootHash []uint8) {
 	t.DebugLog("set root, root hash", rootHash)
 	t.impl.checkpoint.rootHash = rootHash
 }
 
 // Snapshot ...
-func (t *Trie) Snapshot(dest *Trie, fn db.ProgressCB) int {
+func (t *TrieDB) Snapshot(dest *TrieDB, fn db.ProgressCB) int {
 	start := time.Now().Unix()
 
 	keys := t.impl.Snapshot(dest, fn, t.impl.checkpoint.rootHash, 0, 0, 0)

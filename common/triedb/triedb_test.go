@@ -7,7 +7,7 @@ import (
 	"github.com/c3systems/go-substrate/common/db"
 )
 
-func newTrie(codec InterfaceCodec) *Trie {
+func newTrie(codec InterfaceCodec) *TrieDB {
 	memdb := db.NewMemoryDB(&db.BaseOptions{})
 	basedb := db.BaseDB(memdb)
 	txdbt := db.NewTransactionDB(&basedb)
