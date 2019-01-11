@@ -20,6 +20,10 @@ test:
 test/wasm:
 	@go test -v wasm/*.go
 
+.PHONY: test/runtime
+test/runtime:
+	@go test -v runtime/*.go
+
 .PHONY: test/common
 test/common:
 	@go test -v $$(go list ./... | grep common/)
