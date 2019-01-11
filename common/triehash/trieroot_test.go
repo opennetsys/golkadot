@@ -27,7 +27,7 @@ func TestTrieRoot(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := TrieRoot(tt.in)
-			if u8util.ToHex(result, -1, true) != tt.out {
+			if u8util.ToHex(result[:], -1, true) != tt.out {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
 		})
@@ -49,7 +49,7 @@ func TestTrieRootOrdered(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := TrieRootOrdered(tt.in)
-			if !reflect.DeepEqual(result, tt.out) {
+			if !reflect.DeepEqual(result[:], tt.out) {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
 		})

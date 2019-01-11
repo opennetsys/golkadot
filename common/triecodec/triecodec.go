@@ -59,7 +59,8 @@ func CreateLeaf(key []uint8, value []uint8) []uint8 {
 // CreateSubstream ...
 func CreateSubstream(value []uint8) []uint8 {
 	if len(value) >= 32 {
-		value = Hashing(value)
+		hashValue := Hashing(value)
+		value = hashValue[:]
 	}
 
 	return CreateValue(value)
@@ -80,6 +81,6 @@ func EndBranch() []uint8 {
 }
 
 // Hashing ...
-func Hashing(value []byte) []byte {
+func Hashing(value []byte) *crypto.Blake2b256Hash {
 	return crypto.NewBlake2b256(value)
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/u8compact"
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/davecgh/go-spew/spew"
@@ -158,6 +159,12 @@ func encodeValue(input interface{}) []uint8 {
 	case *Null:
 		isNull = true
 	case []uint8:
+		isNull = v == nil
+	case *crypto.Blake2b256Hash:
+		isNull = v == nil
+	case *crypto.Blake2b512Hash:
+		isNull = v == nil
+	case *crypto.Hash:
 		isNull = v == nil
 	case []interface{}:
 		isNull = v == nil

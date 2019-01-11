@@ -1,6 +1,7 @@
 package triedb
 
 import (
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -9,6 +10,9 @@ import (
 
 // NodeType ...
 type NodeType int
+
+// Node ..
+type Node interface{}
 
 // NodeTypeEmpty ...
 var NodeTypeEmpty = 0
@@ -60,9 +64,6 @@ func NewEncodedPath(value []uint8) EncodedPath {
 	return EncodedPath(value)
 }
 
-// Node ..
-type Node interface{}
-
 // NewNode ...
 func NewNode(value interface{}) Node {
 	return Node(value)
@@ -89,7 +90,31 @@ func NewNodeListFromNode(node Node) []Node {
 		for _, x := range v {
 			ret = append(ret, x)
 		}
+	case []*crypto.Blake2b256Hash:
+		for _, x := range v {
+			ret = append(ret, x)
+		}
+	case []*crypto.Blake2b512Hash:
+		for _, x := range v {
+			ret = append(ret, x)
+		}
+	case []*crypto.Hash:
+		for _, x := range v {
+			ret = append(ret, x)
+		}
 	case []uint8:
+		if v != nil || len(v) != 0 {
+			ret = append(ret, v)
+		}
+	case *crypto.Blake2b256Hash:
+		if v != nil || len(v) != 0 {
+			ret = append(ret, v)
+		}
+	case *crypto.Blake2b512Hash:
+		if v != nil || len(v) != 0 {
+			ret = append(ret, v)
+		}
+	case *crypto.Hash:
 		if v != nil || len(v) != 0 {
 			ret = append(ret, v)
 		}
@@ -106,22 +131,38 @@ func NewNodeListFromNode(node Node) []Node {
 func NewUint8FromNode(value interface{}) []uint8 {
 	switch v := value.(type) {
 	case []Node:
-		return v[0].([]uint8)
+		// note: check length?
+		if len(v) > 0 && v[0] != nil {
+			return NewUint8FromNode(v[0])
+		}
 	case Node:
 		switch u := v.(type) {
 		case []interface{}:
-			if u[0] != nil {
-				return u[0].([]uint8)
+			if len(u) > 0 && u[0] != nil {
+				return NewUint8FromNode(u[0])
+				//return u[0].([]uint8)[:]
 			}
-		}
-		if u, ok := v.([]uint8); ok {
+		case []uint8:
 			return u
+		case *crypto.Blake2b256Hash:
+			return u[:]
+		case *crypto.Blake2b512Hash:
+			return u[:]
+		case *crypto.Hash:
+			return u[:]
 		}
 	case []uint8:
 		return v
+	case *crypto.Blake2b256Hash:
+		return v[:]
+	case *crypto.Blake2b512Hash:
+		return v[:]
+	case *crypto.Hash:
+		return v[:]
 	case []interface{}:
-		if len(v) > 0 {
-			return v[0].([]uint8)
+		if len(v) > 0 && v[0] != nil {
+			return NewUint8FromNode(v[0])
+			//return v[0].(*crypto.Blake2b256Hash)[:]
 		}
 	}
 
@@ -135,25 +176,47 @@ func NewUint8ListFromNode(value interface{}) [][]uint8 {
 	switch v := value.(type) {
 	case [][]uint8:
 		return v
+	case []*crypto.Blake2b256Hash:
+		var ret [][]uint8
+		for idx := range v {
+			ret = append(ret, v[idx][:])
+		}
+		return ret
+	case []*crypto.Blake2b512Hash:
+		var ret [][]uint8
+		for idx := range v {
+			ret = append(ret, v[idx][:])
+		}
+		return ret
+	case []*crypto.Hash:
+		var ret [][]uint8
+		for idx := range v {
+			ret = append(ret, v[idx][:])
+		}
+		return ret
 	case []Node:
 		for _, x := range v {
-			ret = append(ret, x.([]uint8))
+			ret = append(ret, NewUint8FromNode(x))
+			//ret = append(ret, x.([]uint8))
 		}
 	case Node:
 		switch u := v.(type) {
 		case []Node:
 			for _, x := range u {
-				ret = append(ret, x.([]uint8))
+				ret = append(ret, NewUint8FromNode(x))
+				//ret = append(ret, x.([]uint8))
 			}
 		case []interface{}:
 			spew.Dump(u)
 			for _, x := range u {
-				ret = append(ret, x.([]uint8))
+				ret = append(ret, NewUint8FromNode(x))
+				//ret = append(ret, x.([]uint8))
 			}
 		}
 	case []interface{}:
 		for _, x := range v {
-			ret = append(ret, x.([]uint8))
+			ret = append(ret, NewUint8FromNode(x))
+			//ret = append(ret, x.([]uint8))
 		}
 	}
 
@@ -162,11 +225,19 @@ func NewUint8ListFromNode(value interface{}) [][]uint8 {
 
 // NewFirstUint8ListFromNode ...
 func NewFirstUint8ListFromNode(node Node) []uint8 {
+	// note: check array lenght, first?
 	switch v := node.(type) {
 	case []Node:
-		return v[0].([]uint8)
+		return NewUint8FromNode(v[0])
+		//return v[0].([]uint8)[:]
 	case [][]uint8:
 		return v[0]
+	case []*crypto.Blake2b256Hash:
+		return v[0][:]
+	case []*crypto.Blake2b512Hash:
+		return v[0][:]
+	case []*crypto.Hash:
+		return v[0][:]
 	}
 
 	return nil

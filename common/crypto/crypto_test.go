@@ -17,8 +17,8 @@ func TestNewSHA256(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewSHA256(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}
@@ -35,8 +35,8 @@ func TestNewBlake2b256(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewBlake2b256(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}
@@ -53,8 +53,8 @@ func TestNewBlake2b512(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewBlake2b512(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}

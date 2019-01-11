@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -265,6 +266,12 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 			value = false
 		case []uint8:
 			value = v != nil
+		case *crypto.Blake2b256Hash:
+			isNull = v != nil
+		case *crypto.Blake2b512Hash:
+			isNull = v != nil
+		case *crypto.Hash:
+			isNull = v != nil
 		case *Null:
 			value = false
 		case *BranchHeader:
