@@ -141,13 +141,13 @@ type InterfaceMemory interface {
 
 // InterfaceSandbox ...
 type InterfaceSandbox interface {
-	SandboxInstantiate(a, b, c, d, e, f int64) int64
-	SandboxInstanceTeardown(instanceIndex int64)
-	SandboxInvoke(instanceIndex int64, exportPtr Pointer, exportLength int64, argsPtr Pointer, argsLength int64, returnValPtr Pointer, returnValLength int64, state int64)
-	SandboxMemoryGet(memoryIndex int64, offset int64, ptr Pointer, length int64) int64
-	SandboxMemoryNew(initial int64, maximum int64) int64
-	SandboxMemorySet(memoryIndex int64, offset int64, ptr Pointer, length int64) int64
-	SandboxMemoryTeardown(memoryIndex int64)
+	Instantiate(a, b, c, d, e, f int64) int64
+	InstanceTeardown(instanceIndex int64)
+	Invoke(instanceIndex int64, exportPtr Pointer, exportLength int64, argsPtr Pointer, argsLength int64, returnValPtr Pointer, returnValLength int64, state int64)
+	MemoryGet(memoryIndex int64, offset int64, ptr Pointer, length int64) int64
+	MemoryNew(initial int64, maximum int64) int64
+	MemorySet(memoryIndex int64, offset int64, ptr Pointer, length int64) int64
+	MemoryTeardown(memoryIndex int64)
 }
 
 // InterfaceStorageData ...
