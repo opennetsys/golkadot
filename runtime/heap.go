@@ -8,7 +8,7 @@ import (
 
 // Heap ...
 type Heap struct {
-	memory     *Memory
+	memory     *HeapMemory
 	wasmMemory *WasmMemory
 }
 
@@ -191,7 +191,7 @@ func (h *Heap) FindContaining(size int64) Pointer {
 	return Pointer(ptr)
 }
 
-func createMemory(buffer []uint8, offset int64) *Memory {
+func createMemory(buffer []uint8, offset int64) *HeapMemory {
 	if buffer == nil {
 		buffer = []uint8{}
 	}
@@ -206,9 +206,9 @@ func createMemory(buffer []uint8, offset int64) *Memory {
 		buffer[i] = 0
 	}
 
-	return &Memory{
-		Allocated:   nil,
-		Deallocated: nil,
+	return &HeapMemory{
+		Allocated:   make(MemoryBuffer),
+		Deallocated: make(MemoryBuffer),
 		IsResized:   false,
 		Offset:      offset, // aligned with Rust (should have offset)
 		Size:        size,

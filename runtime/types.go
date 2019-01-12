@@ -42,8 +42,8 @@ type SignedBlock struct{}
 // MemoryBuffer ...
 type MemoryBuffer map[int64]int64 // offset -> size
 
-// Memory ...
-type Memory struct {
+// HeapMemory ...
+type HeapMemory struct {
 	Allocated   MemoryBuffer
 	Deallocated MemoryBuffer
 	IsResized   bool
@@ -136,7 +136,7 @@ type InterfaceMemory interface {
 	Memcmp(s1 Pointer, s2 Pointer, length int64) int64
 	Memcpy(dst Pointer, src Pointer, num int64) Pointer
 	Memmove(dst Pointer, src Pointer, num int64) Pointer
-	Memset(dst Pointer, val Pointer, num int64) Pointer
+	Memset(dst Pointer, val uint8, num int64) Pointer
 }
 
 // InterfaceSandbox ...
