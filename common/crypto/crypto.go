@@ -2,7 +2,9 @@ package crypto
 
 import (
 	"crypto/sha256"
+	"math"
 
+	"github.com/pierrec/xxHash/xxHash64"
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -34,4 +36,39 @@ func NewBlake2b512(data []byte) *Blake2b512Hash {
 	var hash Blake2b512Hash
 	hash = blake2b.Sum512(data)
 	return &hash
+}
+
+// NewXXHash64 ...
+func NewXXHash64(data []byte) [8]byte {
+	var hash [8]byte
+	copy(hash[:], newXXHash(data, 64))
+	return hash
+}
+
+// NewXXHash128 ...
+func NewXXHash128(data []byte) [16]byte {
+	var hash [16]byte
+	copy(hash[:], newXXHash(data, 128))
+	return hash
+}
+
+// NewXXHash256 ...
+func NewXXHash256(data []byte) [32]byte {
+	var hash [32]byte
+	copy(hash[:], newXXHash(data, 256))
+	return hash
+}
+
+func newXXHash(data []byte, bitLength uint) []byte {
+	byteLength := int64(math.Ceil(float64(bitLength) / float64(8)))
+	iterations := int64(math.Ceil(float64(bitLength) / float64(64)))
+	var hash = make([]byte, byteLength)
+
+	for seed := int64(0); seed < iterations; seed++ {
+		digest := xxHash64.New(uint64(seed))
+		digest.Write(data)
+		copy(hash[seed*8:], digest.Sum(nil))
+	}
+
+	return hash
 }

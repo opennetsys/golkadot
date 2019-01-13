@@ -59,3 +59,57 @@ func TestNewBlake2b512(t *testing.T) {
 		})
 	}
 }
+
+func TestNewXXHash64(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef"},
+		{[]byte("abc"), "990977adf52cbc44"},
+		{[]byte("hello"), "a36d9f887d82c726"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash64(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewXXHash128(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef4bbea33613baafd5"},
+		{[]byte("abc"), "990977adf52cbc440889329981caa9be"},
+		{[]byte("hello"), "a36d9f887d82c726b2a1d004cb71dd23"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash128(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewXXHash256(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef4bbea33613baafd56f963c64b1f3685a4eb4abd67ff6203a"},
+		{[]byte("abc"), "990977adf52cbc440889329981caa9bef7da5770b2b8a05303b75d95360dd62b"},
+		{[]byte("hello"), "a36d9f887d82c726b2a1d004cb71dd231fe2fb3bf584fc533914a80e276583e0"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash256(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}

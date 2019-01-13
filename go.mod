@@ -5,6 +5,7 @@ replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wago
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/btcsuite/btcd v0.0.0-20181130015935-7d2daa5bfef2 // indirect
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/ethereum/go-ethereum v1.8.20
@@ -34,8 +35,8 @@ require (
 	github.com/multiformats/go-multistream v0.3.9 // indirect
 	github.com/opentracing/opentracing-go v1.0.2 // indirect
 	github.com/perlin-network/life v0.0.0-20181118045116-6bf6615afaa9
+	github.com/pierrec/xxHash v0.1.1
 	github.com/sirupsen/logrus v1.2.0
-	github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect

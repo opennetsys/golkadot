@@ -80,6 +80,8 @@ github.com/perlin-network/life/compiler
 github.com/perlin-network/life/exec
 github.com/perlin-network/life/compiler/opcodes
 github.com/perlin-network/life/utils
+# github.com/pierrec/xxHash v0.1.1
+github.com/pierrec/xxHash/xxHash64
 # github.com/sirupsen/logrus v1.2.0
 github.com/sirupsen/logrus
 # github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72
