@@ -1,11 +1,16 @@
 package crypto
 
 import (
+	"bytes"
+	"crypto/rand"
 	"crypto/sha256"
+	"log"
 	"math"
 
 	"github.com/pierrec/xxHash/xxHash64"
 	"golang.org/x/crypto/blake2b"
+	naclauth "golang.org/x/crypto/nacl/auth"
+	naclsign "golang.org/x/crypto/nacl/sign"
 )
 
 // Hash ...
@@ -71,4 +76,30 @@ func newXXHash(data []byte, bitLength uint) []byte {
 	}
 
 	return hash
+}
+
+// NewNaclKeyPair ...
+func NewNaclKeyPair() ([32]byte, [64]byte) {
+	publicKey, privateKey, err := naclsign.GenerateKey(rand.Reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return *publicKey, *privateKey
+}
+
+// NewNaclKeyPairFromSeed ...
+func NewNaclKeyPairFromSeed(seed []byte) ([32]byte, [64]byte) {
+	reader := bytes.NewBuffer(seed)
+	publicKey, privateKey, err := naclsign.GenerateKey(reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return *publicKey, *privateKey
+}
+
+// NaclVerify ...
+func NaclVerify(digest []byte, message []byte, key [naclauth.KeySize]byte) bool {
+	return naclauth.Verify(digest, message, &key)
 }
