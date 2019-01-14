@@ -9,6 +9,8 @@ import (
 
 	"github.com/pierrec/xxHash/xxHash64"
 	"golang.org/x/crypto/blake2b"
+
+	"github.com/agl/ed25519"
 	naclauth "golang.org/x/crypto/nacl/auth"
 	naclsign "golang.org/x/crypto/nacl/sign"
 )
@@ -99,7 +101,9 @@ func NewNaclKeyPairFromSeed(seed []byte) ([32]byte, [64]byte) {
 	return *publicKey, *privateKey
 }
 
-// NaclVerify ...
-func NaclVerify(digest []byte, message []byte, key [naclauth.KeySize]byte) bool {
-	return naclauth.Verify(digest, message, &key)
+// NaclVerify returns true if signature is a valid signature of digest by public key. Using the 'agl' library because native nacl library doesn't support detached signatures.
+func NaclVerify(digest []byte, signature []byte, publicKey [naclauth.KeySize]byte) bool {
+	var sig64 [64]byte
+	copy(sig64[:], signature)
+	return ed25519.Verify(&publicKey, digest, &sig64)
 }
