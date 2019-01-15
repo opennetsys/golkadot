@@ -1,11 +1,13 @@
 package block
 
 import (
+	"math/big"
+
 	pcrypto "github.com/c3systems/go-substrate/common/crypto"
 )
 
 // AccountID ...
-type AccountID []uint8
+type AccountID [32]uint8
 
 // AuthorityID ...
 type AuthorityID AccountID
@@ -37,10 +39,10 @@ type Digest struct {
 
 // Header ...
 type Header struct {
-	ParentHash     pcrypto.Hash
-	Number         uint64
-	StateRoot      pcrypto.Hash
-	ExtrinsicsRoot pcrypto.Hash
+	ParentHash     *pcrypto.Blake2b256Hash
+	Number         *big.Int
+	StateRoot      *pcrypto.Blake2b256Hash
+	ExtrinsicsRoot *pcrypto.Blake2b256Hash
 	Digest         *Digest
 }
 

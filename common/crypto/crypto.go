@@ -35,3 +35,25 @@ func NewBlake2b512(data []byte) *Blake2b512Hash {
 	hash = blake2b.Sum512(data)
 	return &hash
 }
+
+// NewBlake2b256Sig ...
+func NewBlake2b256Sig(key, data []byte) ([]byte, error) {
+	hash, err := blake2b.New256(key)
+	if err != nil {
+		return nil, err
+	}
+
+	hash.Write(data)
+	return hash.Sum(nil), nil
+}
+
+// NewBlake2b512Sig ...
+func NewBlake2b512Sig(key, data []byte) ([]byte, error) {
+	hash, err := blake2b.New512(key)
+	if err != nil {
+		return nil, err
+	}
+
+	hash.Write(data)
+	return hash.Sum(nil), nil
+}
