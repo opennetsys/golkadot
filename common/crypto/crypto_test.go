@@ -60,6 +60,24 @@ func TestNewBlake2b512(t *testing.T) {
 	}
 }
 
+func TestNewXXHash(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef"},
+		{[]byte("abc"), "990977adf52cbc44"},
+		{[]byte("hello"), "a36d9f887d82c726"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash(tt.in, 64)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
 func TestNewXXHash64(t *testing.T) {
 	for i, tt := range []struct {
 		in  []byte

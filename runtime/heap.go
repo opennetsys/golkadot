@@ -93,7 +93,7 @@ func (h *Heap) FreeAlloc(size int64) Pointer {
 // GrowAlloc ...
 func (h *Heap) GrowAlloc(size int64) Pointer {
 	// NOTE: grow memory by 4 times the requested amount (rounded up)
-	if h.GrowMemory(1 + int64(math.Ceil(float64(4)*float64(size)/float64(PageSize)))) {
+	if h.GrowMemory(1 + int64(math.Ceil((float64(4)*float64(size))/float64(PageSize)))) {
 		return h.Allocate(size)
 	}
 
@@ -102,7 +102,16 @@ func (h *Heap) GrowAlloc(size int64) Pointer {
 
 // Get ...
 func (h *Heap) Get(ptr Pointer, length int64) []uint8 {
-	return h.memory.Buffer[ptr : int64(ptr)+length]
+	start := int64(ptr)
+	end := int64(ptr) + length
+	if end > int64(len(h.memory.Buffer)) {
+		end = int64(len(h.memory.Buffer))
+	}
+	if start > end {
+		start = 0
+	}
+
+	return h.memory.Buffer[start:end]
 }
 
 // GetU32 ...
@@ -165,8 +174,10 @@ func (h *Heap) GrowMemory(pages int64) bool {
 		return false
 	}
 
-	// TODO
-	//h.wasmMemory.grow(pages)
+	// NOTE: Growing allocated memory by pages * 64KB
+	newBuffer := make([]byte, pages*int64(PageSize))
+	copy(newBuffer[:], h.wasmMemory.Buffer[:])
+	h.wasmMemory.Buffer = newBuffer
 	h.memory.Size = int64(len(h.wasmMemory.Buffer))
 	h.memory.Buffer = h.wasmMemory.Buffer
 	h.memory.IsResized = true

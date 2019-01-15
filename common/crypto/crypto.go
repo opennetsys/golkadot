@@ -45,6 +45,11 @@ func NewBlake2b512(data []byte) *Blake2b512Hash {
 	return &hash
 }
 
+// NewXXHash ...
+func NewXXHash(data []byte, bitLength int64) []byte {
+	return newXXHash(data, uint(bitLength))
+}
+
 // NewXXHash64 ...
 func NewXXHash64(data []byte) [8]byte {
 	var hash [8]byte

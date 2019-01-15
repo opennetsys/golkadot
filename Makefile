@@ -22,7 +22,7 @@ test/wasm:
 
 .PHONY: test/runtime
 test/runtime:
-	@go test -v runtime/*.go
+	@go test -v runtime/*.go $(ARGS)
 
 .PHONY: test/common
 test/common:
