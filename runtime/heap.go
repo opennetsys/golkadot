@@ -174,7 +174,7 @@ func (h *Heap) GrowMemory(pages int64) bool {
 		return false
 	}
 
-	// NOTE: Growing allocated memory by pages * 64KB
+	// NOTE: growing allocated memory by (pages * 64KB)
 	newBuffer := make([]byte, pages*int64(PageSize))
 	copy(newBuffer[:], h.wasmMemory.Buffer[:])
 	h.wasmMemory.Buffer = newBuffer
