@@ -1,9 +1,14 @@
 package runtime
 
 import (
+	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
+
+	"github.com/c3systems/go-substrate/common/hexutil"
 )
 
 // Heap ...
@@ -115,8 +120,15 @@ func (h *Heap) Get(ptr Pointer, length int64) []uint8 {
 }
 
 // GetU32 ...
-func (h *Heap) GetU32(ptr Pointer) []uint8 {
-	return h.memory.Buffer[ptr:]
+func (h *Heap) GetU32(ptr Pointer) uint32 {
+	buf := h.memory.Buffer[ptr : ptr+4]
+	// TODO: better way to convert 4 bytes to uint32 in little endian
+	n, err := strconv.ParseInt("0x"+hexutil.Reverse(hex.EncodeToString(buf)), 0, 32)
+	if err != nil {
+		panic(err)
+	}
+
+	return uint32(n)
 }
 
 // Set ...
@@ -127,8 +139,10 @@ func (h *Heap) Set(ptr Pointer, data []uint8) Pointer {
 }
 
 // SetU32 ...
-func (h *Heap) SetU32(ptr Pointer, value []uint8) Pointer {
-	copy(h.memory.Buffer[ptr:], value)
+func (h *Heap) SetU32(ptr Pointer, value uint32) Pointer {
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint32(b, value)
+	copy(h.memory.Buffer[ptr:], b)
 
 	return ptr
 }

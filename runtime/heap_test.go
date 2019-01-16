@@ -22,7 +22,7 @@ func TestHeap(t *testing.T) {
 		})
 
 		t.Run("allows set of LE u32 values", func(t *testing.T) {
-			if !reflect.DeepEqual(heap.Get(heap.SetU32(Pointer(4), intToBytes(0x12345, 4)), 4), []uint8{0x45, 0x23, 0x01, 0}) {
+			if !reflect.DeepEqual(heap.Get(heap.SetU32(Pointer(4), 0x12345), 4), []uint8{0x45, 0x23, 0x01, 0}) {
 				t.Fail()
 			}
 		})
@@ -40,7 +40,7 @@ func TestHeap(t *testing.T) {
 		})
 
 		t.Run("allows retrieval of LE u32 values", func(t *testing.T) {
-			if !reflect.DeepEqual(heap.GetU32(heap.SetU32(4, intToBytes(0x12345, 4))), intToBytes(0x12345, 4)) {
+			if heap.GetU32(heap.SetU32(4, 0x12345)) != 0x12345 {
 				t.Fail()
 			}
 		})

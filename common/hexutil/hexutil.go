@@ -142,6 +142,7 @@ func ToUint8Slice(hexStr string, bitLength int) ([]uint8, error) {
 
 // Reverse reverses a hex string
 func Reverse(s string) string {
+	s = StripPrefix(s)
 	regex := regexp.MustCompile(`.{1,2}`)
 	in := regex.FindAllString(s, -1)
 	var out []string

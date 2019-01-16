@@ -152,17 +152,17 @@ func (t *TrieDB) Put(key, value []uint8) {
 }
 
 // GetRoot ...
-func (t *TrieDB) GetRoot() *crypto.Blake2b256Hash {
+func (t *TrieDB) GetRoot() []byte {
 	t.DebugLog("get root")
 	rootnode := t.GetNode(nil)
 	t.DebugLog("get root, root node", rootnode)
 
 	if IsNull(rootnode) {
 		t.DebugLog("get root, root node is nil")
-		return triehash.TrieRoot(nil)
+		return triehash.TrieRoot(nil)[:]
 	}
 
-	return t.impl.checkpoint.rootHash
+	return t.impl.checkpoint.rootHash[:]
 }
 
 // GetNode ...

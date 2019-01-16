@@ -34,7 +34,7 @@ func TestSnapshots(t *testing.T) {
 			t.Fail()
 		}
 
-		if !reflect.DeepEqual(back.GetRoot(), root) {
+		if !reflect.DeepEqual(back.GetRoot(), root[:]) {
 			t.Fail()
 		}
 

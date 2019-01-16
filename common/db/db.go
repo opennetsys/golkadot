@@ -38,4 +38,5 @@ type BaseDB interface {
 type TXDB interface {
 	BaseDB
 	Transaction(fn func() bool) (bool, error)
+	GetRoot() []byte // triedb
 }
