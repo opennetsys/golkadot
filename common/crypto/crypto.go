@@ -112,3 +112,25 @@ func NaclVerify(digest []byte, signature []byte, publicKey [naclauth.KeySize]byt
 	copy(sig64[:], signature)
 	return ed25519.Verify(&publicKey, digest, &sig64)
 }
+
+// NewBlake2b256Sig ...
+func NewBlake2b256Sig(key, data []byte) ([]byte, error) {
+	hash, err := blake2b.New256(key)
+	if err != nil {
+		return nil, err
+	}
+
+	hash.Write(data)
+	return hash.Sum(nil), nil
+}
+
+// NewBlake2b512Sig ...
+func NewBlake2b512Sig(key, data []byte) ([]byte, error) {
+	hash, err := blake2b.New512(key)
+	if err != nil {
+		return nil, err
+	}
+
+	hash.Write(data)
+	return hash.Sum(nil), nil
+}

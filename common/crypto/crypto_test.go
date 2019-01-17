@@ -3,7 +3,10 @@ package crypto
 import (
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"testing"
+
+	"github.com/c3systems/go-substrate/common/u8util"
 )
 
 func TestNewSHA256(t *testing.T) {
@@ -96,6 +99,28 @@ func TestNewXXHash64(t *testing.T) {
 	}
 }
 
+func TestNewBlake2b256Sig(t *testing.T) {
+	for i, tt := range []struct {
+		key  []byte
+		data []byte
+		out  string
+	}{
+		{nil, []byte("abc"), "bddd813c…68d52319"},
+		{[]byte{4, 5, 6}, []byte{1, 2, 3}, "af0e60f4…8a714a8f"},
+		{[]byte("abc"), nil, "7a78f945…73b8f07b"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result, err := NewBlake2b256Sig(tt.key, tt.data)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(u8util.ToHex(result[:], 512/8, false), tt.out) {
+				t.Error(u8util.ToHex(result[:], 512/8, false), tt.out)
+			}
+		})
+	}
+}
+
 func TestNewXXHash128(t *testing.T) {
 	for i, tt := range []struct {
 		in  []byte
@@ -127,6 +152,28 @@ func TestNewXXHash256(t *testing.T) {
 			result := NewXXHash256(tt.in)
 			if hex.EncodeToString(result[:]) != tt.out {
 				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewBlake2b512Sig(t *testing.T) {
+	for i, tt := range []struct {
+		key  []byte
+		data []byte
+		out  string
+	}{
+		{nil, []byte("abc"), "ba80a53f…d4009923"},
+		{[]byte{4, 5, 6}, []byte{1, 2, 3}, "7ed2dd42…2ec9362e"},
+		{[]byte("abc"), nil, "91cc35fc…f47b00e5"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result, err := NewBlake2b512Sig(tt.key, tt.data)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(u8util.ToHex(result[:], 512/8, false), tt.out) {
+				t.Error(u8util.ToHex(result[:], 512/8, false), tt.out)
 			}
 		})
 	}
