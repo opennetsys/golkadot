@@ -24,6 +24,10 @@ test/wasm:
 test/runtime:
 	@go test -v runtime/*.go $(ARGS)
 
+.PHONY: test/clientdb
+test/clientdb:
+	@go test -v clientdb/*.go
+
 .PHONY: test/common
 test/common:
 	@go test -v $$(go list ./... | grep common/)
