@@ -51,5 +51,10 @@ type Request struct{}
 
 // Data TODO
 type Data struct {
-	Hash pcrypto.Hash
+	Hash          *pcrypto.Blake2b256Hash
+	Header        *Header
+	Body          []byte
+	Receipt       []byte
+	MessageQueue  []byte
+	Justification []byte
 }
