@@ -48,8 +48,12 @@ func EncodeToCompact(val *big.Int) (*Compact, error) {
 }
 
 // note: https://stackoverflow.com/a/51123337/3512709
+// @asked Shahul Hameed https://stackoverflow.com/users/4518319/shahul-hameed
+// @answered Tim Cooper https://stackoverflow.com/users/142162/tim-cooper
+// per https://stackoverflow.blog/2009/06/25/attribution-required/
 func bigEToLittleE(b []byte) {
-	for i := 0; i < len(b)/2; i++ {
-		b[i], b[len(b)-i-1] = b[len(b)-i-1], b[i]
+	l := len(b)
+	for i := 0; i < l/2; i++ {
+		b[i], b[l-i-1] = b[l-i-1], b[i]
 	}
 }
