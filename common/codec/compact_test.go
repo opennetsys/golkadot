@@ -8,6 +8,7 @@ import (
 )
 
 func TestEncodeToCompact(t *testing.T) {
+	bi, _ := big.NewInt(0).SetString("18446744073709551615", 10)
 	for i, tt := range []struct {
 		in  *big.Int
 		out Compact
@@ -39,6 +40,63 @@ func TestEncodeToCompact(t *testing.T) {
 		{
 			big.NewInt(100000000000000),
 			Compact([]byte{11, 0, 64, 122, 16, 243, 90}),
+		},
+		// note: https://github.com/paritytech/parity-codec/blob/master/src/codec.rs
+		{
+			big.NewInt(0),
+			Compact([]byte{0}),
+		},
+		{
+			big.NewInt(63),
+			Compact([]byte{252}),
+		},
+		{
+			big.NewInt(64),
+			Compact([]byte{1, 1}),
+		},
+		{
+			big.NewInt(16383),
+			Compact([]byte{253, 255}),
+		},
+		{
+			big.NewInt(16384),
+			Compact([]byte{2, 0, 1, 0}),
+		},
+		{
+			big.NewInt(1073741823),
+			Compact([]byte{254, 255, 255, 255}),
+		},
+		{
+			big.NewInt(1073741824),
+			Compact([]byte{3, 0, 0, 0, 64}),
+		},
+		{
+			big.NewInt(4294967295),
+			Compact([]byte{3, 255, 255, 255, 255}),
+		},
+		{
+			big.NewInt(4294967296),
+			Compact([]byte{7, 0, 0, 0, 0, 1}),
+		},
+		{
+			big.NewInt(1099511627776),
+			Compact([]byte{11, 0, 0, 0, 0, 0, 1}),
+		},
+		{
+			big.NewInt(281474976710656),
+			Compact([]byte{15, 0, 0, 0, 0, 0, 0, 1}),
+		},
+		{
+			big.NewInt(72057594037927935),
+			Compact([]byte{15, 255, 255, 255, 255, 255, 255, 255}),
+		},
+		{
+			big.NewInt(72057594037927936),
+			Compact([]byte{19, 0, 0, 0, 0, 0, 0, 0, 1}),
+		},
+		{
+			bi,
+			Compact([]byte{19, 255, 255, 255, 255, 255, 255, 255, 255}),
 		},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
