@@ -53,3 +53,43 @@ func TestEncodeToCompact(t *testing.T) {
 		})
 	}
 }
+
+func TestBigEToLittleE(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out []byte
+	}{
+		{
+			nil,
+			nil,
+		},
+		{
+			[]byte{},
+			[]byte{},
+		},
+		{
+			[]byte{0},
+			[]byte{0},
+		},
+		{
+			[]byte{0, 1},
+			[]byte{1, 0},
+		},
+		{
+			[]byte{0, 1, 2},
+			[]byte{2, 1, 0},
+		},
+		{
+			[]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			[]byte{10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
+		},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			bigEToLittleE(tt.in)
+
+			if !reflect.DeepEqual(tt.in, tt.out) {
+				t.Errorf("want %v; got %v", tt.out, tt.in)
+			}
+		})
+	}
+}
