@@ -1,5 +1,7 @@
 package codec
 
+import "errors"
+
 // note: https://github.com/polkadot-js/common/blob/89030f41b34e5bb815f8004861c0424bdd3337f4/packages/util/src/compact/toU8a.ts#L11
 const (
 	// MAX_U8 ...
@@ -8,6 +10,21 @@ const (
 	MAX_U16 uint = 16383
 	// MAX_U32 ...
 	MAX_U32 uint = 1073741823
+)
+
+var (
+	// ErrInvalidKind ...
+	ErrInvalidKind = errors.New("invalid kind")
+	// ErrNilKind ...
+	ErrNilKind = errors.New("kind cannot be nil")
+	// ErrNilInput ...
+	ErrNilInput = errors.New("input cannot be nil")
+	// ErrNilTarget ...
+	ErrNilTarget = errors.New("target cannot be nil")
+	// ErrNonTargetPointer ...
+	ErrNonTargetPointer = errors.New("target must be pointer")
+	// ErrInvalidLength ...
+	ErrInvalidLength = errors.New("invalid length")
 )
 
 // Compact ...

@@ -3,24 +3,10 @@ package codec
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"math/big"
 	"reflect"
 
 	"github.com/c3systems/go-substrate/common/u8compact"
-)
-
-var (
-	// ErrInvalidKind ...
-	ErrInvalidKind = errors.New("invalid kind")
-	// ErrNilKind ...
-	ErrNilKind = errors.New("kind cannot be nil")
-	// ErrNilInput ...
-	ErrNilInput = errors.New("input cannot be nil")
-	// ErrNilTarget ...
-	ErrNilTarget = errors.New("target cannot be nil")
-	// ErrNonTargetPointer ...
-	ErrNonTargetPointer = errors.New("target must be pointer")
 )
 
 func writeBinary(v interface{}) ([]byte, error) {

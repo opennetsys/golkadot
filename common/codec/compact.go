@@ -29,21 +29,18 @@ func EncodeToCompact(val *big.Int) (*Compact, error) {
 		return &c, err
 	}
 
-	//var b []byte
-	//w := val.Bits()
-	//for idx := range w {
-	//b = append(b, uint8(w[idx]))
-	//}
-
 	// note: bytes is big-endian
 	b := val.Bytes()
 	bigEToLittleE(b)
 	l := len(b)
 
+	if l < 4 {
+		return nil, ErrInvalidLength
+	}
+
 	for ; b[l-1] == 0; l-- {
 	}
 
-	// note: assert l > 4?
 	ret := []byte{uint8(((l - 4) << 2) + 3)}
 	ret = append(ret, b[0:l]...)
 	c := Compact(ret)
