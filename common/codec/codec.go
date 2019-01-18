@@ -15,6 +15,12 @@ var (
 	ErrInvalidKind = errors.New("invalid kind")
 	// ErrNilKind ...
 	ErrNilKind = errors.New("kind cannot be nil")
+	// ErrNilInput ...
+	ErrNilInput = errors.New("input cannot be nil")
+	// ErrNilTarget ...
+	ErrNilTarget = errors.New("target cannot be nil")
+	// ErrNonTargetPointer ...
+	ErrNonTargetPointer = errors.New("target must be pointer")
 )
 
 func writeBinary(v interface{}) ([]byte, error) {
@@ -144,9 +150,32 @@ func encode(v *reflect.Value) ([]byte, error) {
 // Encode ...
 func Encode(input interface{}) ([]byte, error) {
 	if input == nil {
-		return nil, ErrNilKind
+		return nil, ErrNilInput
 	}
 
 	v := reflect.ValueOf(input)
 	return encode(&v)
+}
+
+// Decode ...
+// TODO: this is an incomplete implementation
+func Decode(input []byte, target interface{}) error {
+	if input == nil {
+		return ErrNilInput
+	}
+	if target == nil {
+		return ErrNilTarget
+	}
+
+	switch v := reflect.ValueOf(target); v.Kind() {
+	case reflect.Ptr, reflect.UnsafePointer, reflect.Uintptr:
+		{
+			return binary.Read(bytes.NewReader(input), binary.LittleEndian, target)
+		}
+
+	default:
+		{
+			return ErrNonTargetPointer
+		}
+	}
 }
