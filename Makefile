@@ -20,6 +20,18 @@ test:
 test/wasm:
 	@go test -v wasm/*.go
 
+.PHONY: test/rpc
+test/rpc:
+	@go test -v rpc/*.go
+
+.PHONY: test/p2p
+test/p2p:
+	@go test -v p2p/*.go
+
+.PHONY: test/types
+test/types:
+	@go test -v types/*.go
+
 .PHONY: test/runtime
 test/runtime:
 	@go test -v runtime/*.go $(ARGS)

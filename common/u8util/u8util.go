@@ -56,7 +56,7 @@ func ToString(value []uint8) string {
 	return string(value)
 }
 
-// ToHex creates a hex string from a uint8 slice.
+// ToHex creates a hex string from a uint8 slice. Set bitLength to -1 for default
 func ToHex(value []uint8, bitLength int, isPrefixed bool) string {
 	byteLength := int(math.Ceil(float64(bitLength) / float64(8)))
 
