@@ -1,6 +1,9 @@
 package codec
 
-import "errors"
+import (
+	"errors"
+	"math/big"
+)
 
 // note: https://github.com/polkadot-js/common/blob/89030f41b34e5bb815f8004861c0424bdd3337f4/packages/util/src/compact/toU8a.ts#L11
 const (
@@ -10,6 +13,8 @@ const (
 	MAX_U16 uint = 16383
 	// MAX_U32 ...
 	MAX_U32 uint = 1073741823
+	// DEFAULT_BITLENGTH ...
+	DEFAULT_BITLENGTH int = 32
 )
 
 var (
@@ -29,3 +34,9 @@ var (
 
 // Compact ...
 type Compact []byte
+
+// CompactMeta ...
+type CompactMeta struct {
+	Offset int
+	Length *big.Int
+}

@@ -5,9 +5,11 @@ import (
 	"math/big"
 	"reflect"
 	"testing"
+
+	"github.com/c3systems/go-substrate/common/u8util"
 )
 
-func TestEncodeToCompact(t *testing.T) {
+func TestBNToCompact(t *testing.T) {
 	bi, _ := big.NewInt(0).SetString("18446744073709551615", 10)
 	for i, tt := range []struct {
 		in  *big.Int
@@ -100,7 +102,7 @@ func TestEncodeToCompact(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			comp, err := EncodeToCompact(tt.in)
+			comp, err := BNToCompact(tt.in)
 			if err != nil || comp == nil {
 				t.Fatal(err)
 			}
@@ -147,6 +149,67 @@ func TestBigEToLittleE(t *testing.T) {
 
 			if !reflect.DeepEqual(tt.in, tt.out) {
 				t.Errorf("want %v; got %v", tt.out, tt.in)
+			}
+		})
+	}
+}
+
+func TestCompactMetaFromBytes(t *testing.T) {
+	type out struct {
+		Offset int
+		Length string
+	}
+
+	for i, tt := range []struct {
+		in  []byte
+		out out
+	}{
+		{
+			[]byte{252},
+			out{
+				Offset: 1,
+				Length: "63",
+			},
+		},
+		{
+			[]byte{253, 7},
+			out{
+				Offset: 2,
+				Length: "511",
+			},
+		},
+		{
+			[]byte{254, 255, 3, 0},
+			out{
+				Offset: 4,
+				Length: "65535",
+			},
+		},
+		{
+			[]byte{3, 249, 255, 255, 255},
+			out{
+				Offset: 5,
+				Length: "4294967289",
+			},
+		},
+		// note: fails...
+		// see #36 https://github.com/opennetsys/go-substrate/issues/36
+		{
+			u8util.FromHex("0x0b00407a10f35a"),
+			out{
+				Offset: 7,
+				Length: "100000000000000",
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			cm, err := CompactMetaFromBytes(tt.in)
+			if err != nil || cm == nil {
+				t.Error(err)
+			}
+
+			if tt.out.Offset != cm.Offset || tt.out.Length != cm.Length.String() {
+				t.Errorf("want offset %d length %s; got offset %d length %v", tt.out.Offset, tt.out.Length, cm.Offset, cm.Length.String())
 			}
 		})
 	}
