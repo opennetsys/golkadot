@@ -1,6 +1,7 @@
 package bnutil
 
 import (
+	"encoding/hex"
 	"math"
 	"math/big"
 
@@ -46,9 +47,7 @@ func ToBN(ivalue interface{}, isLittleEndian bool) *big.Int {
 	case uint:
 		return big.NewInt(int64(v))
 	case []uint8:
-		i := new(big.Int)
-		i.SetBytes(v)
-		hx := ToHex(i, -1)
+		hx := hex.EncodeToString(v)
 		n, err := hexutil.ToBN(hx, isLittleEndian)
 		if err != nil {
 			panic(err)

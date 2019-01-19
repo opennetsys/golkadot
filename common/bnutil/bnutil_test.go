@@ -31,14 +31,16 @@ func TestFromHex(t *testing.T) {
 func TestToBN(t *testing.T) {
 	for i, tt := range []struct {
 		in  interface{}
+		le  bool
 		out *big.Int
 	}{
-		{"14", big.NewInt(14)},
-		{81, big.NewInt(81)},
-		{float64(21), big.NewInt(21)},
+		{"14", false, big.NewInt(14)},
+		{81, false, big.NewInt(81)},
+		{float64(21), false, big.NewInt(21)},
+		{[]byte{0, 64, 122, 16, 243, 90}, true, ToBN("100000000000000", false)},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result := ToBN(tt.in, false)
+			result := ToBN(tt.in, tt.le)
 			if result.String() != tt.out.String() {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
