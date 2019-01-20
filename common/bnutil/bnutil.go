@@ -10,7 +10,7 @@ import (
 
 // FromHex creates a math/big big number from a hex string.
 func FromHex(hexStr string) (*big.Int, error) {
-	return hexutil.ToBN(hexStr, false)
+	return hexutil.ToBN(hexStr, false, false)
 }
 
 // ToBN creates a BN value from a number input
@@ -48,7 +48,7 @@ func ToBN(ivalue interface{}, isLittleEndian bool) *big.Int {
 		return big.NewInt(int64(v))
 	case []uint8:
 		hx := hex.EncodeToString(v)
-		n, err := hexutil.ToBN(hx, isLittleEndian)
+		n, err := hexutil.ToBN(hx, isLittleEndian, false)
 		if err != nil {
 			panic(err)
 		}

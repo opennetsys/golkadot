@@ -1,6 +1,10 @@
 package types
 
-import "math/big"
+import (
+	"math/big"
+
+	"github.com/c3systems/go-substrate/common/hexutil"
+)
 
 // UintBitLength ...
 var UintBitLength = 8 | 16 | 32 | 64 | 128 | 256
@@ -56,4 +60,35 @@ func (a *AbstractInt) Bytes() {
 
 // ToU8a ...
 func (a *AbstractInt) ToU8a(isBare bool) {
+}
+
+func decodeAbstracInt(value interface{}, bitLength int64, isNegative bool) *big.Int {
+
+	switch v := value.(type) {
+	case string:
+		if hexutil.ValidHex(v) {
+			i, err := hexutil.ToBN(v, false, isNegative)
+			if err != nil {
+				panic(err)
+			}
+			return i
+		}
+
+		i := new(big.Int)
+		i.SetString(v, 10)
+		return i
+	case []uint8:
+	case int:
+		return big.NewInt(int64(v))
+	case int64:
+		return big.NewInt(v)
+	case uint:
+		return big.NewInt(int64(v))
+	case uint64:
+		return big.NewInt(int64(v))
+	case *big.Int:
+		return v
+	}
+
+	return nil
 }

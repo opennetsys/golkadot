@@ -83,7 +83,7 @@ func HexFixLength(hexStr string, bitLength int, withPadding bool) string {
 }
 
 // ToBN creates a math/big big number from a hex string.
-func ToBN(hexStr string, isLittleEndian bool) (*big.Int, error) {
+func ToBN(hexStr string, isLittleEndian bool, isNegative bool) (*big.Int, error) {
 	i := new(big.Int)
 	hx := StripPrefix(hexStr)
 
@@ -97,6 +97,12 @@ func ToBN(hexStr string, isLittleEndian bool) (*big.Int, error) {
 
 	if _, ok := i.SetString(hx, 16); !ok {
 		return nil, errors.New("could not decode to big.Int")
+	}
+
+	// NOTE: fromTwos takes as parameter the number of bits,
+	// which is the hex length multiplied by 4.
+	if isNegative {
+		return fromTwos(i, i.BitLen()), nil
 	}
 
 	return i, nil
@@ -151,4 +157,42 @@ func Reverse(s string) string {
 		out = append(out, v)
 	}
 	return strings.Join(out, "")
+}
+
+func fromTwos(i *big.Int, width int) *big.Int {
+	a := inotn(i, width)
+	b := new(big.Int).Add(a, big.NewInt(1))
+	return new(big.Int).Neg(b)
+}
+
+func inotn(n *big.Int, width int) *big.Int {
+	words := n.Bits()
+	var bytesNeeded = int(math.Ceil(float64(width) / float64(26)))
+	var bitsLeft = width % 26
+	var length = n.BitLen()
+
+	// extend the buffer with leading zeroes
+	for length < bytesNeeded {
+		words[length] = 0
+		length = length + 1
+	}
+
+	if bitsLeft > 0 {
+		bytesNeeded--
+	}
+
+	var i int
+	// handle complete words
+	for i = 0; i < bytesNeeded; i++ {
+		words[i] = big.Word(^int(words[i]) & 0x3ffffff)
+	}
+
+	// handle the residue
+	if bitsLeft > 0 {
+		words[i] = big.Word(^int(words[i]) & (0x3ffffff >> (26 - uint(bitsLeft))))
+	}
+
+	ret := new(big.Int)
+	ret.SetBits(words)
+	return ret
 }
