@@ -55,15 +55,15 @@ func CompactToUint8Slice(value *big.Int, bitLength int) []uint8 {
 		return []uint8{uint8(value.Int64() << 2)}
 	} else if value.Cmp(MaxU16) <= 0 {
 		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(1))
-		return bnutil.ToUint8Slice(i, 16, true)
+		return bnutil.ToUint8Slice(i, 16, true, false)
 	} else if value.Cmp(MaxU32) <= 0 {
 		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(2))
-		return bnutil.ToUint8Slice(i, 32, true)
+		return bnutil.ToUint8Slice(i, 32, true, false)
 	}
 
 	return u8util.Concat(
 		[]uint8{0x3},
-		bnutil.ToUint8Slice(value, bitLength, true),
+		bnutil.ToUint8Slice(value, bitLength, true, false),
 	)
 }
 

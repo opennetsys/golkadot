@@ -63,7 +63,7 @@ func TestToHex(t *testing.T) {
 		{input{big.NewInt(128), 16}, "0x0080"},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result := ToHex(tt.in.i, tt.in.bitLength)
+			result := ToHex(tt.in.i, tt.in.bitLength, false)
 			if result != tt.out {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
@@ -76,6 +76,7 @@ func TestToUint8Slice(t *testing.T) {
 		i            *big.Int
 		bitLength    int
 		littleEndian bool
+		isNegative   bool
 	}
 
 	for i, tt := range []struct {
@@ -83,24 +84,43 @@ func TestToUint8Slice(t *testing.T) {
 		out []uint8
 	}{
 		{
-			input{big.NewInt(2045), 16, true},
+			input{big.NewInt(2045), 16, true, false},
 			[]uint8{0xFD, 0x7},
 		},
 		{
-			input{big.NewInt(1193046), -1, false}, // 0x123456
+			input{big.NewInt(1193046), -1, false, false}, // 0x123456
 			[]uint8{0x12, 0x34, 0x56},
 		},
 		{
-			input{big.NewInt(1193046), 32, false},
+			input{big.NewInt(1193046), 32, false, false},
 			[]uint8{0x00, 0x12, 0x34, 0x56},
 		},
 		{
-			input{big.NewInt(1193046), 32, true},
+			input{big.NewInt(1193046), 32, true, false},
 			[]uint8{0x56, 0x34, 0x12, 0x00},
 		},
+		{
+			input{big.NewInt(1234), 32, false, false},
+			[]uint8{0, 0, 4, 210},
+		},
+		{
+			input{big.NewInt(-1234), -1, true, true},
+			[]uint8{46, 251},
+		},
+		{
+			input{big.NewInt(-1234), -1, false, true},
+			[]uint8{251, 46},
+		},
+		// TODO
+		/*
+			{
+				input{big.NewInt(-1234), 32, false, true},
+				[]uint8{255, 255, 251, 46},
+			},
+		*/
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result := ToUint8Slice(tt.in.i, tt.in.bitLength, tt.in.littleEndian)
+			result := ToUint8Slice(tt.in.i, tt.in.bitLength, tt.in.littleEndian, tt.in.isNegative)
 			if !reflect.DeepEqual(result, tt.out) {
 				t.Errorf("want %v; got %v", tt.out, result)
 			}
