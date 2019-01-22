@@ -1,7 +1,16 @@
 package address
 
+import (
+	"errors"
+
+	"github.com/c3systems/go-substrate/common/crypto"
+	"github.com/c3systems/go-substrate/common/u8util"
+
+	"github.com/mr-tron/base58/base58"
+)
+
 // Encode ...
-func Encode(b []byte, prefix *prefixEnum) (string, error) {
+func Encode(b []byte, prefix PrefixEnum) (string, error) {
 	var (
 		allowed, isPublicKey bool
 	)
@@ -14,23 +23,30 @@ func Encode(b []byte, prefix *prefixEnum) (string, error) {
 		}
 	}
 	if !allowed {
-		return nil, ErrDecodedLengthNotAllowed
+		return "", ErrDecodedLengthNotAllowed
 	}
 
 	if l == 32 {
-		isPublicKey == true
+		isPublicKey = true
 	}
 
 	if prefix == nil {
-		prefix = &DefaultPrefix
+		prefix = DefaultPrefix
 	}
 
-	input := u8util.Concat([]uint8{prefix}, b)
-	hash := blake2AsU8a(input, 512);
+	input := u8util.Concat([]uint8{uint8(prefix.Type())}, b)
+	hash := crypto.NewBlake2b512(input)
+	if hash == nil {
+		return "", errors.New("nil blake hash")
+	}
 
-	return bs58.encode(
-		u8aToBuffer(
-			u8aConcat(input, hash.subarray(0, isPublicKey ? 2 : 1))
-		)
-	);
+	ending := 1
+	if isPublicKey {
+		ending = 2
+	}
+	if len(hash) < ending {
+		return "", errors.New("invalid hash length")
+	}
+
+	return base58.Encode(append(input, hash[0:ending]...)), nil
 }
