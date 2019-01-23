@@ -29,9 +29,17 @@ func Decode(passphrase *string, encrypted []byte) ([32]byte, [64]byte, error) {
 			return naclPub, naclPriv, errors.New("secret length is not 32")
 		}
 
-		var tmp [32]byte
-		copy(tmp[:], secret)
-		encoded = crypto.NaclDecrypt(encrypted[24:], encrypted[0:24], tmp)
+		var (
+			tmpSecret [32]byte
+			tmpNonce  [24]byte
+			err       error
+		)
+		copy(tmpSecret[:], secret)
+		copy(tmpNonce[:], encrypted[0:24])
+		encoded, err = crypto.NaclDecrypt(encrypted[24:], tmpNonce, tmpSecret)
+		if err != nil {
+			return naclPub, naclPriv, err
+		}
 	}
 
 	if encoded == nil || len(encoded) == 0 {
@@ -53,10 +61,10 @@ func Decode(passphrase *string, encrypted []byte) ([32]byte, [64]byte, error) {
 	secretKey := u8util.Concat(seed, publicKey)
 
 	pub, priv := crypto.NewNaclKeyPairFromSeed(seed)
-	if string(pub) != string(publicKey) {
+	if string(pub[:]) != string(publicKey) {
 		return naclPub, naclPriv, errors.New("Pkcs8 decoded publicKeys are not matching")
 	}
-	if string(priv) != string(secret) {
+	if string(priv[:]) != string(secretKey) {
 		return naclPub, naclPriv, errors.New("Pkcs8 decoded secret Keys are not matching")
 	}
 

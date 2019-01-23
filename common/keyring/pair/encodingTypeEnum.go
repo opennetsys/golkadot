@@ -17,13 +17,14 @@ const (
 // ErrUnknownEncodingType ...
 var ErrUnknownEncodingType = errors.New("encoding type: unknown")
 
+// EncodingTypeEnum ...
 type EncodingTypeEnum interface {
 	Type() encodingTypeEnum
 	String() string
 }
 
 func (e encodingTypeEnum) Type() encodingTypeEnum {
-	return p
+	return e
 }
 
 // AllEncodingTypeEnums returns all of the encoding type enums

@@ -123,12 +123,12 @@ func NaclSign(secret [64]byte, message []byte) ([]byte, error) {
 		return nil, errors.New("cannot sign nil message")
 	}
 
-	sig := ed25519.Sign(secret, message)
+	sig := ed25519.Sign(&secret, message)
 	if sig == nil {
 		return nil, errors.New("could not sign message")
 	}
 
-	return *sig[:], nil
+	return sig[:], nil
 }
 
 // NaclEncrypt ...

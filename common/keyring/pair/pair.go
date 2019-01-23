@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/c3systems/go-substrate/common/crypto"
+	"github.com/c3systems/go-substrate/common/keyring/address"
 	ktypes "github.com/c3systems/go-substrate/common/keyring/types"
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/c3systems/go-substrate/logger"
@@ -35,7 +36,7 @@ func (p *Pair) Address() (string, error) {
 
 // DecodePkcs8 ...
 func (p *Pair) DecodePkcs8(passphrase *string, encoded []byte) error {
-	tmp = p.defaultEncoded
+	tmp := p.defaultEncoded
 	if encoded != nil && len(encoded) > 0 {
 		tmp = encoded
 	}
@@ -67,19 +68,19 @@ func (p *Pair) GetMeta() (*ktypes.Meta, error) {
 
 // IsLocked ...
 func (p *Pair) IsLocked() bool {
-	return p.secretKey == nil || len(p.secretKey) == 0
+	return len(p.secretKey) == 0
 }
 
 // Lock ...
 func (p *Pair) Lock() error {
-	p.secretKey = []byte{}
+	p.secretKey = [64]byte{}
 	return nil
 }
 
 // PublicKey ...
 func (p *Pair) PublicKey() ([32]byte, error) {
 	if p.State == nil {
-		return nil, errors.New("state is nil")
+		return [32]byte{}, errors.New("state is nil")
 	}
 
 	return p.State.PublicKey, nil
@@ -102,8 +103,12 @@ func (p *Pair) Sign(message []byte) ([]byte, error) {
 
 // ToJSON ...
 func (p *Pair) ToJSON(passphrase *string) ([]byte, error) {
+	if p.State == nil {
+		return nil, errors.New("nil state")
+	}
+
 	var isEncrypted bool
-	if passphrase != nil && passphrase != "" {
+	if passphrase != nil && *passphrase != "" {
 		isEncrypted = true
 	}
 
@@ -117,7 +122,7 @@ func (p *Pair) ToJSON(passphrase *string) ([]byte, error) {
 		return nil, errors.New("nil state")
 	}
 
-	address, err := address.EncodeAddress(state.PublicKey)
+	address, err := address.Encode(p.State.PublicKey[:], nil)
 	if err != nil {
 		logger.Errorf("err encoding public key\n%v", err)
 		return nil, err
@@ -130,13 +135,13 @@ func (p *Pair) ToJSON(passphrase *string) ([]byte, error) {
 	enc := encoding{
 		Content: PKCS8,
 		Type:    typ,
-		Version: '0',
+		Version: "0",
 	}
 	tmp := forJSON{
 		Address:  address,
 		Encoded:  u8util.ToHex(encoded, -1, false),
 		Encoding: enc,
-		Meta:     state.Meta,
+		Meta:     p.State.Meta,
 	}
 	return json.Marshal(tmp)
 }

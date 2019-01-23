@@ -6,12 +6,13 @@ import (
 	"math/big"
 	"reflect"
 
+	codectypes "github.com/c3systems/go-substrate/common/codec/types"
 	"github.com/c3systems/go-substrate/common/u8compact"
 )
 
 func writeBinary(v interface{}) ([]byte, error) {
 	if v == nil {
-		return nil, ErrNilKind
+		return nil, codectypes.ErrNilKind
 	}
 
 	buf := new(bytes.Buffer)
@@ -24,7 +25,7 @@ func writeBinary(v interface{}) ([]byte, error) {
 
 func encodeStruct(v *reflect.Value) ([]byte, error) {
 	if v == nil {
-		return nil, ErrNilKind
+		return nil, codectypes.ErrNilKind
 	}
 
 	if v.Kind() != reflect.Struct {
@@ -66,7 +67,7 @@ func encodeStruct(v *reflect.Value) ([]byte, error) {
 
 func encode(v *reflect.Value) ([]byte, error) {
 	if v == nil {
-		return nil, ErrNilKind
+		return nil, codectypes.ErrNilKind
 	}
 
 	var (
@@ -122,7 +123,7 @@ func encode(v *reflect.Value) ([]byte, error) {
 	case reflect.Invalid, reflect.Chan, reflect.Func:
 		{
 			// note: also Complex64, Complex128, Interface, Map
-			return nil, ErrInvalidKind
+			return nil, codectypes.ErrInvalidKind
 		}
 	default:
 		{
@@ -136,7 +137,7 @@ func encode(v *reflect.Value) ([]byte, error) {
 // Encode ...
 func Encode(input interface{}) ([]byte, error) {
 	if input == nil {
-		return nil, ErrNilInput
+		return nil, codectypes.ErrNilInput
 	}
 
 	v := reflect.ValueOf(input)
@@ -147,10 +148,10 @@ func Encode(input interface{}) ([]byte, error) {
 // TODO: this is an incomplete implementation
 func Decode(input []byte, target interface{}) error {
 	if input == nil {
-		return ErrNilInput
+		return codectypes.ErrNilInput
 	}
 	if target == nil {
-		return ErrNilTarget
+		return codectypes.ErrNilTarget
 	}
 
 	switch v := reflect.ValueOf(target); v.Kind() {
@@ -161,7 +162,7 @@ func Decode(input []byte, target interface{}) error {
 
 	default:
 		{
-			return ErrNonTargetPointer
+			return codectypes.ErrNonTargetPointer
 		}
 	}
 }

@@ -4,7 +4,8 @@ import (
 	ktypes "github.com/c3systems/go-substrate/common/keyring/types"
 )
 
-type PairInterface interface {
+// InterfacePair ...
+type InterfacePair interface {
 	Address() (string, error)
 	DecodePkcs8(passphrase *string, encoded []byte) error
 	EncodePkcs8(passphrase *string) ([]byte, error)
@@ -18,7 +19,8 @@ type PairInterface interface {
 	Verify(message, signature []byte) (bool, error)
 }
 
-type PairsInterface interface {
+// InterfacePairs ...
+type InterfacePairs interface {
 	Add(pair *Pair) (*Pair, error)
 	All() []*Pair
 	Get(address []byte) (*Pair, error)

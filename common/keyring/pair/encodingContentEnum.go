@@ -8,12 +8,14 @@ import (
 type encodingContentEnum int
 
 const (
+	// PKCS8 ...
 	PKCS8 encodingContentEnum = iota
 )
 
 // ErrUnknownEncodingContent ...
 var ErrUnknownEncodingContent = errors.New("encoding content: unknown")
 
+// EncodingContentEnum ...
 type EncodingContentEnum interface {
 	Type() encodingContentEnum
 	String() string

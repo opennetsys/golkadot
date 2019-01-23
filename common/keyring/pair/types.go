@@ -4,6 +4,11 @@ import (
 	ktypes "github.com/c3systems/go-substrate/common/keyring/types"
 )
 
+var (
+	// note: ensure the pair struct implements the interface at compile time
+	_ InterfacePair = (*Pair)(nil)
+)
+
 // State ...
 type State struct {
 	Meta      *ktypes.Meta
@@ -29,3 +34,6 @@ type encoding struct {
 	Type    EncodingTypeEnum
 	Version string
 }
+
+// note: implement nobody and everybody?
+// https://github.com/polkadot-js/common/blob/master/packages/keyring/src/pair/nobody.ts

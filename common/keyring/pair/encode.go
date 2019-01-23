@@ -30,5 +30,5 @@ func Encode(secretKey [64]byte, passphrase *string) ([]byte, error) {
 		return nil, err
 	}
 
-	return u8util.Concat(nonce, encrypted), nil
+	return u8util.Concat(nonce[:], encrypted), nil
 }
