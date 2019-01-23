@@ -111,13 +111,14 @@ func TestToUint8Slice(t *testing.T) {
 			input{big.NewInt(-1234), -1, false, true},
 			[]uint8{251, 46},
 		},
-		// TODO
-		/*
-			{
-				input{big.NewInt(-1234), 32, false, true},
-				[]uint8{255, 255, 251, 46},
-			},
-		*/
+		{
+			input{big.NewInt(-1234), 32, true, true},
+			[]uint8{46, 251, 255, 255},
+		},
+		{
+			input{big.NewInt(-1234), 32, false, true},
+			[]uint8{255, 255, 251, 46},
+		},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := ToUint8Slice(tt.in.i, tt.in.bitLength, tt.in.littleEndian, tt.in.isNegative)

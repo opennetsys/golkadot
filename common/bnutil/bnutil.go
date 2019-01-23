@@ -70,7 +70,7 @@ func ToHex(value *big.Int, bitLength int, isNegative bool) string {
 func ToUint8Slice(value *big.Int, bitLength int, isLittleEndian bool, isNegative bool) []uint8 {
 	var byteLength int
 	if bitLength == -1 {
-		byteLength = int(math.Ceil(float64(value.BitLen()) / float64(8)))
+		byteLength = int(math.Ceil(float64(mathutil.BitLen(value)) / float64(8)))
 	} else {
 		byteLength = int(math.Ceil(float64(bitLength) / float64(8)))
 	}
@@ -82,25 +82,11 @@ func ToUint8Slice(value *big.Int, bitLength int, isLittleEndian bool, isNegative
 		return make([]uint8, byteLength)
 	}
 
-	output := make([]uint8, byteLength)
-	b := value.Bytes()
 	if isNegative {
-		b = mathutil.FromTwos(value, byteLength*8).Bytes()
+		value = mathutil.ToTwos(value, byteLength*8)
 	}
 
-	for index := 0; index < byteLength; index++ {
-		if isLittleEndian {
-			if index < len(b) {
-				output[len(b)-index-1] = uint8(b[index])
-			}
-		} else {
-			if index < len(b) && len(b)-index > 0 {
-				output[len(output)-index-1] = uint8(b[len(b)-index-1])
-			}
-		}
-	}
-
-	return output
+	return mathutil.ToUint8Slice(value, isLittleEndian, byteLength)
 }
 
 // Uint8Slice  ...

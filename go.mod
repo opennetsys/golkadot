@@ -4,12 +4,18 @@ replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wago
 
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
+	github.com/allegro/bigcache v1.1.0 // indirect
+	github.com/aristanetworks/goarista v0.0.0-20190121184617-8f049bdb8feb // indirect
 	github.com/btcsuite/btcd v0.0.0-20181130015935-7d2daa5bfef2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
+	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/ethereum/go-ethereum v1.8.20
+	github.com/fatih/color v1.7.0 // indirect
 	github.com/fd/go-nat v1.0.0 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/gorilla/websocket v1.4.0 // indirect
@@ -55,10 +61,13 @@ require (
 	github.com/multiformats/go-multicodec v0.1.6 // indirect
 	github.com/multiformats/go-multistream v0.3.9 // indirect
 	github.com/perlin-network/life v0.0.0-20181118045116-6bf6615afaa9
+	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pierrec/xxHash v0.1.1
+	github.com/rs/cors v1.6.0 // indirect
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/syndtr/goleveldb v0.0.0-20181128100959-b001fa50d6b2 // indirect
 	github.com/tendermint/iavl v0.12.0
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
 	github.com/whyrusleeping/base32 v0.0.0-20170828182744-c30ac30633cc // indirect
