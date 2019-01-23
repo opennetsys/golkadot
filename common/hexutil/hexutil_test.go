@@ -112,24 +112,30 @@ func TestToBN(t *testing.T) {
 	type input struct {
 		hexStr       string
 		littleEndian bool
+		isNegative   bool
 	}
 
 	for i, tt := range []struct {
 		in  input
 		out *big.Int
 	}{
-		{input{"0x14", false}, big.NewInt(20)},
-		{input{"14", false}, big.NewInt(20)},
-		{input{"0x14", true}, big.NewInt(20)},
-		{input{"14", true}, big.NewInt(20)},
-		{input{"81", false}, big.NewInt(129)},
-		{input{"0x", true}, big.NewInt(0)},
-		{input{"0x4500000000000000", true}, big.NewInt(69)},
-		{input{"0x0000000000000100", false}, big.NewInt(256)},
-		{input{"0x0001000000000000", true}, big.NewInt(256)},
+		{input{"0x14", false, false}, big.NewInt(20)},
+		{input{"14", false, false}, big.NewInt(20)},
+		{input{"0x14", true, false}, big.NewInt(20)},
+		{input{"14", true, false}, big.NewInt(20)},
+		{input{"81", false, false}, big.NewInt(129)},
+		{input{"0", false, false}, big.NewInt(0)},
+		{input{"", false, false}, big.NewInt(0)},
+		{input{"0x", true, false}, big.NewInt(0)},
+		{input{"0x4500000000000000", true, false}, big.NewInt(69)},
+		{input{"0x0000000000000100", false, false}, big.NewInt(256)},
+		{input{"0x0001000000000000", true, false}, big.NewInt(256)},
+		{input{"0x2efb", true, true}, big.NewInt(-1234)},
+		{input{"0xfb2e", false, true}, big.NewInt(-1234)},
+		{input{"0x0100", false, false}, big.NewInt(256)},
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			result, err := ToBN(tt.in.hexStr, tt.in.littleEndian)
+			result, err := ToBN(tt.in.hexStr, tt.in.littleEndian, tt.in.isNegative)
 			if err != nil {
 				t.Error(err)
 			}

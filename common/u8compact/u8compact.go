@@ -55,15 +55,28 @@ func CompactToUint8Slice(value *big.Int, bitLength int) []uint8 {
 		return []uint8{uint8(value.Int64() << 2)}
 	} else if value.Cmp(MaxU16) <= 0 {
 		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(1))
-		return bnutil.ToUint8Slice(i, 16, true)
+		return bnutil.ToUint8Slice(i, 16, true, false)
 	} else if value.Cmp(MaxU32) <= 0 {
 		i := new(big.Int).Add(new(big.Int).Lsh(value, 2), big.NewInt(2))
-		return bnutil.ToUint8Slice(i, 32, true)
+		return bnutil.ToUint8Slice(i, 32, true, false)
+	}
+
+	slice := bnutil.ToUint8Slice(value, -1, true, false)
+	length := len(slice)
+
+	// adjust to the minimum number of bytes
+	for slice[length-1] == 0 {
+		length--
+	}
+
+	if length < 4 {
+		panic("previous tests match anything less than 2^30; qed")
 	}
 
 	return u8util.Concat(
-		[]uint8{0x3},
-		bnutil.ToUint8Slice(value, bitLength, true),
+		// substract 4 as minimum (also catered for in decoding)
+		[]uint8{uint8(((length - 4) << 2) + 0x3)}, // NOTE: 0x3 = 0b11
+		slice[0:length],
 	)
 }
 
