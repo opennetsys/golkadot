@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/sha256"
+	"errors"
 	"log"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 
 	"github.com/agl/ed25519"
 	naclauth "golang.org/x/crypto/nacl/auth"
+	naclsecret "golang.org/x/crypto/nacl/secretbox"
 	naclsign "golang.org/x/crypto/nacl/sign"
 )
 
@@ -96,6 +98,7 @@ func NewNaclKeyPair() ([32]byte, [64]byte) {
 }
 
 // NewNaclKeyPairFromSeed ...
+// note: return pointers???
 func NewNaclKeyPairFromSeed(seed []byte) ([32]byte, [64]byte) {
 	reader := bytes.NewBuffer(seed)
 	publicKey, privateKey, err := naclsign.GenerateKey(reader)
@@ -111,6 +114,53 @@ func NaclVerify(digest []byte, signature []byte, publicKey [naclauth.KeySize]byt
 	var sig64 [64]byte
 	copy(sig64[:], signature)
 	return ed25519.Verify(&publicKey, digest, &sig64)
+}
+
+// NaclSign ...
+// Using the 'agl' library because native nacl library doesn't support detached signatures.
+func NaclSign(secret [64]byte, message []byte) ([]byte, error) {
+	if message == nil || len(message) == 0 {
+		return nil, errors.New("cannot sign nil message")
+	}
+
+	sig := ed25519.Sign(secret, message)
+	if sig == nil {
+		return nil, errors.New("could not sign message")
+	}
+
+	return *sig[:], nil
+}
+
+// NaclEncrypt ...
+// note: use pointers???
+func NaclEncrypt(message []byte, nonce [24]byte, secret [32]byte) ([]byte, error) {
+	if message == nil || len(message) == 0 {
+		return nil, errors.New("cannot encrypt nil message")
+	}
+
+	var out []byte
+	out = naclsecret.Seal(out, message, &nonce, &secret)
+	return out, nil
+}
+
+// NaclDecrypt ...
+// note: use pointers???
+func NaclDecrypt(box []byte, nonce [24]byte, secret [32]byte) ([]byte, error) {
+	if box == nil || len(box) == 0 {
+		return nil, errors.New("cannot decrypt a nil message")
+	}
+
+	var (
+		out []byte
+		ok  bool
+	)
+
+	out, ok = naclsecret.Open(out, box, &nonce, &secret)
+	if !ok {
+		return nil, errors.New("could not decrypt message")
+	}
+
+	return out, nil
 }
 
 // NewBlake2b256Sig ...
