@@ -6,6 +6,7 @@ import (
 	keytypes "github.com/c3systems/go-substrate/common/keyring/types"
 )
 
+// InterfaceKeyRing ...
 type InterfaceKeyRing interface {
 	DecodeAddress(encoded []byte) ([]byte, error)
 	EncodeAddress(key []byte) (string, error)
@@ -14,7 +15,7 @@ type InterfaceKeyRing interface {
 	AddFromAddress(address []byte, meta *keytypes.Meta, defaultEncoded []byte) (*pair.Pair, error)
 	AddFromMnemonic(mnemonic string, meta *keytypes.Meta) (*pair.Pair, error)
 	AddFromSeed(seed []byte, meta *keytypes.Meta) (*pair.Pair, error)
-	AddFromJson(pairJSON []byte) (*pair.Pair, error)
+	AddFromJSON(pairJSON []byte) (*pair.Pair, error)
 	GetPair(address []byte) (*pair.Pair, error)
 	GetPairs() []*pair.Pair
 	GetPublicKeys() ([][]byte, error)

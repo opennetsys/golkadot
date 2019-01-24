@@ -15,14 +15,14 @@ func New() (*KeyRing, error) {
 	}, nil
 }
 
-// DecodeAddres ...
+// DecodeAddress ...
 func (k *KeyRing) DecodeAddress(encoded []byte) ([]byte, error) {
 	return address.Decode(string(encoded), nil)
 }
 
 // EncodeAddress ...
 func (k *KeyRing) EncodeAddress(key []byte) (string, error) {
-	return address.Encode(string(key), nil)
+	return address.Encode(key, nil)
 }
 
 // SetAddressPrefix ...
@@ -43,7 +43,7 @@ func (k *KeyRing) AddPair(pair *pair.Pair) (*pair.Pair, error) {
 
 // AddFromAddress ...
 func (k *KeyRing) AddFromAddress(addr []byte, meta *keytypes.Meta, defaultEncoded []byte) (*pair.Pair, error) {
-	tmp, err := address.Decode(addr)
+	tmp, err := address.Decode(string(addr), nil)
 	if err != nil {
 		return nil, err
 	}
