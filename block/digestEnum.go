@@ -21,11 +21,13 @@ const (
 // ErrUnknownDigest ...
 var ErrUnknownDigest = errors.New("digest: unknown")
 
+// DigestEnum ...
 type DigestEnum interface {
 	Type() digestEnum
 	String() string
 }
 
+// Type ...
 func (d digestEnum) Type() digestEnum {
 	return d
 }

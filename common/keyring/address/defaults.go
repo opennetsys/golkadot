@@ -10,3 +10,7 @@ var (
 	// DefaultPrefix ...
 	DefaultPrefix = FortyTwo
 )
+
+func SetDefaultPrefix(prefix PrefixEnum) {
+	DefaultPrefix = prefix.Type()
+}
