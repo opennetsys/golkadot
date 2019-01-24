@@ -3,9 +3,11 @@ package keyring
 import (
 	"errors"
 
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/keyring/address"
 	"github.com/c3systems/go-substrate/common/keyring/pair"
 	keytypes "github.com/c3systems/go-substrate/common/keyring/types"
+	"github.com/c3systems/go-substrate/common/mnemonic"
 )
 
 // New ...
@@ -60,41 +62,94 @@ func (k *KeyRing) AddFromAddress(addr []byte, meta *keytypes.Meta, defaultEncode
 }
 
 // AddFromMnemonic ...
-func (k *KeyRing) AddFromMnemonic(mnemonic string, meta *keytypes.Meta) (*pair.Pair, error) {
-	return nil, nil
+func (k *KeyRing) AddFromMnemonic(mn, password string, meta *keytypes.Meta) (*pair.Pair, error) {
+	seed, err := mnemonic.ToSeed(mn, password)
+	if err != nil {
+		return nil, err
+	}
+
+	return k.AddFromSeed(seed, meta)
 }
 
 // AddFromSeed ...
 func (k *KeyRing) AddFromSeed(seed []byte, meta *keytypes.Meta) (*pair.Pair, error) {
-	return nil, nil
+	pub, priv, err := crypto.NewNaclKeyPairFromSeed(seed)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: nil defaultEncoded?
+	pair, err := pair.NewPair(pub, priv, meta, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return k.AddPair(pair)
 }
 
 // AddFromJSON ...
-func (k *KeyRing) AddFromJSON(pairJSON []byte) (*pair.Pair, error) {
-	return nil, nil
+func (k *KeyRing) AddFromJSON(data []byte, password *string) (*pair.Pair, error) {
+	pair, err := pair.NewPairFromJSON(data, password)
+	if err != nil {
+		return nil, err
+	}
+
+	return k.AddPair(pair)
 }
 
 // GetPair ...
-func (k *KeyRing) GetPair(address []byte) (*pair.Pair, error) {
-	return nil, nil
+func (k *KeyRing) GetPair(addr []byte) (*pair.Pair, error) {
+	if k.Pairs == nil {
+		return nil, errors.New("nil pairs")
+	}
+
+	return k.Pairs.Get(addr)
 }
 
 // GetPairs ...
-func (k *KeyRing) GetPairs() []*pair.Pair {
-	return nil
+func (k *KeyRing) GetPairs() ([]*pair.Pair, error) {
+	if k.Pairs == nil {
+		return nil, errors.New("nil pairs")
+	}
+
+	return k.Pairs.All()
 }
 
 // GetPublicKeys ...
-func (k *KeyRing) GetPublicKeys() ([][]byte, error) {
-	return nil, nil
+func (k *KeyRing) GetPublicKeys() ([][32]byte, error) {
+	pairs, err := k.GetPairs()
+	if err != nil {
+		return nil, err
+	}
+
+	var pks [][32]byte
+	for idx := range pairs {
+		pk, err := pairs[idx].PublicKey()
+		if err != nil {
+			return nil, err
+		}
+
+		pks = append(pks, pk)
+	}
+
+	return pks, nil
 }
 
 // RemovePair ...
-func (k *KeyRing) RemovePair(address []byte) error {
-	return nil
+func (k *KeyRing) RemovePair(addr []byte) error {
+	if k.Pairs == nil {
+		return errors.New("nil pairs")
+	}
+
+	return k.Pairs.Remove(addr)
 }
 
 // ToJSON ...
-func (k *KeyRing) ToJSON(address []byte, passphrase *string) ([]byte, error) {
-	return nil, nil
+func (k *KeyRing) ToJSON(addr []byte, password *string) ([]byte, error) {
+	pair, err := k.GetPair(addr)
+	if err != nil {
+		return nil, err
+	}
+
+	return pair.ToJSON(password)
 }

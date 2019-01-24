@@ -60,7 +60,10 @@ func Decode(passphrase *string, encrypted []byte) ([32]byte, [64]byte, error) {
 	seed := encoded[DEFAULT_SEED_OFFSET : DEFAULT_SEED_OFFSET+DEFAULT_KEY_LENGTH]
 	secretKey := u8util.Concat(seed, publicKey)
 
-	pub, priv := crypto.NewNaclKeyPairFromSeed(seed)
+	pub, priv, err := crypto.NewNaclKeyPairFromSeed(seed)
+	if err != nil {
+		return naclPub, naclPriv, err
+	}
 	if string(pub[:]) != string(publicKey) {
 		return naclPub, naclPriv, errors.New("Pkcs8 decoded publicKeys are not matching")
 	}
