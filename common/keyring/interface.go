@@ -20,6 +20,6 @@ type InterfaceKeyRing interface {
 	GetPairs() ([]*pair.Pair, error)
 	GetPublicKeys() ([][32]byte, error)
 	RemovePair(addr []byte) error
-	// note: change to Marshal?
+	// note: change to Marshal? Add Unmarshal?
 	ToJSON(addr []byte, password *string) ([]byte, error)
 }

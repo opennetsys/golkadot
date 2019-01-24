@@ -2,6 +2,7 @@ package pair
 
 import (
 	"errors"
+	"log"
 
 	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/u8util"
@@ -26,6 +27,7 @@ func Decode(passphrase *string, encrypted []byte) ([32]byte, [64]byte, error) {
 
 		secret := u8util.FixLength([]byte(*passphrase), 256, true)
 		if len(secret) != 32 {
+			log.Println(secret, len(secret))
 			return naclPub, naclPriv, errors.New("secret length is not 32")
 		}
 

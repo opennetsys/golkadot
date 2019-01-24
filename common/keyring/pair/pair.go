@@ -12,7 +12,7 @@ import (
 )
 
 // NewPair ...
-func NewPair(naclPub [32]byte, naclPriv [64]byte, meta *ktypes.Meta, defaultEncoded []byte) (*Pair, error) {
+func NewPair(naclPub [32]byte, naclPriv [64]byte, meta ktypes.Meta, defaultEncoded []byte) (*Pair, error) {
 	state := &State{
 		Meta:      meta,
 		PublicKey: naclPub,
@@ -100,7 +100,7 @@ func (p *Pair) EncodePkcs8(passphrase *string) ([]byte, error) {
 }
 
 // GetMeta ...
-func (p *Pair) GetMeta() (*ktypes.Meta, error) {
+func (p *Pair) GetMeta() (ktypes.Meta, error) {
 	if p.State == nil {
 		return nil, errors.New("nil state")
 	}
@@ -131,7 +131,7 @@ func (p *Pair) PublicKey() ([32]byte, error) {
 }
 
 // SetMeta ...
-func (p *Pair) SetMeta(meta *ktypes.Meta) error {
+func (p *Pair) SetMeta(meta ktypes.Meta) error {
 	if p.State == nil {
 		return errors.New("state is nil")
 	}

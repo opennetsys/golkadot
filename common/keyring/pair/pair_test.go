@@ -3,6 +3,6 @@ package pair
 import "testing"
 
 // TODO...
-func TestToJSON(t *testing.T) {
+func TestToFromJSON(t *testing.T) {
 	t.Skip()
 }
