@@ -203,6 +203,9 @@ func Iushrn(value *big.Int, bits uint, hint int, extended bool) *big.Int {
 	return iushrn(value, bits, hint, extended)
 }
 
+// Shift-right in-place
+// NOTE: `hint` is a lowest bit before trailing zeroes
+// NOTE: if `extended` is present - it will be filled with destroyed bits
 func iushrn(value *big.Int, bits uint, hint int, extended bool) *big.Int {
 	var h int
 	if hint != -1 {
