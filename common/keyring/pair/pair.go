@@ -11,8 +11,8 @@ import (
 	"github.com/c3systems/go-substrate/logger"
 )
 
-// New ...
-func New(naclPub [32]byte, naclPriv [64]byte, meta *ktypes.Meta, defaultEncoded []byte) (*Pair, error) {
+// NewPair ...
+func NewPair(naclPub [32]byte, naclPriv [64]byte, meta *ktypes.Meta, defaultEncoded []byte) (*Pair, error) {
 	state := &State{
 		Meta:      meta,
 		PublicKey: naclPub,
@@ -68,7 +68,9 @@ func (p *Pair) GetMeta() (*ktypes.Meta, error) {
 
 // IsLocked ...
 func (p *Pair) IsLocked() bool {
-	return len(p.secretKey) == 0
+	// note: string comparison is slow, better method? reflect.DeepEqual will probably also be slow...
+	blankSecret := [64]byte{}
+	return string(p.secretKey[:]) == string(blankSecret[:])
 }
 
 // Lock ...

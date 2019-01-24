@@ -57,6 +57,7 @@ require (
 	github.com/libp2p/go-stream-muxer v3.0.1+incompatible // indirect
 	github.com/libp2p/go-tcp-transport v2.0.16+incompatible // indirect
 	github.com/libp2p/go-ws-transport v2.0.15+incompatible // indirect
+	github.com/mr-tron/base58 v1.1.0
 	github.com/multiformats/go-multibase v0.3.0 // indirect
 	github.com/multiformats/go-multicodec v0.1.6 // indirect
 	github.com/multiformats/go-multistream v0.3.9 // indirect
@@ -68,7 +69,8 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/syndtr/goleveldb v0.0.0-20181128100959-b001fa50d6b2 // indirect
-	github.com/tendermint/iavl v0.12.0
+	github.com/tendermint/iavl v0.12.0 // indirect
+	github.com/tyler-smith/go-bip39 v1.0.0
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
 	github.com/whyrusleeping/base32 v0.0.0-20170828182744-c30ac30633cc // indirect
 	github.com/whyrusleeping/go-notifier v0.0.0-20170827234753-097c5d47330f // indirect

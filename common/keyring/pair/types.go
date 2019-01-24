@@ -5,8 +5,9 @@ import (
 )
 
 var (
-	// note: ensure the pair struct implements the interface at compile time
-	_ InterfacePair = (*Pair)(nil)
+	// note: ensure the struct(s) implement the interface(s) at compile time
+	_ InterfacePair  = (*Pair)(nil)
+	_ InterfacePairs = (*Pairs)(nil)
 )
 
 // State ...
@@ -34,6 +35,14 @@ type encoding struct {
 	Type    EncodingTypeEnum
 	Version string
 }
+
+// Pairs ...
+type Pairs struct {
+	PairMap MapPair
+}
+
+// MapPair ...
+type MapPair map[string]*Pair
 
 // note: implement nobody and everybody?
 // https://github.com/polkadot-js/common/blob/master/packages/keyring/src/pair/nobody.ts

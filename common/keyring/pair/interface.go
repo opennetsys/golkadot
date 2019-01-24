@@ -22,7 +22,7 @@ type InterfacePair interface {
 // InterfacePairs ...
 type InterfacePairs interface {
 	Add(pair *Pair) (*Pair, error)
-	All() []*Pair
+	All() ([]*Pair, error)
 	Get(address []byte) (*Pair, error)
 	Remove(address []byte) error
 }
