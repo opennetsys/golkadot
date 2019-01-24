@@ -24,6 +24,7 @@ require (
 	github.com/ipfs/go-ipfs-util v1.2.8 // indirect
 	github.com/jbenet/go-temp-err-catcher v0.0.0-20150120210811-aac704a3f4f2 // indirect
 	github.com/jbenet/goprocess v0.0.0-20160826012719-b497e2f366b8 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.1
 	github.com/libp2p/go-addr-util v2.0.7+incompatible // indirect
 	github.com/libp2p/go-buffer-pool v0.1.1 // indirect
 	github.com/libp2p/go-conn-security v0.1.15 // indirect

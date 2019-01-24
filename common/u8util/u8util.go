@@ -39,7 +39,8 @@ func FixLength(value []uint8, bitLength int, atStart bool) []uint8 {
 
 	result := make([]uint8, byteLength)
 	if atStart {
-		return append(result, value...)
+		copy(result[:], value)
+		return result
 	}
 
 	start := byteLength - len(value)
