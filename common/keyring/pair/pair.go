@@ -25,6 +25,48 @@ func NewPair(naclPub [32]byte, naclPriv [64]byte, meta *ktypes.Meta, defaultEnco
 	}, nil
 }
 
+// NewPairFromJSON ...
+func NewPairFromJSON(data []byte, password *string) (*Pair, error) {
+	tmp := forJSON{}
+	if err := json.Unmarshal(data, &tmp); err != nil {
+		return nil, err
+	}
+
+	pubBytes, err := address.Decode(tmp.Address, nil)
+	if err != nil {
+		return nil, err
+	}
+	var (
+		pub  [32]byte
+		priv [64]byte
+	)
+	copy(pub[:], pubBytes)
+
+	privBytes := u8util.FromHex(tmp.Encoded)
+	if password != nil {
+		pub2, priv2, err := Decode(password, privBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(pub2) != len(pub) {
+			return nil, errors.New("public keys do not match")
+		}
+		for idx := range pub2 {
+			if pub2[idx] != pub[idx] {
+				return nil, errors.New("public keys do not match")
+			}
+		}
+
+		copy(priv[:], priv2[:])
+	} else {
+		copy(priv[:], privBytes)
+	}
+
+	// TODO: nil defaultEncoded?
+	return NewPair(pub, priv, tmp.Meta, nil)
+}
+
 // Address ...
 func (p *Pair) Address() (string, error) {
 	if p.State == nil {
@@ -120,11 +162,7 @@ func (p *Pair) ToJSON(passphrase *string) ([]byte, error) {
 		return nil, err
 	}
 
-	if p.State == nil {
-		return nil, errors.New("nil state")
-	}
-
-	address, err := address.Encode(p.State.PublicKey[:], nil)
+	addr, err := address.Encode(p.State.PublicKey[:], nil)
 	if err != nil {
 		logger.Errorf("err encoding public key\n%v", err)
 		return nil, err
@@ -140,7 +178,7 @@ func (p *Pair) ToJSON(passphrase *string) ([]byte, error) {
 		Version: "0",
 	}
 	tmp := forJSON{
-		Address:  address,
+		Address:  addr,
 		Encoded:  u8util.ToHex(encoded, -1, false),
 		Encoding: enc,
 		Meta:     p.State.Meta,

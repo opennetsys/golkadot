@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"errors"
-	"log"
 	"math"
 
 	"github.com/pierrec/xxHash/xxHash64"
@@ -88,25 +87,43 @@ func newXXHash(data []byte, bitLength uint) []byte {
 }
 
 // NewNaclKeyPair ...
-func NewNaclKeyPair() ([32]byte, [64]byte) {
-	publicKey, privateKey, err := naclsign.GenerateKey(rand.Reader)
+func NewNaclKeyPair() ([32]byte, [64]byte, error) {
+	var (
+		pub  *[32]byte
+		priv *[64]byte
+		err  error
+	)
+
+	pub, priv, err = naclsign.GenerateKey(rand.Reader)
 	if err != nil {
-		log.Fatal(err)
+		return [32]byte{}, [64]byte{}, err
+	}
+	if pub == nil || priv == nil {
+		return [32]byte{}, [64]byte{}, errors.New("nil keys")
 	}
 
-	return *publicKey, *privateKey
+	return *pub, *priv, nil
 }
 
 // NewNaclKeyPairFromSeed ...
 // note: return pointers???
-func NewNaclKeyPairFromSeed(seed []byte) ([32]byte, [64]byte) {
+func NewNaclKeyPairFromSeed(seed []byte) ([32]byte, [64]byte, error) {
+	var (
+		pub  *[32]byte
+		priv *[64]byte
+		err  error
+	)
+
 	reader := bytes.NewBuffer(seed)
-	publicKey, privateKey, err := naclsign.GenerateKey(reader)
+	pub, priv, err = naclsign.GenerateKey(reader)
 	if err != nil {
-		log.Fatal(err)
+		return [32]byte{}, [64]byte{}, err
+	}
+	if pub == nil || priv == nil {
+		return [32]byte{}, [64]byte{}, errors.New("nil keys")
 	}
 
-	return *publicKey, *privateKey
+	return *pub, *priv, nil
 }
 
 // NaclVerify returns true if signature is a valid signature of digest by public key. Using the 'agl' library because native nacl library doesn't support detached signatures.
