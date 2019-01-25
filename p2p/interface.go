@@ -1,7 +1,7 @@
 package p2p
 
-// Interface defines the methods of the p2p service
-type Interface interface {
+// InterfaceP2P defines the methods of the p2p service
+type InterfaceP2P interface {
 	// IsStarted returns true if the p2p interface has started
 	IsStarted() bool
 	// GetNumPeers returns the number of connected peers

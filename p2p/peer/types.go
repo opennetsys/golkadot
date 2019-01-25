@@ -43,8 +43,8 @@ type Connection struct {
 	Pushable   chan<- interface{} // note: a write only channel
 }
 
-// Service ...
-type Service struct {
+// Peer ...
+type Peer struct {
 	Map        map[pstore.PeerInfo]*KnownPeer
 	BestHash   []byte
 	BestNumber *math.Big

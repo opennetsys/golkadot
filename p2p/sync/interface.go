@@ -2,8 +2,8 @@ package sync
 
 import "github.com/c3systems/go-substrate/p2p/peer"
 
-// Interface defines the methods of the sync service
-type Interface interface {
+// InterfaceSync defines the methods of the sync service
+type InterfaceSync interface {
 	// On handles events
 	On(event EventEnum, cb EventCallback) (interface{}, error)
 	// QueueBlocks ...

@@ -1,7 +1,11 @@
 package triecodec
 
 import (
+	"fmt"
 	"log"
+
+	"github.com/c3systems/go-substrate/common/crypto"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // Null ...
@@ -98,7 +102,7 @@ func (n *NodeHeader) EncodedLength() int {
 	} else if n.nodeType == NODE_TYPE_EXT {
 		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion, 1)
 		}
 
 		nibbleCount := header.value
@@ -111,7 +115,7 @@ func (n *NodeHeader) EncodedLength() int {
 	} else if n.nodeType == NODE_TYPE_LEAF {
 		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion, 2)
 		}
 
 		nibbleCount := header.value
@@ -134,7 +138,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_BRANCH {
 		header, ok := n.value.(*BranchHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion, 3)
 		}
 
 		if header.value == 1 {
@@ -144,7 +148,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_EXT {
 		header, ok := n.value.(*ExtensionHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion, 4)
 		}
 
 		nibbleCount := header.value
@@ -156,7 +160,7 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 	} else if n.nodeType == NODE_TYPE_LEAF {
 		header, ok := n.value.(*LeafHeader)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			log.Fatal(ErrTypeAssertion, 10)
 		}
 
 		nibbleCount := header.value
@@ -174,16 +178,22 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 
 // DecodeNodeHeader ...
 func DecodeNodeHeader(input interface{}) (int, interface{}) {
+	fmt.Println("Debug: triecodec, DecodeNodeHeader, input", input)
+
 	switch v := input.(type) {
 	case []uint8:
+		fmt.Println("Debug: triecodec, DecodeNodeHeader, is []uint8")
 		return DecodeNodeHeaderUint8Slice(v)
 	case []interface{}:
 		if len(v) == 1 {
 			arr, ok := v[0].([]uint8)
 			if ok {
+				fmt.Println("Debug: triecodec, DecodeNodeHeader, 0 is []uint8")
 				return DecodeNodeHeaderUint8Slice(arr)
 			}
 		}
+
+		fmt.Println("Debug: triecodec, DecodeNodeHeader, slices")
 		return DecodeNodeHeaderUint8Slices(v)
 	}
 
@@ -222,20 +232,25 @@ func DecodeNodeHeaderUint8Slice(input []uint8) (int, interface{}) {
 
 // DecodeNodeHeaderUint8Slices ...
 func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
+	fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices")
 	var isNull bool
 	if len(input) == 1 {
-		_, ok := input[0].(*Null)
-		if ok {
+		switch input[0].(type) {
+		case *Null:
+			isNull = true
+		case nil:
 			isNull = true
 		}
 	}
 
+	fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices size", len(input))
 	if len(input) == 0 || isNull {
 		return NODE_TYPE_NULL, NewNull()
 	} else if len(input) == 2 {
 		value, ok := input[0].([]uint8)
 		if !ok {
-			log.Fatal(ErrCastingType)
+			spew.Dump(input[0])
+			log.Fatal(ErrTypeAssertion, 6)
 		}
 		nibbles := DecodeNibbles(value)
 		isTerminated := IsNibblesTerminated(nibbles)
@@ -247,6 +262,16 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 	} else if len(input) == 17 {
 		var value bool
 		switch v := input[16].(type) {
+		case nil:
+			value = false
+		case []uint8:
+			value = v != nil
+		case *crypto.Blake2b256Hash:
+			isNull = v != nil
+		case *crypto.Blake2b512Hash:
+			isNull = v != nil
+		case *crypto.Hash:
+			isNull = v != nil
 		case *Null:
 			value = false
 		case *BranchHeader:
@@ -256,6 +281,8 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 		default:
 			value = true
 		}
+
+		fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices returning new branch header", NODE_TYPE_BRANCH, value)
 		return NODE_TYPE_BRANCH, NewBranchHeader(value)
 	}
 

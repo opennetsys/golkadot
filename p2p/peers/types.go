@@ -30,10 +30,10 @@ var (
 // EventCallback is a function that is called on a peer event
 type EventCallback func(p interface{}) (interface{}, error)
 
-// Service ...
-type Service struct {
-	Store pstore.Peerstore
-	Peers map[pstore.PeerInfo]*peer.KnownPeer
+// Peers ...
+type Peers struct {
+	Store      pstore.Peerstore
+	KnownPeers map[pstore.PeerInfo]*peer.KnownPeer
 }
 
 // Config ...

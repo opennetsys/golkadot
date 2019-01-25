@@ -9,6 +9,9 @@ import (
 	"github.com/c3systems/go-substrate/p2p/peer"
 )
 
+// note: ensure the struct implements the interface
+var _ InterfaceHandler = (*BlockRequestHandler)(*nil)
+
 // BlockRequestHandler implements the block request handler
 type BlockRequestHandler struct{}
 

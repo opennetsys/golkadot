@@ -31,7 +31,7 @@ func decodeBranch(header *NodeHeader, input []uint8) []interface{} {
 	offset := header.EncodedLength()
 	branch, ok := header.value.(*BranchHeader)
 	if !ok {
-		log.Fatal(ErrCastingType)
+		log.Fatal(ErrTypeAssertion)
 	}
 	bitmap := int(input[offset]) + (int(input[offset+1]) * 256)
 	var value []uint8
@@ -78,7 +78,15 @@ func decodeKv(header *NodeHeader, input []uint8) []interface{} {
 	offset := header.EncodedLength()
 	nibbleCount := header.Value()
 	nibbleLength := int(math.Floor(float64(nibbleCount+1) / float64(2)))
-	nibbleData := input[offset : offset+nibbleLength]
+
+	var endoffset int
+	if (offset + nibbleLength) < len(input) {
+		endoffset = offset + nibbleLength
+	} else {
+		endoffset = len(input)
+	}
+
+	nibbleData := input[offset:endoffset]
 
 	// for odd, ignore the first nibble, data starts at offset 1
 	nibbles := ToNibbles(nibbleData)[(nibbleCount % 2):]

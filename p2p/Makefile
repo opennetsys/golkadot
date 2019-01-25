@@ -1,7 +1,7 @@
 GO:=$(shell command type go 2> /dev/null)
 STRINGER:=$(shell command type stringer 2> /dev/null)
 
-all: check sync-status-enum sync-event-enum peer-event-enum peers-event-enum p2p-event-enum handler-func-enum
+all: check sync-event-enum peer-event-enum peers-event-enum p2p-event-enum handler-func-enum
 
 .PHONY: check
 check: check/go check/stringer
@@ -24,10 +24,6 @@ endif
 .PHONY: install/stringer
 install/stringer: check/go
 	@go get -u golang.org/x/tools/cmd/stringer
-
-.PHONY: sync-status-enum
-sync-status-enum:
-	@(cd ./sync && stringer -type=statusEnum && echo "made p2p syncStatus enum")
 
 .PHONY: sync-event-enum
 sync-event-enum:

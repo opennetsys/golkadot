@@ -10,6 +10,9 @@ import (
 	"github.com/c3systems/go-substrate/p2p/peer"
 )
 
+// note: ensure the struct implements the interface
+var _ InterfaceHandler = (*StatusHandler)(*nil)
+
 // StatusHandler implements the status handler
 type StatusHandler struct{}
 

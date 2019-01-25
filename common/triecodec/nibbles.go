@@ -110,6 +110,10 @@ func RemoveNibblesTerminator(nibbles []uint8) []uint8 {
 
 // IsNibblesTerminated ...
 func IsNibblesTerminated(nibbles []uint8) bool {
+	if nibbles == nil || len(nibbles) == 0 {
+		return false
+	}
+
 	return nibbles[len(nibbles)-1] == NibbleTerminator
 }
 

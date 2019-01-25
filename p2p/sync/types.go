@@ -2,6 +2,7 @@ package sync
 
 import (
 	"errors"
+	"math/big"
 
 	"github.com/c3systems/go-substrate/block"
 	"github.com/c3systems/go-substrate/chain"
@@ -10,7 +11,7 @@ import (
 )
 
 const (
-	// RESPORT_COUNT ...
+	// REPORT_COUNT ...
 	REPORT_COUNT int = 5
 	// REQUEST_TIMEOUT ...
 	// note: ms?
@@ -64,13 +65,13 @@ type State struct {
 // EventCallback ...
 type EventCallback func() (interface{}, error)
 
-// Service ...
-type Service struct {
+// Sync ...
+type Sync struct {
 	Chain         chain.Interface
 	BlockRequests StateBlockRequests
 	BlockQueue    StateBlockQueue
-	BestQueued    *math.Big
-	BestSeen      *math.Big
+	BestQueued    *big.Int
+	BestSeen      *big.Int
 	Status        StatusEnum
 	Config        *client.Config
 }

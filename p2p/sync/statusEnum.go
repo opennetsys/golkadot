@@ -10,8 +10,9 @@ type statusEnum int
 const (
 	// Idle TODO
 	Idle statusEnum = iota
-	// Sync TODO
-	Sync
+	// SyncStatus TODO
+	// note: we cannot use sync bc the collision with the sync struct
+	SyncStatus
 )
 
 // ErrUnknownStatus is thrown when an unknown sync status is encountered.
@@ -32,7 +33,7 @@ func (s statusEnum) Type() statusEnum {
 func AllStatusEnums() []StatusEnum {
 	return []StatusEnum{
 		Idle,
-		Sync,
+		SyncStatus,
 	}
 }
 
@@ -42,8 +43,19 @@ func StatusEnumFromString(s string) (StatusEnum, error) {
 	case "IDLE":
 		return Idle, nil
 	case "SYNC":
-		return Sync, nil
+		return SyncStatus, nil
 	default:
 		return nil, ErrUnknownStatus
+	}
+}
+
+// String ...
+// note: we have to implement this ourselves and not with the stringer package bc of the collision
+func (s statusEnum) String() string {
+	switch s {
+	case Idle:
+		return "idle"
+	default:
+		return "sync"
 	}
 }

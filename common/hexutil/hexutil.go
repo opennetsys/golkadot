@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/c3systems/go-substrate/common/mathutil"
 )
 
 var (
@@ -83,7 +85,7 @@ func HexFixLength(hexStr string, bitLength int, withPadding bool) string {
 }
 
 // ToBN creates a math/big big number from a hex string.
-func ToBN(hexStr string, isLittleEndian bool) (*big.Int, error) {
+func ToBN(hexStr string, isLittleEndian bool, isNegative bool) (*big.Int, error) {
 	i := new(big.Int)
 	hx := StripPrefix(hexStr)
 
@@ -97,6 +99,12 @@ func ToBN(hexStr string, isLittleEndian bool) (*big.Int, error) {
 
 	if _, ok := i.SetString(hx, 16); !ok {
 		return nil, errors.New("could not decode to big.Int")
+	}
+
+	// NOTE: fromTwos takes as parameter the number of bits,
+	// which is the hex length multiplied by 4.
+	if isNegative {
+		return mathutil.FromTwos(i, i.BitLen()), nil
 	}
 
 	return i, nil
@@ -142,6 +150,7 @@ func ToUint8Slice(hexStr string, bitLength int) ([]uint8, error) {
 
 // Reverse reverses a hex string
 func Reverse(s string) string {
+	s = StripPrefix(s)
 	regex := regexp.MustCompile(`.{1,2}`)
 	in := regex.FindAllString(s, -1)
 	var out []string

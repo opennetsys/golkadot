@@ -93,8 +93,8 @@ type State struct {
 	SyncState *p2psync.State
 }
 
-// Service implements the p2p interface
-type Service struct {
+// P2P implements the p2p interface
+type P2P struct {
 	state  *State
 	Config *Config
 }

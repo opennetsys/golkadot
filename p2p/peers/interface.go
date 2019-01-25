@@ -5,8 +5,8 @@ import (
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
 
-// Interface defines the methods of the peers
-type Interface interface {
+// InterfacePeers defines the methods of the peers
+type InterfacePeers interface {
 	// Add adds a peer to peers
 	Add(pi pstore.PeerInfo) (*peer.KnownPeer, error)
 	// Count returns the number of connected peers

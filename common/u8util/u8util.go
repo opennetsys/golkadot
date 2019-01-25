@@ -8,7 +8,6 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/c3systems/go-substrate/common/bnutil"
 	"github.com/c3systems/go-substrate/common/hexutil"
 )
 
@@ -40,7 +39,8 @@ func FixLength(value []uint8, bitLength int, atStart bool) []uint8 {
 
 	result := make([]uint8, byteLength)
 	if atStart {
-		return append(result, value...)
+		copy(result[:], value)
+		return result
 	}
 
 	start := byteLength - len(value)
@@ -56,7 +56,7 @@ func ToString(value []uint8) string {
 	return string(value)
 }
 
-// ToHex creates a hex string from a uint8 slice.
+// ToHex creates a hex string from a uint8 slice. Set bitLength to -1 for default
 func ToHex(value []uint8, bitLength int, isPrefixed bool) string {
 	byteLength := int(math.Ceil(float64(bitLength) / float64(8)))
 
@@ -91,7 +91,12 @@ func FromHex(hexStr string) []uint8 {
 
 // ToBN creates a utf-8 string from a uint8 slice.
 func ToBN(value []uint8, isLittleEndian bool) *big.Int {
-	return bnutil.ToBN(value, isLittleEndian)
+	hx := hex.EncodeToString(value)
+	n, err := hexutil.ToBN(hx, isLittleEndian, false)
+	if err != nil {
+		panic(err)
+	}
+	return n
 }
 
 // TODO: need to implement from https://github.com/polkadot-js/common/tree/master/packages/util

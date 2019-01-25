@@ -7,8 +7,8 @@ import (
 	transport "github.com/libp2p/go-libp2p-transport"
 )
 
-// Interface defines the methods of peer
-type Interface interface {
+// InterfacePeer defines the methods of peer
+type InterfacePeer interface {
 	// AddConnection is used to add a connection
 	AddConnection(conn transport.Conn, isWritable bool) (uint, error)
 	// Disconnect disconnects from the peer

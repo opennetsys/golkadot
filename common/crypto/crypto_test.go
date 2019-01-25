@@ -3,7 +3,10 @@ package crypto
 import (
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"testing"
+
+	"github.com/c3systems/go-substrate/common/u8util"
 )
 
 func TestNewSHA256(t *testing.T) {
@@ -17,8 +20,8 @@ func TestNewSHA256(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewSHA256(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}
@@ -35,8 +38,8 @@ func TestNewBlake2b256(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewBlake2b256(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}
@@ -53,9 +56,156 @@ func TestNewBlake2b512(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			result := NewBlake2b512(tt.in)
-			if hex.EncodeToString(result) != tt.out {
-				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result))
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
 			}
 		})
 	}
+}
+
+func TestNewXXHash(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef"},
+		{[]byte("abc"), "990977adf52cbc44"},
+		{[]byte("hello"), "a36d9f887d82c726"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash(tt.in, 64)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewXXHash64(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef"},
+		{[]byte("abc"), "990977adf52cbc44"},
+		{[]byte("hello"), "a36d9f887d82c726"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash64(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewBlake2b256Sig(t *testing.T) {
+	for i, tt := range []struct {
+		key  []byte
+		data []byte
+		out  string
+	}{
+		{nil, []byte("abc"), "bddd813c…68d52319"},
+		{[]byte{4, 5, 6}, []byte{1, 2, 3}, "af0e60f4…8a714a8f"},
+		{[]byte("abc"), nil, "7a78f945…73b8f07b"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result, err := NewBlake2b256Sig(tt.key, tt.data)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(u8util.ToHex(result[:], 512/8, false), tt.out) {
+				t.Error(u8util.ToHex(result[:], 512/8, false), tt.out)
+			}
+		})
+	}
+}
+
+func TestNewXXHash128(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef4bbea33613baafd5"},
+		{[]byte("abc"), "990977adf52cbc440889329981caa9be"},
+		{[]byte("hello"), "a36d9f887d82c726b2a1d004cb71dd23"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash128(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewXXHash256(t *testing.T) {
+	for i, tt := range []struct {
+		in  []byte
+		out string
+	}{
+		{[]byte(""), "99e9d85137db46ef4bbea33613baafd56f963c64b1f3685a4eb4abd67ff6203a"},
+		{[]byte("abc"), "990977adf52cbc440889329981caa9bef7da5770b2b8a05303b75d95360dd62b"},
+		{[]byte("hello"), "a36d9f887d82c726b2a1d004cb71dd231fe2fb3bf584fc533914a80e276583e0"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result := NewXXHash256(tt.in)
+			if hex.EncodeToString(result[:]) != tt.out {
+				t.Errorf("want %v; got %v", tt.out, hex.EncodeToString(result[:]))
+			}
+		})
+	}
+}
+
+func TestNewBlake2b512Sig(t *testing.T) {
+	for i, tt := range []struct {
+		key  []byte
+		data []byte
+		out  string
+	}{
+		{nil, []byte("abc"), "ba80a53f…d4009923"},
+		{[]byte{4, 5, 6}, []byte{1, 2, 3}, "7ed2dd42…2ec9362e"},
+		{[]byte("abc"), nil, "91cc35fc…f47b00e5"},
+	} {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			result, err := NewBlake2b512Sig(tt.key, tt.data)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(u8util.ToHex(result[:], 512/8, false), tt.out) {
+				t.Error(u8util.ToHex(result[:], 512/8, false), tt.out)
+			}
+		})
+	}
+}
+
+func TestNaclVerify(t *testing.T) {
+	signature := []byte{28, 58, 206, 239, 249, 70, 59, 191, 166, 40, 219, 218, 235, 170, 25, 79, 10, 94, 9, 197, 34, 126, 1, 150, 246, 68, 28, 238, 36, 26, 172, 163, 168, 90, 202, 211, 126, 246, 57, 212, 43, 24, 88, 197, 240, 113, 118, 76, 37, 81, 91, 110, 236, 50, 144, 134, 100, 223, 220, 238, 34, 185, 211, 7}
+
+	publicKey, _, err := NewNaclKeyPairFromSeed([]uint8("12345678901234567890123456789012"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("validates a correctly signed message", func(t *testing.T) {
+		digest := []byte{0x61, 0x62, 0x63, 0x64}
+		if !NaclVerify(digest, signature, publicKey) {
+			t.Fail()
+		}
+	})
+
+	t.Run("fails a correctly signed message (message changed)", func(t *testing.T) {
+		digest := []byte{0x61, 0x62, 0x63, 0x64, 0x65}
+		if NaclVerify(digest, signature, publicKey) {
+			t.Fail()
+		}
+	})
+
+	t.Run("fails a correctly signed message (signature changed)", func(t *testing.T) {
+		signature[0] = 0xff
+		digest := []byte{0x61, 0x62, 0x63, 0x64}
+		if NaclVerify(digest, signature, publicKey) {
+			t.Fail()
+		}
+	})
 }
