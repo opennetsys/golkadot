@@ -12,8 +12,13 @@ import (
 
 // New ...
 func New() (*KeyRing, error) {
+	p, err := pair.NewPairs()
+	if err != nil {
+		return nil, err
+	}
+
 	return &KeyRing{
-		Pairs: new(pair.Pairs),
+		Pairs: p,
 	}, nil
 }
 
@@ -44,7 +49,7 @@ func (k *KeyRing) AddPair(pair *pair.Pair) (*pair.Pair, error) {
 }
 
 // AddFromAddress ...
-func (k *KeyRing) AddFromAddress(addr []byte, meta *keytypes.Meta, defaultEncoded []byte) (*pair.Pair, error) {
+func (k *KeyRing) AddFromAddress(addr []byte, meta keytypes.Meta, defaultEncoded []byte) (*pair.Pair, error) {
 	tmp, err := address.Decode(string(addr), nil)
 	if err != nil {
 		return nil, err
@@ -62,7 +67,7 @@ func (k *KeyRing) AddFromAddress(addr []byte, meta *keytypes.Meta, defaultEncode
 }
 
 // AddFromMnemonic ...
-func (k *KeyRing) AddFromMnemonic(mn, password string, meta *keytypes.Meta) (*pair.Pair, error) {
+func (k *KeyRing) AddFromMnemonic(mn, password string, meta keytypes.Meta) (*pair.Pair, error) {
 	seed, err := mnemonic.ToSeed(mn, password)
 	if err != nil {
 		return nil, err
@@ -72,7 +77,7 @@ func (k *KeyRing) AddFromMnemonic(mn, password string, meta *keytypes.Meta) (*pa
 }
 
 // AddFromSeed ...
-func (k *KeyRing) AddFromSeed(seed []byte, meta *keytypes.Meta) (*pair.Pair, error) {
+func (k *KeyRing) AddFromSeed(seed []byte, meta keytypes.Meta) (*pair.Pair, error) {
 	pub, priv, err := crypto.NewNaclKeyPairFromSeed(seed)
 	if err != nil {
 		return nil, err

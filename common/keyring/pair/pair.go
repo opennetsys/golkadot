@@ -43,25 +43,20 @@ func NewPairFromJSON(data []byte, password *string) (*Pair, error) {
 	copy(pub[:], pubBytes)
 
 	privBytes := u8util.FromHex(tmp.Encoded)
-	if password != nil {
-		pub2, priv2, err := Decode(password, privBytes)
-		if err != nil {
-			return nil, err
-		}
+	pub2, priv2, err := Decode(password, privBytes)
+	if err != nil {
+		return nil, err
+	}
 
-		if len(pub2) != len(pub) {
+	if len(pub2) != len(pub) {
+		return nil, errors.New("public keys do not match")
+	}
+	for idx := range pub2 {
+		if pub2[idx] != pub[idx] {
 			return nil, errors.New("public keys do not match")
 		}
-		for idx := range pub2 {
-			if pub2[idx] != pub[idx] {
-				return nil, errors.New("public keys do not match")
-			}
-		}
-
-		copy(priv[:], priv2[:])
-	} else {
-		copy(priv[:], privBytes)
 	}
+	copy(priv[:], priv2[:])
 
 	// TODO: nil defaultEncoded?
 	return NewPair(pub, priv, tmp.Meta, nil)

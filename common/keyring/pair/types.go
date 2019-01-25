@@ -31,8 +31,8 @@ type forJSON struct {
 }
 
 type encoding struct {
-	Content EncodingContentEnum
-	Type    EncodingTypeEnum
+	Content encodingContentEnum
+	Type    encodingTypeEnum
 	Version string
 }
 

@@ -2,6 +2,8 @@ package pair
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"strings"
 )
 
@@ -40,4 +42,23 @@ func EncodingContentEnumFromString(s string) (EncodingContentEnum, error) {
 	default:
 		return nil, ErrUnknownEncodingContent
 	}
+}
+
+// MarshalJSON ...
+func (e encodingContentEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, e.String())), nil
+}
+
+// Unmarshal ...
+func (e *encodingContentEnum) UnmarshalJSON(data []byte) error {
+	ECE, err := EncodingContentEnumFromString(strings.Replace(string(data), "\"", "", -1))
+	if err != nil {
+		log.Println("err getting content from string")
+		return err
+	}
+
+	typ := ECE.Type()
+	e = &typ
+
+	return nil
 }
