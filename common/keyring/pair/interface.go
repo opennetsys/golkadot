@@ -9,11 +9,11 @@ type InterfacePair interface {
 	Address() (string, error)
 	DecodePkcs8(password *string, encoded []byte) error
 	EncodePkcs8(password *string) ([]byte, error)
-	GetMeta() (*ktypes.Meta, error)
+	GetMeta() (ktypes.Meta, error)
 	IsLocked() bool
 	Lock() error
 	PublicKey() ([32]byte, error)
-	SetMeta(meta *ktypes.Meta) error
+	SetMeta(meta ktypes.Meta) error
 	Sign(message []byte) ([]byte, error)
 	// note: change to Marshal?
 	ToJSON(password *string) ([]byte, error)

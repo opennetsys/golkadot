@@ -12,7 +12,7 @@ var (
 
 // State ...
 type State struct {
-	Meta      *ktypes.Meta
+	Meta      ktypes.Meta
 	PublicKey [32]byte
 }
 
@@ -27,12 +27,12 @@ type forJSON struct {
 	Address  string
 	Encoded  string
 	Encoding encoding
-	Meta     *ktypes.Meta
+	Meta     ktypes.Meta
 }
 
 type encoding struct {
-	Content EncodingContentEnum
-	Type    EncodingTypeEnum
+	Content encodingContentEnum
+	Type    encodingTypeEnum
 	Version string
 }
 

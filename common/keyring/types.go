@@ -9,5 +9,5 @@ var (
 
 // KeyRing ...
 type KeyRing struct {
-	Pairs *pair.Pairs
+	Pairs pair.InterfacePairs
 }
