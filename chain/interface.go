@@ -1,15 +1,19 @@
 package chain
 
-import "github.com/c3systems/go-substrate/p2p/sync"
+import (
+	"math/big"
 
-// Interface describes the methods of the chain service
-type Interface interface {
+	synctypes "github.com/c3systems/go-substrate/p2p/sync/types"
+)
+
+// InterfaceChain describes the methods of the chain service
+type InterfaceChain interface {
 	// note: required from p2p.peer.AddConnection
-	GetBestBlocksNumber() (*math.Big, error)
+	GetBestBlocksNumber() (*big.Int, error)
 	GetBestBlocksHash() ([]byte, error)
 	GetGenesisHash() ([]byte, error)
 	// note: required by sync.processBlock
-	ImportBlock(block sync.StateBlock) (bool, error)
+	ImportBlock(block synctypes.StateBlock) (bool, error)
 	// note required by sync.QueuBlocks
-	GetBlockDataByHash(hash []byte) (sync.StateBlock, error)
+	GetBlockDataByHash(hash []byte) (synctypes.StateBlock, error)
 }

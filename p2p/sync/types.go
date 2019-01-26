@@ -4,10 +4,8 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/c3systems/go-substrate/block"
 	"github.com/c3systems/go-substrate/chain"
 	"github.com/c3systems/go-substrate/client"
-	"github.com/c3systems/go-substrate/p2p/peer"
 )
 
 const (
@@ -25,49 +23,9 @@ var (
 	ErrNilChain = errors.New("nil chain")
 )
 
-// Requests ...
-type Requests []*StateRequest
-
-// StateRequest TODO
-type StateRequest struct {
-	// Peer ..
-	Peer peer.Interface
-	// Request ...
-	Request block.Request
-	// Timeout ...
-	Timeout uint64
-}
-
-// StateBlockRequests ...
-type StateBlockRequests map[string]*StateRequest
-
-// StateBlock ...
-type StateBlock struct {
-	// Block ...
-	Block block.Data
-	// Peer ...
-	Peer peer.Interface
-}
-
-// StateBlockQueue ...
-type StateBlockQueue map[string]*StateBlock
-
-// State TODO
-type State struct {
-	// BlockRequests ...
-	BlockRequests StateBlockRequests
-	// BlockQueue ...
-	BlockQueue StateBlockQueue
-	// Status ...
-	Status StatusEnum
-}
-
-// EventCallback ...
-type EventCallback func() (interface{}, error)
-
 // Sync ...
 type Sync struct {
-	Chain         chain.Interface
+	Chain         chain.InterfaceChain
 	BlockRequests StateBlockRequests
 	BlockQueue    StateBlockQueue
 	BestQueued    *big.Int

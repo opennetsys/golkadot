@@ -4,11 +4,11 @@ import (
 	"math/big"
 
 	"github.com/c3systems/go-substrate/chain"
-	"github.com/c3systems/go-substrate/client"
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/c3systems/go-substrate/logger"
 	"github.com/c3systems/go-substrate/p2p/message"
 	"github.com/c3systems/go-substrate/p2p/message/status"
+	peertypes "github.com/c3systems/go-substrate/p2p/peer/types"
 
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	transport "github.com/libp2p/go-libp2p-transport"
@@ -16,10 +16,10 @@ import (
 
 // TODO ...
 // note: ensure the struct implements the interface
-var _ InterfacePeer = (*Peer)(nil)
+var _ peertypes.InterfacePeer = (*Peer)(nil)
 
 // New ...
-func New(cfg *client.Config, chn chain.Interface, pInfo pstore.PeerInfo) (*Peer, error) {
+func New(cfg *peertypes.Config, chn chain.Interface, pInfo pstore.PeerInfo) (*Peer, error) {
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}

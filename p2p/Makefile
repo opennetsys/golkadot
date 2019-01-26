@@ -27,7 +27,7 @@ install/stringer: check/go
 
 .PHONY: sync-event-enum
 sync-event-enum:
-	@(cd ./sync && stringer -type=eventEnum && echo "made p2p syncEvent enum")
+	@(cd ./sync/types && stringer -type=eventEnum && echo "made p2p syncEvent enum")
 
 .PHONY: peer-event-enum
 peer-event-enum:

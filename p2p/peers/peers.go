@@ -3,7 +3,7 @@ package peers
 import (
 	"github.com/c3systems/go-substrate/logger"
 	"github.com/c3systems/go-substrate/p2p/peer"
-
+	peertypes "github.com/c3systems/go-substrate/p2p/peer/types"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	"github.com/libp2p/go-libp2p-peerstore/pstoremem"
 )
@@ -28,19 +28,20 @@ func New(cfg *Config) (*Peers, error) {
 		return nil, err
 	}
 
-	pMap := make(map[pstore.PeerInfo]*peer.KnownPeer)
+	pMap := make(map[pstore.PeerInfo]*peertypes.KnownPeer)
 
 	return &Peers{
-		Store:      ps,
-		KnownPeers: mMap,
+		Store:         ps,
+		KnownPeersMap: pMap,
 	}, nil
 }
 
-func (p *Peers) Add(pi pstore.PeerInfo) (*peer.KnownPeer, error) {
+// Add ...
+func (p *Peers) Add(pi pstore.PeerInfo) (*peertypes.KnownPeer, error) {
 	if p.Store == nil {
 		return nil, ErrNoStore
 	}
-	if p.KnownPeers == nil {
+	if p.KnownPeersMap == nil {
 		return nil, ErrNoPeerMap
 	}
 
@@ -54,7 +55,7 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*peer.KnownPeer, error) {
 		return nil, err
 	}
 
-	pr.KnownPeers[pi] = pr
+	pr.KnownPeersMap[pi] = pr
 
 	return pr, nil
 }
@@ -62,19 +63,19 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*peer.KnownPeer, error) {
 // Count returns the number of connected peers
 func (p *Peers) Count() (int, error) {
 	if p.Store == nil {
-		return nil, ErrNoStore
+		return 0, ErrNoStore
 	}
 
 	return p.Store.PeersWithAddrs().Len(), nil
 }
 
 // Get returns a peer
-func (p *Peers) Get(pi pstore.PeerInfo) (*peer.KnownPeer, error) {
-	if p.KnownPeers == nil {
+func (p *Peers) Get(pi pstore.PeerInfo) (*peertypes.KnownPeer, error) {
+	if p.KnownPeersMap == nil {
 		return nil, ErrNoPeerMap
 	}
 
-	pr, ok := s.KnownPeers[pi]
+	pr, ok := p.KnownPeersMap[pi]
 	if !ok {
 		return nil, ErrNoSuchPeer
 	}
@@ -83,7 +84,7 @@ func (p *Peers) Get(pi pstore.PeerInfo) (*peer.KnownPeer, error) {
 }
 
 // Log TODO
-func (p *Peers) Log(event EventEnum, p *peer.KnownPeer) error {
+func (p *Peers) Log(event EventEnum, kp *peertypes.KnownPeer) error {
 	if event == nil {
 		return ErrNilEvent
 	}
@@ -101,13 +102,13 @@ func (p *Peers) On(event EventEnum, cb EventCallback) (interface{}, error) {
 }
 
 // Peers returns the peers
-func (p *Peers) KnownPeers() ([]*peer.KnownPeer, error) {
-	if p.KnownPeers == nil {
+func (p *Peers) KnownPeers() ([]*peertypes.KnownPeer, error) {
+	if p.KnownPeersMap == nil {
 		return nil, ErrNoPeerMap
 	}
 
-	var knownPeers []*peer.KnownPeer
-	for _, v := range p.KnownPeers {
+	var knownPeers []*peertypes.KnownPeer
+	for _, v := range p.KnownPeersMap {
 		knownPeers = append(knownPeers, v)
 	}
 

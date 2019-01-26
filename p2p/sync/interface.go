@@ -1,11 +1,14 @@
 package sync
 
-import "github.com/c3systems/go-substrate/p2p/peer"
+import (
+	peertypes "github.com/c3systems/go-substrate/p2p/peer/types"
+	synctypes "github.com/c3systems/go-substrate/p2p/sync/types"
+)
 
 // InterfaceSync defines the methods of the sync service
 type InterfaceSync interface {
 	// On handles events
-	On(event EventEnum, cb EventCallback) (interface{}, error)
+	On(event synctypes.EventEnum, cb synctypes.EventCallback) (interface{}, error)
 	// QueueBlocks ...
 	// TODO ...
 	QueueBlocks()
@@ -16,5 +19,5 @@ type InterfaceSync interface {
 	// TODO ...
 	ProvideBlocks()
 	// PeerRequests ...
-	PeerRequests(pr peer.Interface) (Requests, error)
+	PeerRequests(pr peertypes.InterfacePeer) (Requests, error)
 }

@@ -3,7 +3,7 @@ package peers
 import (
 	"errors"
 
-	"github.com/c3systems/go-substrate/p2p/peer"
+	peertypes "github.com/c3systems/go-substrate/p2p/peer/types"
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
@@ -32,8 +32,8 @@ type EventCallback func(p interface{}) (interface{}, error)
 
 // Peers ...
 type Peers struct {
-	Store      pstore.Peerstore
-	KnownPeers map[pstore.PeerInfo]*peer.KnownPeer
+	Store         pstore.Peerstore
+	KnownPeersMap map[pstore.PeerInfo]*peertypes.KnownPeer
 }
 
 // Config ...

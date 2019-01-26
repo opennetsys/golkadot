@@ -12,7 +12,7 @@ import (
 	"github.com/c3systems/go-substrate/client"
 	"github.com/c3systems/go-substrate/logger"
 	"github.com/c3systems/go-substrate/p2p/defaults"
-	"github.com/c3systems/go-substrate/p2p/peer"
+	peertypes "github.com/c3systems/go-substrate/p2p/peer/types"
 )
 
 // New ...
@@ -35,7 +35,7 @@ func New(ctx context.Context, cfg *client.Config, chn chain.Interface) (*Sync, e
 }
 
 // PeerRequests ...
-func (s *Sync) PeerRequests(pr peer.Interface) (Requests, error) {
+func (s *Sync) PeerRequests(pr peertypes.InterfacePeer) (Requests, error) {
 	if pr == nil {
 		return nil, errors.New("nil peer")
 	}
@@ -129,7 +129,7 @@ func (s *Sync) processBlock() (bool, error) {
 		// }
 	}
 
-	return hasImported
+	return false, hasImported
 
 	// if (count) {
 	//   l.log(`#${startNumber.toString()}- ${count} imported (${Date.now() - start}ms)`);
@@ -137,7 +137,7 @@ func (s *Sync) processBlock() (bool, error) {
 }
 
 // TODO finish...
-func (s *Sync) provideBlocks(pr peer.Interface, request *client.BlockRequest) error {
+func (s *Sync) provideBlocks(pr peertypes.InterfacePeer, request *client.BlockRequest) error {
 	current := request.FromValue
 	best := s.Chain.GetBestBlocksNumber()
 	// TODO: change...
@@ -175,7 +175,7 @@ func (s *Sync) provideBlocks(pr peer.Interface, request *client.BlockRequest) er
 }
 
 // QueueBlocks ...
-func (s *Sync) QueueBlocks(pr peer.Interface, response *client.BlockResponse) error {
+func (s *Sync) QueueBlocks(pr peertypes.InterfacePeer, response *client.BlockResponse) error {
 	if pr == nil {
 		return errors.New("nil peer")
 	}
@@ -242,7 +242,7 @@ func (s *Sync) QueueBlocks(pr peer.Interface, response *client.BlockResponse) er
 }
 
 // RequestBlocks ...
-func (s *Sync) RequestBlocks(pr peer.Interface) error {
+func (s *Sync) RequestBlocks(pr peertypes.InterfacePeer) error {
 	s.timeoutRequests()
 
 	if !pr.isActive() {
