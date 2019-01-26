@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 
-	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triecodec"
 	"github.com/c3systems/go-substrate/common/u8util"
@@ -28,7 +27,7 @@ type TxDB struct {
 }
 
 // NewImpl ...
-func NewImpl(db db.TXDB, rootHash *crypto.Blake2b256Hash, codec InterfaceCodec) *Impl {
+func NewImpl(db db.TXDB, rootHash []byte, codec InterfaceCodec) *Impl {
 	checkpoint := NewCheckpoint(rootHash)
 	return &Impl{
 		checkpoint: checkpoint,
@@ -52,7 +51,7 @@ func (i *Impl) DebugLog(ifcs ...interface{}) {
 }
 
 // Snapshot ...
-func (i *Impl) Snapshot(dest *TrieDB, fn db.ProgressCB, root *crypto.Blake2b256Hash, keys int, percent int, depth int) int {
+func (i *Impl) Snapshot(dest *TrieDB, fn db.ProgressCB, root []byte, keys int, percent int, depth int) int {
 	i.DebugLog("Snapshot, root", root)
 	node := i.GetNode(root)
 	i.DebugLog("Snapshot, GetNode result", node)
@@ -85,9 +84,7 @@ func (i *Impl) Snapshot(dest *TrieDB, fn db.ProgressCB, root *crypto.Blake2b256H
 	for _, val := range nodes {
 		v := NewUint8FromNode(val)
 		if v != nil && len(v) == 32 {
-			tmpHash := new(crypto.Blake2b256Hash)
-			copy(tmpHash[:], v)
-			keys = i.Snapshot(dest, fn, tmpHash, keys, percent, depth+1)
+			keys = i.Snapshot(dest, fn, v, keys, percent, depth+1)
 		}
 
 		percent += int((float64(100) / float64(len(nodes))) / math.Pow(float64(16), float64(depth)))
@@ -645,7 +642,7 @@ func (i *Impl) SetRootNode(node Node) {
 
 	if IsEmptyNode(node) {
 		i.DebugLog("SetRootNode, is empty")
-		i.checkpoint.rootHash = new(crypto.Blake2b256Hash)
+		i.checkpoint.rootHash = []byte{}
 	} else {
 		i.DebugLog("SetRootNode, call EncodeNode")
 		encoded := EncodeNode(node, i.codec)

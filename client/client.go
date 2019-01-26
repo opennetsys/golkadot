@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"math/big"
 	"time"
+
+	clientdbtypes "github.com/c3systems/go-substrate/clientdb/types"
+	"github.com/c3systems/go-substrate/p2p"
 )
 
-// InformantDelay ...
-var InformantDelay = 10000
-
-// TODO: these are placeholders. need to implement
+// TODO: these are placeholders. need to implement in their respective package
 
 // InterfaceChain ...
 type InterfaceChain interface{}
@@ -25,9 +25,6 @@ type InterfaceTelemetry interface{}
 
 // ChainName ...
 type ChainName struct{}
-
-// DBConfig ...
-type DBConfig struct{}
 
 // DevConfig ...
 type DevConfig struct {
@@ -49,33 +46,37 @@ type TelemetryConfig struct{}
 // WasmConfig ...
 type WasmConfig struct{}
 
-// Client ...
-type Client struct {
-	chain       InterfaceChain
-	informantID interface{}
-	p2p         InterfaceP2P
-	rpc         InterfaceRPC
-	telemetry   InterfaceTelemetry
-	prevBest    big.Int
-	prevTime    int64
-}
-
 // Config ...
 type Config struct {
-	chain     ChainName
-	db        DBConfig
-	dev       DevConfig
-	p2p       P2PConfig
-	rpc       RPCConfig
-	roles     []string
-	telemetry TelemetryConfig
-	wasm      WasmConfig
+	// TODO: types
+	Chain     *ChainName
+	DB        *clientdbtypes.InterfaceDBConfig
+	Dev       *DevConfig
+	P2P       *p2p.Config
+	RPC       *RPCConfig
+	Roles     []string
+	Telemetry *TelemetryConfig
+	Wasm      *WasmConfig
+}
+
+// InformantDelay ...
+var InformantDelay = 10000
+
+// Client ...
+type Client struct {
+	Chain       InterfaceChain
+	InformantID interface{}
+	P2P         InterfaceP2P
+	RPC         InterfaceRPC
+	Telemetry   InterfaceTelemetry
+	PrevBest    big.Int
+	PrevTime    int64
 }
 
 // NewClient ..
 func NewClient() *Client {
 	return &Client{
-		prevTime: time.Now().Unix(),
+		PrevTime: time.Now().Unix(),
 	}
 }
 
@@ -83,7 +84,7 @@ func NewClient() *Client {
 func (c *Client) Start(config *Config) {
 	// TODO: implement
 	/*
-		c.chain = NewChain(config)
+		c.chain = clientchain.NewChain(config)
 		c.p2p = NewP2P(config, c.chain)
 		c.rpc = NewRPC(config, c.chain)
 		c.telemetry = NewTelemetry(config, c.chain)
@@ -106,7 +107,7 @@ func (c *Client) StartInformant() {
 	// TODO: implement
 	//c.informantID = setInterval(c.runInformant, InformationDelay)
 
-	if c.p2p == nil {
+	if c.P2P == nil {
 		return
 	}
 
@@ -122,17 +123,17 @@ func (c *Client) StartInformant() {
 
 // StopInformant ...
 func (c *Client) StopInformant() {
-	if c.informantID != nil {
+	if c.InformantID != nil {
 		// TODO: implement
 		// clearInterval(c.informantID)
 	}
 
-	c.informantID = nil
+	c.InformantID = nil
 }
 
 // RunInformant ...
 func (c *Client) RunInformant() {
-	if c.chain == nil || c.p2p == nil || c.rpc == nil {
+	if c.Chain == nil || c.P2P == nil || c.RPC == nil {
 		c.StopInformant()
 		return
 	}
@@ -173,7 +174,7 @@ func (c *Client) RunInformant() {
 		c.prevTime = now
 	*/
 
-	if c.telemetry != nil {
+	if c.Telemetry != nil {
 		// TODO: implement
 		// c.telemetry.intervalInfo(numPeers, status)
 	}

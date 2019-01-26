@@ -93,7 +93,24 @@ func (u *U8Fixed) Sub(start, end int) []uint8 {
 	return u.value[start:end]
 }
 
+// Bytes ...
+func (u *U8Fixed) Bytes() []byte {
+	return u.value[:]
+}
+
+// ToU8a ...
+func (u *U8Fixed) ToU8a(isBare bool) []byte {
+	return u.value[:]
+}
+
 // Equals ...
-func (u *U8Fixed) Equals(value *U8Fixed) bool {
-	return u.String() == value.String()
+func (u *U8Fixed) Equals(other interface{}) bool {
+	switch v := other.(type) {
+	case *U8Fixed:
+		return u.String() == v.String()
+	case []uint8:
+		return reflect.DeepEqual(u.value, v)
+	}
+
+	return false
 }

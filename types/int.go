@@ -67,6 +67,16 @@ func (i *Int) BitLen() int {
 	return i.bitLen
 }
 
+// Len ...
+func (i *Int) Len() int {
+	return i.BitLen()
+}
+
+// EncodedLen ...
+func (i *Int) EncodedLen() int {
+	return i.BitLen()
+}
+
 // BN ...
 func (i *Int) BN() *big.Int {
 	return i.value
@@ -88,7 +98,7 @@ func (i *Int) String() string {
 }
 
 // ToU8a ...
-func (i *Int) ToU8a() []uint8 {
+func (i *Int) ToU8a(isBare bool) []uint8 {
 	return bnutil.ToUint8Slice(i.value, i.bitLen, true, false)
 }
 
@@ -98,6 +108,37 @@ func (i *Int) Hex() string {
 }
 
 // Equals ...
-func (i *Int) Equals(value *Int) bool {
-	return i.String() == value.String()
+func (i *Int) Equals(other interface{}) bool {
+	switch v := other.(type) {
+	case *Int:
+		return i.String() == v.String()
+	case int:
+		return i.Int64() == int64(v)
+	case int64:
+		return i.Int64() == v
+	case uint:
+		return i.Uint64() == uint64(v)
+	case uint64:
+		return i.Uint64() == v
+	}
+
+	return false
+}
+
+// IsZero ...
+func (i *Int) IsZero() bool {
+	if i == nil {
+		return true
+	}
+
+	if i.value.Uint64() == 0 {
+		return true
+	}
+
+	return false
+}
+
+// Bytes ...
+func (i *Int) Bytes() []byte {
+	return i.value.Bytes()
 }

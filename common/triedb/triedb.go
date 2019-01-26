@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triecodec"
 	"github.com/c3systems/go-substrate/common/triehash"
@@ -18,7 +17,7 @@ type TrieDB struct {
 }
 
 // NewTrie ...
-func NewTrie(db db.TXDB, rootHash *crypto.Blake2b256Hash, codec InterfaceCodec) *TrieDB {
+func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *TrieDB {
 	impl := NewImpl(db, rootHash, codec)
 	return &TrieDB{
 		impl:  impl,
@@ -166,7 +165,7 @@ func (t *TrieDB) GetRoot() []byte {
 }
 
 // GetNode ...
-func (t *TrieDB) GetNode(hash *crypto.Blake2b256Hash) Node {
+func (t *TrieDB) GetNode(hash []byte) Node {
 	t.DebugLog("get node, input hash", hash)
 	if hash == nil {
 		hash = t.impl.checkpoint.rootHash
@@ -177,7 +176,7 @@ func (t *TrieDB) GetNode(hash *crypto.Blake2b256Hash) Node {
 }
 
 // SetRoot ...
-func (t *TrieDB) SetRoot(rootHash *crypto.Blake2b256Hash) {
+func (t *TrieDB) SetRoot(rootHash []byte) {
 	t.DebugLog("set root, root hash", rootHash)
 	t.impl.checkpoint.rootHash = rootHash
 }

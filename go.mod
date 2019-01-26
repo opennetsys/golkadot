@@ -7,6 +7,7 @@ require (
 	github.com/allegro/bigcache v1.1.0 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20190121184617-8f049bdb8feb // indirect
 	github.com/btcsuite/btcd v0.0.0-20181130015935-7d2daa5bfef2 // indirect
+	github.com/c3systems/c3-go v0.0.2
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1

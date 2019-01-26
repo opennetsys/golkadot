@@ -19,7 +19,7 @@ func TestInt(t *testing.T) {
 	})
 
 	t.Run("converts to LE from the provided value", func(t *testing.T) {
-		if !reflect.DeepEqual(NewInt(1234567, -1).ToU8a(), []byte{135, 214, 18, 0, 0, 0, 0, 0}) {
+		if !reflect.DeepEqual(NewInt(1234567, -1).ToU8a(false), []byte{135, 214, 18, 0, 0, 0, 0, 0}) {
 			t.Fail()
 		}
 	})

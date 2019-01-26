@@ -9,7 +9,7 @@ import (
 
 // Text is a string wrapper, along with the length.
 type Text struct {
-	value string
+	value *string
 }
 
 // NewText ...
@@ -29,24 +29,32 @@ func NewText(i interface{}) *Text {
 // NewTextFromString ...
 func NewTextFromString(value string) *Text {
 	return &Text{
-		value: value,
+		value: &value,
 	}
 }
 
 // NewTextFromText ...
 func NewTextFromText(value *Text) *Text {
+	v := value.String()
 	return &Text{
-		value: value.String(),
+		value: &v,
 	}
 }
 
 // NewTextFromBytes ...
 func NewTextFromBytes(value []byte) *Text {
 	offset, length := u8compact.FromUint8Slice(value, 8)
-	result := value[offset : uint64(offset)+length.Uint64()]
+
+	end := int(offset) + int(length.Uint64())
+	if end > len(value) {
+		end = len(value)
+	}
+
+	result := value[offset:end]
+	v := string(result)
 
 	return &Text{
-		value: string(result),
+		value: &v,
 	}
 }
 
@@ -58,7 +66,11 @@ func (t *Text) DecodeText(value string) {
 
 // Len ...
 func (t *Text) Len() int {
-	return len(t.value)
+	if t.value != nil {
+		return len(*t.value)
+	}
+
+	return 0
 }
 
 // EncodedLen ...
@@ -68,7 +80,11 @@ func (t *Text) EncodedLen() int {
 
 // String ...
 func (t *Text) String() string {
-	return t.value
+	if t.value != nil {
+		return *t.value
+	}
+
+	return ""
 }
 
 // Hex ...
@@ -83,10 +99,33 @@ func (t *Text) Bytes() []byte {
 
 // ToU8a encodes the value as a []uint8 as per the parity-codec specifications. Set isBare to true when the value has none of the type-specific prefixes (internal)
 func (t *Text) ToU8a(isBare bool) []uint8 {
-	encoded := []byte(t.value)
+	var encoded []byte
+	if t.value != nil {
+		encoded = []byte(*t.value)
+	}
+
 	if isBare {
 		return encoded
 	}
 
 	return u8compact.AddLength(encoded, -1)
+}
+
+// Equals ...
+func (t *Text) Equals(other interface{}) bool {
+	switch v := other.(type) {
+	case *Text:
+		return t.String() == v.String()
+	case string:
+		return t.String() == v
+	case *string:
+		return t.String() == *v
+	}
+
+	return false
+}
+
+// Value ...
+func (t *Text) Value() *string {
+	return t.value
 }

@@ -1,19 +1,18 @@
 package triedb
 
 import (
-	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/triecodec"
 	"github.com/c3systems/go-substrate/common/triehash"
 )
 
 // Checkpoint ...
 type Checkpoint struct {
-	rootHash *crypto.Blake2b256Hash
-	txRoot   *crypto.Blake2b256Hash
+	rootHash []byte
+	txRoot   []byte
 }
 
 // NewCheckpoint ...
-func NewCheckpoint(rootHash *crypto.Blake2b256Hash) *Checkpoint {
+func NewCheckpoint(rootHash []byte) *Checkpoint {
 	if rootHash == nil {
 		tmpHash := triehash.TrieRoot(nil)
 		rootHash = triecodec.Hashing(tmpHash[:])
@@ -26,30 +25,30 @@ func NewCheckpoint(rootHash *crypto.Blake2b256Hash) *Checkpoint {
 }
 
 // CreateCheckpoint ...
-func (c *Checkpoint) CreateCheckpoint() *crypto.Blake2b256Hash {
+func (c *Checkpoint) CreateCheckpoint() []byte {
 	c.txRoot = c.rootHash
 
 	return c.txRoot
 }
 
 // CommitCheckpoint ...
-func (c *Checkpoint) CommitCheckpoint() *crypto.Blake2b256Hash {
+func (c *Checkpoint) CommitCheckpoint() []byte {
 	return c.rootHash
 }
 
 // RevertCheckpoint ...
-func (c *Checkpoint) RevertCheckpoint() *crypto.Blake2b256Hash {
+func (c *Checkpoint) RevertCheckpoint() []byte {
 	c.rootHash = c.txRoot
 
 	return c.rootHash
 }
 
 // RootHash ...
-func (c *Checkpoint) RootHash() *crypto.Blake2b256Hash {
+func (c *Checkpoint) RootHash() []byte {
 	return c.rootHash
 }
 
 // TxRoot ...
-func (c *Checkpoint) TxRoot() *crypto.Blake2b256Hash {
+func (c *Checkpoint) TxRoot() []byte {
 	return c.txRoot
 }

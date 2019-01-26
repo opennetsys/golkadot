@@ -36,9 +36,17 @@ test/types:
 test/runtime:
 	@go test -v runtime/*.go $(ARGS)
 
+.PHONY: test/client
+test/client:
+	@go test -v client/*.go
+
 .PHONY: test/clientdb
 test/clientdb:
 	@go test -v clientdb/*.go
+
+.PHONY: test/clientchain
+test/clientchain:
+	@go test -v clientchain/*.go
 
 .PHONY: test/common
 test/common:

@@ -45,8 +45,8 @@ func FromUint8Slice(input []uint8, bitLength int) (int, *big.Int) {
 	if end > len(input) {
 		end = len(input)
 	}
-	return offset, bnutil.ToBN(input[1:end], true)
 
+	return offset, bnutil.ToBN(input[1:end], true)
 }
 
 // CompactToUint8Slice encodes a number into a compact representation.

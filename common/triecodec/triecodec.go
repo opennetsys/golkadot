@@ -81,6 +81,6 @@ func EndBranch() []uint8 {
 }
 
 // Hashing ...
-func Hashing(value []byte) *crypto.Blake2b256Hash {
-	return crypto.NewBlake2b256(value)
+func Hashing(value []byte) []byte {
+	return crypto.NewBlake2b256(value)[:]
 }

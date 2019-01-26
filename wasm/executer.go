@@ -1,20 +1,23 @@
 package wasm
 
 import (
+	"github.com/c3systems/go-substrate/client"
+	"github.com/c3systems/go-substrate/clientdb"
+	"github.com/c3systems/go-substrate/clienttypes"
 	"github.com/c3systems/go-substrate/runtime"
 	"github.com/c3systems/go-substrate/types"
 )
 
 // Executer ...
 type Executer struct {
-	BlockDB *types.BlockDB
-	Config  *types.Config
+	BlockDB *clientdb.BlockDB
+	Config  *client.Config
 	Runtime runtime.Interface
-	StateDB *types.StateDB
+	StateDB *clientdb.StateDB
 }
 
 // NewExecuter ...
-func NewExecuter(config *types.Config, blockDB *types.BlockDB, stateDB *types.StateDB, runtime runtime.Interface) *Executer {
+func NewExecuter(config *client.Config, blockDB *clientdb.BlockDB, stateDB *clientdb.StateDB, runtime runtime.Interface) *Executer {
 	return &Executer{
 		BlockDB: blockDB,
 		Config:  config,
@@ -24,7 +27,7 @@ func NewExecuter(config *types.Config, blockDB *types.BlockDB, stateDB *types.St
 }
 
 // ExecuteBlock ...
-func (e *Executer) ExecuteBlock(blockData *types.BlockData, forceNew bool) bool {
+func (e *Executer) ExecuteBlock(blockData *clienttypes.BlockData, forceNew bool) bool {
 	// TODO
 	/*
 		start := time.Now().Unix()
