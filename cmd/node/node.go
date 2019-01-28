@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/c3systems/go-substrate/client"
+	"github.com/c3systems/go-substrate/client/p2p"
+	"github.com/c3systems/go-substrate/client/rpc"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/logger"
-	"github.com/c3systems/go-substrate/p2p"
-	"github.com/c3systems/go-substrate/rpc"
 	"github.com/c3systems/go-substrate/telemetry"
 	"github.com/c3systems/go-substrate/wasm"
 	"github.com/spf13/cobra"
