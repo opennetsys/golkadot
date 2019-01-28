@@ -1,0 +1,13 @@
+package db
+
+// DefaultPath ...
+var DefaultPath = "~/.go-substrate"
+
+// DefaultType ...
+var DefaultType = "disk"
+
+// DBPathPrefix ...
+var DBPathPrefix = "database"
+
+// DBConfigType ...
+var DBConfigType = "disk" // other option is "memory"
