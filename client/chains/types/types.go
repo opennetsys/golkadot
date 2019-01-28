@@ -1,13 +1,9 @@
-package clientchaintypes
+package types
 
 import (
-	"github.com/c3systems/go-substrate/clienttypes"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/types"
 )
-
-// ChainInterface ...
-// TODO
-type ChainInterface struct{}
 
 // ChainJSON ...
 // TODO
@@ -28,7 +24,7 @@ type ChainJSONGenesisRaw map[string]string
 
 // ChainGenesis ...
 type ChainGenesis struct {
-	Block  *clienttypes.BlockData
+	Block  *clienttypes.Data
 	Code   []uint8
 	Header *types.Header
 }

@@ -5,8 +5,8 @@ import (
 	"math/big"
 	"time"
 
-	clientdbtypes "github.com/c3systems/go-substrate/clientdb/types"
-	"github.com/c3systems/go-substrate/p2p"
+	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
 // TODO: these are placeholders. need to implement in their respective package
@@ -52,8 +52,8 @@ type Config struct {
 	Chain     *ChainName
 	DB        *clientdbtypes.InterfaceDBConfig
 	Dev       *DevConfig
-	P2P       *p2p.Config
-	RPC       *RPCConfig
+	P2P       *clienttypes.ConfigP2P
+	RPC       *clienttypes.ConfigRPC
 	Roles     []string
 	Telemetry *TelemetryConfig
 	Wasm      *WasmConfig
@@ -81,7 +81,7 @@ func NewClient() *Client {
 }
 
 // Start ...
-func (c *Client) Start(config *Config) {
+func (c *Client) Start(config *clienttypes.ConfigP2P) {
 	// TODO: implement
 	/*
 		c.chain = clientchain.NewChain(config)

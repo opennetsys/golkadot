@@ -1,8 +1,8 @@
-package clientchainloader
+package loader
 
 import (
 	"github.com/c3systems/go-substrate/client"
-	clientchaintypes "github.com/c3systems/go-substrate/clientchain/types"
+	clientchaintypes "github.com/c3systems/go-substrate/client/chains/types"
 )
 
 // Loader ...

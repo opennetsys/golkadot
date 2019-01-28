@@ -2,8 +2,8 @@ package db
 
 import (
 	"github.com/c3systems/go-substrate/client"
-	clientchainloader "github.com/c3systems/go-substrate/clientchain/loader"
-	clientdbtypes "github.com/c3systems/go-substrate/clientdb/types"
+	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
+	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triedb"
 	types "github.com/c3systems/go-substrate/types"

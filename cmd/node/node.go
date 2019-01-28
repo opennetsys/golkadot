@@ -7,6 +7,7 @@ import (
 	"github.com/c3systems/go-substrate/client"
 	"github.com/c3systems/go-substrate/client/p2p"
 	"github.com/c3systems/go-substrate/client/rpc"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/logger"
 	"github.com/c3systems/go-substrate/telemetry"
@@ -47,7 +48,7 @@ func setup() {
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			// TODO: implement
-			config := &client.Config{}
+			config := &clienttypes.ConfigP2P{}
 			cl := client.NewClient()
 			cl.Start(config)
 

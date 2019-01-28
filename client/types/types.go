@@ -262,6 +262,7 @@ type Request struct {
 }
 
 // Data TODO
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/BlockData.ts
 type Data struct {
 	Hash          *pcrypto.Blake2b256Hash
 	Header        *Header
