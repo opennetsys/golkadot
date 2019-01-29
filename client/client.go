@@ -5,72 +5,24 @@ import (
 	"math/big"
 	"time"
 
-	clientdbtypes "github.com/c3systems/go-substrate/clientdb/types"
-	"github.com/c3systems/go-substrate/p2p"
+	"github.com/c3systems/go-substrate/client/p2p"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts
 
 // TODO: these are placeholders. need to implement in their respective package
 
-// InterfaceChain ...
-type InterfaceChain interface{}
-
-// InterfaceP2P ...
-type InterfaceP2P interface{}
-
-// InterfaceRPC ...
-type InterfaceRPC interface{}
-
-// InterfaceTelemetry ...
-type InterfaceTelemetry interface{}
-
-// ChainName ...
-type ChainName struct{}
-
-// DevConfig ...
-type DevConfig struct {
-	genBlocks bool
-}
-
-// P2PConfig ...
-type P2PConfig struct{}
-
-// RPCConfig ...
-type RPCConfig struct{}
-
-// RolesConfig ...
-type RolesConfig struct{}
-
-// TelemetryConfig ...
-type TelemetryConfig struct{}
-
-// WasmConfig ...
-type WasmConfig struct{}
-
-// Config ...
-type Config struct {
-	// TODO: types
-	Chain     *ChainName
-	DB        *clientdbtypes.InterfaceDBConfig
-	Dev       *DevConfig
-	P2P       *p2p.Config
-	RPC       *RPCConfig
-	Roles     []string
-	Telemetry *TelemetryConfig
-	Wasm      *WasmConfig
-}
-
 // InformantDelay ...
 var InformantDelay = 10000
 
 // Client ...
 type Client struct {
-	Chain       InterfaceChain
+	Chain       clienttypes.InterfaceChains
 	InformantID interface{}
-	P2P         InterfaceP2P
-	RPC         InterfaceRPC
-	Telemetry   InterfaceTelemetry
+	P2P         p2p.InterfaceP2P
+	RPC         clienttypes.InterfaceRPC
+	Telemetry   clienttypes.InterfaceTelemetry
 	PrevBest    big.Int
 	PrevTime    int64
 }
@@ -83,7 +35,7 @@ func NewClient() *Client {
 }
 
 // Start ...
-func (c *Client) Start(config *Config) {
+func (c *Client) Start(config *clienttypes.ConfigClient) {
 	// TODO: implement
 	/*
 		c.chain = clientchain.NewChain(config)
