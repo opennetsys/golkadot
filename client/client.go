@@ -9,6 +9,8 @@ import (
 	"github.com/c3systems/go-substrate/p2p"
 )
 
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts
+
 // TODO: these are placeholders. need to implement in their respective package
 
 // InterfaceChain ...

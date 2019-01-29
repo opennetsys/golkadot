@@ -9,8 +9,7 @@ import (
 	types "github.com/c3systems/go-substrate/types"
 )
 
-// https://github.com/polkadot-js/client/tree/master/packages/client-db/src
-// TODO
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client-db/src/index.ts
 
 // DBConfig ...
 type DBConfig struct {
