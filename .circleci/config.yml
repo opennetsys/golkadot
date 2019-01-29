@@ -1,0 +1,34 @@
+references:
+  go-substrate-build-image: &go-substrate-build-image
+    circleci/classic:latest
+
+version: 2
+jobs:
+  build:
+    machine:
+      image: *go-substrate-build-image
+
+    working_directory: /home/circleci/.go_workspace/src/github.com/c3systems/go-substrate
+    steps:
+      - run:
+          name: Install Golang
+          command: |
+            sudo add-apt-repository ppa:gophers/archive
+            sudo apt-get update -y
+            sudo apt-get install golang-1.10-go -y
+            export GOPATH=/home/circleci/.go_workspace
+            export PATH=$PATH:$GOPATH/bin
+            go version
+
+      - checkout
+
+      - run:
+          name: Tests
+          command: |
+            make test
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build
