@@ -2,6 +2,7 @@ package clienttypes
 
 // TODO...
 
+// Kind ...
 func (s *StateRequest) Kind() uint {
 	return 0
 }

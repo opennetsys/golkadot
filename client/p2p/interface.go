@@ -17,5 +17,5 @@ type InterfaceP2P interface {
 	// Stop stops the p2p service
 	Stop() error
 	// Cfg returns the config
-	Cfg() clienttypes.ConfigP2P
+	Cfg() clienttypes.ConfigClient
 }

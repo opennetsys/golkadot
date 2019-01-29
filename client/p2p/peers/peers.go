@@ -1,6 +1,8 @@
 package peers
 
 import (
+	"errors"
+
 	"github.com/c3systems/go-substrate/client/p2p/peer"
 	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
@@ -15,18 +17,21 @@ import (
 var _ clienttypes.InterfacePeers = (*Peers)(nil)
 
 // New ...
-func New(cfg *clienttypes.ConfigPeers) (*Peers, error) {
+func New(cfg *clienttypes.ConfigClient) (*Peers, error) {
 	// TODO ...
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}
+	if cfg.Peers == nil {
+		return nil, errors.New("nil peers config")
+	}
 
 	ps := pstoremem.NewPeerstore()
-	if err := ps.AddPrivKey(cfg.ID, cfg.Priv); err != nil {
+	if err := ps.AddPrivKey(cfg.Peers.ID, cfg.Peers.Priv); err != nil {
 		logger.Errorf("[peers] err adding private keey to peer store\n%v", err)
 		return nil, err
 	}
-	if err := ps.AddPubKey(cfg.ID, cfg.Pub); err != nil {
+	if err := ps.AddPubKey(cfg.Peers.ID, cfg.Peers.Pub); err != nil {
 		logger.Errorf("[peers] err adding public key to peer store\n%v", err)
 		return nil, err
 	}
@@ -36,6 +41,7 @@ func New(cfg *clienttypes.ConfigPeers) (*Peers, error) {
 	return &Peers{
 		Store:         ps,
 		KnownPeersMap: pMap,
+		cfg:           cfg,
 	}, nil
 }
 
@@ -52,8 +58,7 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 	p.Store.AddAddrs(pi.ID, pi.Addrs, pstore.PermanentAddrTTL)
 
 	// TODO...
-	cfg := &clienttypes.ConfigPeer{}
-	pr, err := peer.New(cfg, nil, pstore.PeerInfo{})
+	pr, err := peer.New(p.cfg, nil, pi)
 	if err != nil {
 		logger.Errorf("[peers] err building new peer\n%v", err)
 		return nil, err

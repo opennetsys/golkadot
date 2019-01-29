@@ -28,6 +28,6 @@ var (
 
 // P2P implements the p2p interface
 type P2P struct {
-	state  *clienttypes.State
-	Config *clienttypes.ConfigP2P
+	state *clienttypes.State
+	cfg   *clienttypes.ConfigClient
 }

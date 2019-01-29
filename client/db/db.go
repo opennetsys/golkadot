@@ -1,9 +1,9 @@
 package db
 
 import (
-	"github.com/c3systems/go-substrate/client"
 	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
 	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triedb"
 	types "github.com/c3systems/go-substrate/types"
@@ -107,7 +107,7 @@ type DB struct {
 }
 
 // NewDB ...
-func NewDB(config *client.Config, chain *clientchainloader.Loader) *DB {
+func NewDB(config *clienttypes.ConfigClient, chain *clientchainloader.Loader) *DB {
 	d := &DB{}
 	d.config = config.DB
 	_ = d

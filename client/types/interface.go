@@ -59,7 +59,7 @@ type InterfacePeer interface {
 	// SetBest sets a new block
 	SetBest(blockNumber *big.Int, hash []byte) error
 	// Cfg returns the peer config
-	Cfg() ConfigPeer
+	Cfg() ConfigClient
 	// GetID ...
 	GetID() string
 }
@@ -76,7 +76,7 @@ type InterfacePeers interface {
 	Log(event peerstypes.EventEnum, kp *KnownPeer) error
 	// On handles peers events
 	On(event peerstypes.EventEnum, cb peerstypes.EventCallback) (interface{}, error)
-	// Peers returns the peers
+	// KnownPeers returns the peers
 	KnownPeers() ([]*KnownPeer, error)
 }
 
@@ -95,3 +95,9 @@ type InterfaceMessage interface {
 	// Header ...
 	Header() *Header
 }
+
+// InterfaceTelemetry ...
+type InterfaceTelemetry interface{}
+
+// InterfaceRPC ...
+type InterfaceRPC interface{}

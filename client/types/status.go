@@ -1,5 +1,6 @@
 package clienttypes
 
+// Kind ...
 func (s *Status) Kind() uint {
 	return 0
 }

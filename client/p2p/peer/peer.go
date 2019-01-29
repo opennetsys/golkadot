@@ -22,7 +22,7 @@ import (
 var _ clienttypes.InterfacePeer = (*Peer)(nil)
 
 // New ...
-func New(cfg *clienttypes.ConfigPeer, chn clienttypes.InterfaceChains, pInfo pstore.PeerInfo) (*Peer, error) {
+func New(cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains, pInfo pstore.PeerInfo) (*Peer, error) {
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}
@@ -179,9 +179,9 @@ func (p *Peer) SetBest(blockNumber *big.Int, hash []byte) error {
 }
 
 // Cfg ...
-func (p *Peer) Cfg() clienttypes.ConfigPeer {
+func (p *Peer) Cfg() clienttypes.ConfigClient {
 	if p.Config == nil {
-		return clienttypes.ConfigPeer{}
+		return clienttypes.ConfigClient{}
 	}
 
 	return *p.Config

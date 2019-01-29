@@ -22,8 +22,8 @@ type Peer struct {
 	BestHash   []byte
 	BestNumber *big.Int
 	Chain      clienttypes.InterfaceChains
-	//Config     *clienttypes.ConfigClient
-	Config      *clienttypes.ConfigPeer
+	Config     *clienttypes.ConfigClient
+	//Config      *clienttypes.ConfigPeer
 	ID          string
 	Connections map[int]*clienttypes.Connection
 	NextID      uint

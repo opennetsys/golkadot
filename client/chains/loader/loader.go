@@ -1,8 +1,8 @@
 package loader
 
 import (
-	"github.com/c3systems/go-substrate/client"
 	clientchaintypes "github.com/c3systems/go-substrate/client/chains/types"
+	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
 // Loader ...
@@ -11,7 +11,8 @@ type Loader struct {
 }
 
 // NewLoader ...
-func NewLoader(config *client.Config) *Loader {
+// TODO: config loader?
+func NewLoader(config *clienttypes.ConfigClient) *Loader {
 	// TODO
 	return &Loader{}
 }

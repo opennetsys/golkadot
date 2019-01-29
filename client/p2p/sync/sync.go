@@ -216,7 +216,8 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 	defer delete(s.BlockRequests, pr.GetID())
 
 	if !ok {
-		logger.Warnf("Unrequested response from %v", pr.Cfg().ShortID)
+		// TODO: nil check
+		logger.Warnf("Unrequested response from %v", pr.Cfg().Peer.ShortID)
 		return nil
 
 	} else if response.ID != request.ID {
@@ -268,7 +269,7 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 	}
 
 	if count != 0 && firstNumber != nil {
-		logger.Infof("Queued %d blocks from %s, %s", count, pr.Cfg().ShortID, firstNumber.String())
+		logger.Infof("Queued %d blocks from %s, %s", count, pr.Cfg().Peer.ShortID, firstNumber.String())
 	}
 
 	return nil
@@ -306,17 +307,17 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 		}
 	}
 
-	if pr.Cfg().BestNumber.Cmp(s.BestSeen) == 1 {
-		s.BestSeen = pr.Cfg().BestNumber
+	if pr.Cfg().Peer.BestNumber.Cmp(s.BestSeen) == 1 {
+		s.BestSeen = pr.Cfg().Peer.BestNumber
 	}
 
 	// TODO: This assumes no stale block downloading
 	_, ok := s.BlockRequests[pr.GetID()]
-	if ok || from == nil || from.Cmp(pr.Cfg().BestNumber) == 1 {
+	if ok || from == nil || from.Cmp(pr.Cfg().Peer.BestNumber) == 1 {
 		return nil
 	}
 
-	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().ShortID, from)
+	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from)
 
 	timeout := time.Now().Add(time.Duration(REQUEST_TIMEOUT) * time.Millisecond)
 	nextID, err := pr.GetNextID()

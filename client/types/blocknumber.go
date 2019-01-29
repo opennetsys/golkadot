@@ -1,11 +1,9 @@
-package types
+package clienttypes
 
-import "strconv"
-
-// BlockNumber ...
-type BlockNumber struct {
-	value uint64
-}
+import (
+	"math/big"
+	"strconv"
+)
 
 // NewBlockNumber ...
 func NewBlockNumber(value interface{}) *BlockNumber {
@@ -25,8 +23,8 @@ func NewBlockNumber(value interface{}) *BlockNumber {
 			panic(err)
 		}
 		i = uint64(u)
-	case *Int:
-		i = v.Uint64()
+	case *big.Int:
+		i = uint64(v.Int64())
 	}
 	return &BlockNumber{
 		value: i,

@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/c3systems/go-substrate/client/p2p/peers"
@@ -25,24 +26,27 @@ import (
 var _ InterfaceP2P = (*P2P)(nil)
 
 // New builds a new p2p service
-func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error) {
+func New(cfg *clienttypes.ConfigClient, c clienttypes.InterfaceChains) (*P2P, error) {
 	// 1. check inputs
 	if cfg == nil {
 		return nil, ErrNoConfig
+	}
+	if cfg.P2P == nil {
+		return nil, errors.New("nil p2p config")
 	}
 	if c == nil {
 		return nil, ErrNoChainService
 	}
 
 	// 2. parse the public key for the pid
-	pid, err := libpeer.IDFromPublicKey(cfg.Pub)
+	pid, err := libpeer.IDFromPublicKey(cfg.P2P.Pub)
 	if err != nil {
 		logger.Errorf("[p2p] err generating peer id from public key\n%v", err)
 		return nil, err
 	}
 
 	// 3. parse the address
-	listen, err := ma.NewMultiaddr(cfg.Address)
+	listen, err := ma.NewMultiaddr(cfg.P2P.Address)
 	if err != nil {
 		logger.Errorf("[p2p] err parsing address\n%v", err)
 		return nil, err
@@ -51,18 +55,18 @@ func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error
 	// 4. build the peerstore and save the keys
 	// TODO: pass in pstore?
 	ps := pstoremem.NewPeerstore()
-	if err := ps.AddPrivKey(pid, cfg.Priv); err != nil {
+	if err := ps.AddPrivKey(pid, cfg.P2P.Priv); err != nil {
 		logger.Errorf("[p2p] err adding private keey to peer store\n%v", err)
 		return nil, err
 	}
-	if err := ps.AddPubKey(pid, cfg.Pub); err != nil {
+	if err := ps.AddPubKey(pid, cfg.P2P.Pub); err != nil {
 		logger.Errorf("[p2p] err adding public key to peer store\n%v", err)
 		return nil, err
 	}
 
 	// 5. build the swarm network
 	// TODO ...
-	swarmNet := swarm.NewSwarm(cfg.Context, pid, ps, nil)
+	swarmNet := swarm.NewSwarm(cfg.P2P.Context, pid, ps, nil)
 	tcpTransport := tcp.NewTCPTransport(genUpgrader(swarmNet))
 	if err := swarmNet.AddTransport(tcpTransport); err != nil {
 		logger.Errorf("[p2p] err adding transport to swarmnet\n%v", err)
@@ -76,12 +80,12 @@ func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error
 
 	// 6. build the dht
 	// TODO ...
-	dhtSvc, err := dht.New(cfg.Context, bNode)
+	dhtSvc, err := dht.New(cfg.P2P.Context, bNode)
 	if err != nil {
 		logger.Errorf("[p2p] err building dht service\n%v", err)
 		return nil, err
 	}
-	if err := dhtSvc.Bootstrap(cfg.Context); err != nil {
+	if err := dhtSvc.Bootstrap(cfg.P2P.Context); err != nil {
 		logger.Errorf("[p2p] err bootstrapping dht\n%v", err)
 		return nil, err
 	}
@@ -96,7 +100,7 @@ func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error
 	// TODO ...
 	// note: https://libp2p.io/implementations/#discovery
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
-	discoverySvc, err := discovery.NewMdnsService(cfg.Context, newNode, time.Second, Name)
+	discoverySvc, err := discovery.NewMdnsService(cfg.P2P.Context, newNode, time.Second, Name)
 	if err != nil {
 		logger.Errorf("[p2p] err starting discover service\n%v", err)
 		return nil, err
@@ -138,6 +142,7 @@ func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error
 			// TODO ...
 			SyncState: &clienttypes.SyncState{},
 		},
+		cfg: cfg,
 	}
 	nb := &net.NotifyBundle{
 		ConnectedF: p.onConn,
@@ -145,7 +150,7 @@ func New(cfg *clienttypes.ConfigP2P, c clienttypes.InterfaceChains) (*P2P, error
 	newNode.Network().Notify(nb)
 	p.state.Host = newNode
 
-	prs, err := peers.New(&clienttypes.ConfigPeers{})
+	prs, err := peers.New(p.cfg)
 	if err != nil {
 		logger.Errorf("[p2p] err creating new peers\n%v", err)
 	}
@@ -209,12 +214,13 @@ func (p *P2P) Stop() error {
 }
 
 // Cfg returns the cfg
-func (p *P2P) Cfg() clienttypes.ConfigP2P {
-	if p.Config == nil {
-		return clienttypes.ConfigP2P{}
+func (p *P2P) Cfg() clienttypes.ConfigClient {
+	// TODO: return err?
+	if p.cfg == nil {
+		return clienttypes.ConfigClient{}
 	}
 
-	return *p.Config
+	return *p.cfg
 }
 
 func (p *P2P) onConn(network net.Network, conn net.Conn) {

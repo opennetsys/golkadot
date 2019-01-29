@@ -30,4 +30,5 @@ var (
 type Peers struct {
 	Store         pstore.Peerstore
 	KnownPeersMap map[libpeer.ID]*clienttypes.KnownPeer
+	cfg           *clienttypes.ConfigClient
 }

@@ -2,6 +2,7 @@ package clienttypes
 
 // TODO...
 
+// Kind ...
 func (r *Request) Kind() uint {
 	return 0
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 
+	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
 	"github.com/c3systems/go-substrate/client/rpc/author"
 	"github.com/c3systems/go-substrate/client/rpc/chain"
 	"github.com/c3systems/go-substrate/client/rpc/state"
@@ -21,17 +22,36 @@ import (
 
 // TODO ...
 
+// ChainName ...
+type ChainName struct{}
+
+// DevConfig ...
+type DevConfig struct {
+	genBlocks bool
+}
+
+// RolesConfig ...
+type RolesConfig struct{}
+
+// TelemetryConfig ...
+type TelemetryConfig struct{}
+
+// WasmConfig ...
+type WasmConfig struct{}
+
 // ConfigClient ...
 type ConfigClient struct {
-	//Chain ChainName,
-	//DB DbConfig
-	//Dev DevConfig
-	P2P *ConfigP2P
-	RPC *ConfigRPC
-	// note: moving roles to p2p config bc it was causing import collision
-	Roles []string
-	//Telemetry TelemetryConfig
-	//Wasm WasmConfig
+	// TODO: types
+	Chain     *ChainName
+	DB        *clientdbtypes.InterfaceDBConfig
+	Dev       *DevConfig
+	P2P       *ConfigP2P
+	RPC       *ConfigRPC
+	Peer      *ConfigPeer
+	Peers     *ConfigPeers
+	Roles     []string
+	Telemetry *TelemetryConfig
+	Wasm      *WasmConfig
 }
 
 // Nodes is a list of p2p nodes
@@ -86,7 +106,7 @@ type State struct {
 	// Chain TODO
 	Chain InterfaceChains
 	// Config is the current configuration of the node
-	Config *ConfigP2P
+	Config *ConfigClient
 	// Host is the libp2p host
 	Host libp2pHost.Host
 	// Peers are the connected peers
@@ -117,7 +137,7 @@ type StateBlockRequests map[string]*StateRequest
 // StateBlock ...
 type StateBlock struct {
 	// Block ...
-	Block Data
+	Block BlockData
 	// Peer ...
 	Peer InterfacePeer
 }
@@ -147,8 +167,6 @@ type ConfigPeer struct {
 	PeerInfo *pstore.PeerInfo
 	// ShortID TODO
 	ShortID string
-	// Roles ...
-	Roles []string
 }
 
 // PeerEventCallback is a function that is called on a peer event
@@ -170,14 +188,16 @@ type Connection struct {
 
 // BlockNumber ...
 // note: required by sync.provideBlocks
-type BlockNumber struct{}
+type BlockNumber struct {
+	value uint64
+}
 
 // BlockRequest ...
 // note: required by sync.provideBlocks
 // see: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockRequest.ts
 type BlockRequest struct {
 	ID        uint64
-	FromValue *big.Int // note: or BlockNumber???
+	FromValue *big.Int // TODO: or BlockNumber???
 	Max       int
 	From      int
 	Direction string // note: create enums?
@@ -236,6 +256,7 @@ type SealObj struct {
 type OtherObj []byte
 
 // DigestItem ..
+// TODO: map[DigestEnum]Digest ???
 type DigestItem map[DigestEnum]interface{}
 
 // Digest ...
@@ -261,9 +282,9 @@ type Request struct {
 	Max  uint64
 }
 
-// Data TODO
+// BlockData TODO
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/BlockData.ts
-type Data struct {
+type BlockData struct {
 	Hash          *pcrypto.Blake2b256Hash
 	Header        *Header
 	Body          []byte

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/c3systems/go-substrate/client"
 	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
 	clientchaintypes "github.com/c3systems/go-substrate/client/chains/types"
 	clientdb "github.com/c3systems/go-substrate/client/db"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
+	"github.com/c3systems/go-substrate/common/crypto"
 	"github.com/c3systems/go-substrate/common/hexutil"
 	"github.com/c3systems/go-substrate/common/triehash"
 	"github.com/c3systems/go-substrate/common/u8compact"
@@ -30,7 +30,8 @@ type Chain struct {
 }
 
 // NewChain ...
-func NewChain(config *client.Config) *Chain {
+// TODO: configClient?
+func NewChain(config *clienttypes.ConfigClient) *Chain {
 	chain := clientchainloader.NewLoader(config)
 	dbs := clientdb.NewDB(config, chain)
 
@@ -123,7 +124,7 @@ func (c *Chain) RollbackBlock(bestHeader *clienttypes.Header, rollback bool) *cl
 }
 
 // GetBlock ...
-func (c *Chain) GetBlock(headerHash []uint8) *clienttypes.Data {
+func (c *Chain) GetBlock(headerHash []uint8) *clienttypes.BlockData {
 	data := c.Blocks.BlockData.Get(headerHash)
 
 	if data == nil || len(data) == 0 {
@@ -161,10 +162,10 @@ func (c *Chain) CreateGenesis() *clientchaintypes.ChainGenesis {
 
 // CreateGenesisBlock ...
 func (c *Chain) CreateGenesisBlock() *clientchaintypes.ChainGenesis {
-	header := types.NewHeader()
-	header.SetStateRoot(types.NewU8a(c.State.DB.GetRoot()))
-	header.SetExtrinsicsRoot(types.NewU8a(triehash.TrieRoot(nil)))
-	header.SetParentHash(types.NewU8a(make([]uint8, 32)))
+	header := clienttypes.NewHeader()
+	header.SetStateRoot(crypto.NewBlake2b256(c.State.DB.GetRoot()))
+	header.SetExtrinsicsRoot(crypto.NewBlake2b256(triehash.TrieRoot(nil)))
+	header.SetParentHash(crypto.NewBlake2b256(make([]uint8, 32)))
 
 	block := clienttypes.NewBlockData(map[string]interface{}{
 		"hash":   header.Hash,

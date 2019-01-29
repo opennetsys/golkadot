@@ -2,6 +2,7 @@ package clienttypes
 
 // TODO...
 
+// Kind ...
 func (b *BlockResponse) Kind() uint {
 	return 0
 }

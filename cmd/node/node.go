@@ -48,7 +48,7 @@ func setup() {
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			// TODO: implement
-			config := &clienttypes.ConfigP2P{}
+			config := &clienttypes.ConfigClient{}
 			cl := client.NewClient()
 			cl.Start(config)
 

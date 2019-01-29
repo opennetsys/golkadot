@@ -2,7 +2,6 @@ package types
 
 import (
 	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/types"
 )
 
 // ChainJSON ...
@@ -24,7 +23,7 @@ type ChainJSONGenesisRaw map[string]string
 
 // ChainGenesis ...
 type ChainGenesis struct {
-	Block  *clienttypes.Data
+	Block  *clienttypes.BlockData
 	Code   []uint8
-	Header *types.Header
+	Header *clienttypes.Header
 }
