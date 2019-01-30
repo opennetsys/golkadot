@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/c3systems/go-substrate/client/p2p"
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
@@ -13,7 +13,7 @@ type BlockAnnounceHandler struct{}
 
 // Func handles incoming block announce messages
 // TODO ...
-func (b *BlockAnnounceHandler) Func(p p2p.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
+func (b *BlockAnnounceHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
 	//var msgStrBytes []byte
 	//if err := msg.Unmarshal(msgBytes); err != nil {
 	//logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
@@ -37,6 +37,6 @@ func (b *BlockAnnounceHandler) Func(p p2p.InterfaceP2P, pr clienttypes.Interface
 }
 
 // Type returns the func enum
-func (b *BlockAnnounceHandler) Type() FuncEnum {
-	return BlockAnnounce
+func (b *BlockAnnounceHandler) Type() handlertypes.FuncEnum {
+	return handlertypes.BlockAnnounce
 }

@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/c3systems/go-substrate/client/p2p"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
@@ -18,7 +17,7 @@ var InformantDelay = 10000
 type Client struct {
 	Chain       clienttypes.InterfaceChains
 	InformantID interface{}
-	P2P         p2p.InterfaceP2P
+	P2P         clienttypes.InterfaceP2P
 	RPC         clienttypes.InterfaceRPC
 	Telemetry   clienttypes.InterfaceTelemetry
 	PrevBest    big.Int

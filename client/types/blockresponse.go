@@ -1,10 +1,14 @@
 package clienttypes
 
+import (
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
+)
+
 // TODO...
 
 // Kind ...
-func (b *BlockResponse) Kind() uint {
-	return 0
+func (b *BlockResponse) Kind() handlertypes.FuncEnum {
+	return handlertypes.BlockResponse
 }
 
 // Encode serializes the message into a bytes array

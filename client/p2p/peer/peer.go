@@ -12,6 +12,7 @@ import (
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/c3systems/go-substrate/logger"
 
+	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	transport "github.com/libp2p/go-libp2p-transport"
@@ -41,7 +42,7 @@ func New(cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains, pInfo p
 }
 
 // AddConnection ...
-func (p *Peer) AddConnection(conn transport.Conn, isWritable bool) (uint, error) {
+func (p *Peer) AddConnection(conn inet.Conn, isWritable bool) (uint, error) {
 	// TODO: check for chain nil, etc.
 	// note: set first, and then increment?
 	connID := p.NextConnID

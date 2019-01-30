@@ -3,12 +3,14 @@ package clienttypes
 import (
 	"math/big"
 
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
 	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
 	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
+	p2ptypes "github.com/c3systems/go-substrate/client/p2p/types"
 	"github.com/c3systems/go-substrate/common/crypto"
+	inet "github.com/libp2p/go-libp2p-net"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
-	transport "github.com/libp2p/go-libp2p-transport"
 )
 
 // InterfaceSync defines the methods of the sync service
@@ -43,7 +45,7 @@ type InterfaceChains interface {
 // InterfacePeer defines the methods of peer
 type InterfacePeer interface {
 	// AddConnection is used to add a connection
-	AddConnection(conn transport.Conn, isWritable bool) (uint, error)
+	AddConnection(conn inet.Conn, isWritable bool) (uint, error)
 	// Disconnect disconnects from the peer
 	Disconnect() error
 	// IsActive returns whether the peer is active or not
@@ -83,7 +85,7 @@ type InterfacePeers interface {
 // InterfaceMessage defines the methods of Message
 type InterfaceMessage interface {
 	// Kind returns the message's kind
-	Kind() uint
+	Kind() handlertypes.FuncEnum
 	// Encode serializes the message into a bytes array
 	Encode() ([]byte, error)
 	// Decode deserializes a bytes array into a message
@@ -101,3 +103,19 @@ type InterfaceTelemetry interface{}
 
 // InterfaceRPC ...
 type InterfaceRPC interface{}
+
+// InterfaceP2P defines the methods of the p2p service
+type InterfaceP2P interface {
+	// IsStarted returns true if the p2p interface has started
+	IsStarted() bool
+	// GetNumPeers returns the number of connected peers
+	GetNumPeers() (uint, error)
+	// On handles messages
+	On(event p2ptypes.EventEnum, cb EventCallback) (interface{}, error)
+	// Start starts the p2p service
+	Start() error
+	// Stop stops the p2p service
+	Stop() error
+	// Cfg returns the config
+	Cfg() ConfigClient
+}

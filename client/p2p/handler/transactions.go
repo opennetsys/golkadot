@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/c3systems/go-substrate/client/p2p"
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
@@ -14,7 +14,7 @@ type TransactionsHandler struct{}
 // Func handles incoming transactions messages
 // TODO ...
 // TODO Propagate
-func (t *TransactionsHandler) Func(p p2p.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
+func (t *TransactionsHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
 	//var msgStrBytes []byte
 	//if err := msg.Unmarshal(msgBytes); err != nil {
 	//logger.Errorf("[handler] err unmarshalling transaction message\n%v", err)
@@ -27,6 +27,6 @@ func (t *TransactionsHandler) Func(p p2p.InterfaceP2P, pr clienttypes.InterfaceP
 }
 
 // Type returns the func enum
-func (t *TransactionsHandler) Type() FuncEnum {
-	return Transactions
+func (t *TransactionsHandler) Type() handlertypes.FuncEnum {
+	return handlertypes.Transactions
 }

@@ -1,5 +1,7 @@
 package p2p
 
+// TODO: merge with defaults sub-package?
+
 import "fmt"
 
 // DefaultClientID ...
@@ -21,6 +23,7 @@ var DefaultProtocolPing = "/ipfs/ping/1.0.0"
 var DefaultMaxRequestBlocks = 64
 
 // DefaultProtocolBase ...
+// TODO: change...
 var DefaultProtocolBase = "/substrate"
 
 // DefaultProtocolType ...

@@ -1,6 +1,7 @@
 package p2p
 
 import (
+	"context"
 	"errors"
 
 	clienttypes "github.com/c3systems/go-substrate/client/types"
@@ -28,6 +29,11 @@ var (
 
 // P2P implements the p2p interface
 type P2P struct {
-	state *clienttypes.State
-	cfg   *clienttypes.ConfigClient
+	state     *clienttypes.State
+	cfg       *clienttypes.ConfigClient
+	dialQueue map[string]*clienttypes.QueuedPeer
+	sync      clienttypes.InterfaceSync
+	ctx       context.Context
+	ch        chan interface{}
+	cancel    context.CancelFunc
 }

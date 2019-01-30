@@ -1,6 +1,7 @@
 package defaults
 
 // Defaults ...
+// TODO: don't use struct
 var Defaults = struct {
 	// MaxRequestBlocks ...
 	MaxRequestBlocks uint
@@ -44,17 +45,18 @@ var Defaults = struct {
 	ProtocolType:     "/sup",
 	ProtocolVersion:  "1.0.0",
 	Address:          "127.0.0.1",
-	ClientID:         "polkadot-js/0.0.0",
-	MaxPeers:         25,
-	MaxQueuedBlocks:  64 * 8, // MaxRequestBlocks * 8
-	MinIdleBlocks:    16,
-	Port:             31333,
-	Role:             "full",
-	ProtocolDot:      "/substrate/sup/1.0.0", // {ProtocolBase}/{ProtocolType}/{ProtocolVersion}
-	ProtocolPing:     "/ipfs/ping/1.0.0",
-	DialBackoff:      5 * 60000,
-	DialInterval:     15000,
-	RequestInterval:  15000,
-	PingInterval:     30000,
-	PingTimeout:      5000,
+	// TODO: ClientID?
+	ClientID:        "polkadot-go/0.0.0",
+	MaxPeers:        25,
+	MaxQueuedBlocks: 64 * 8, // MaxRequestBlocks * 8
+	MinIdleBlocks:   16,
+	Port:            31333,
+	Role:            "full",
+	ProtocolDot:     "/substrate/sup/1.0.0", // {ProtocolBase}/{ProtocolType}/{ProtocolVersion}
+	ProtocolPing:    "/ipfs/ping/1.0.0",
+	DialBackoff:     5 * 60000,
+	DialInterval:    15000,
+	RequestInterval: 15000,
+	PingInterval:    30000,
+	PingTimeout:     5000,
 }

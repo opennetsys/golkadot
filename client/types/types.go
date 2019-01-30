@@ -3,6 +3,7 @@ package clienttypes
 import (
 	"context"
 	"math/big"
+	"time"
 
 	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
 	"github.com/c3systems/go-substrate/client/rpc/author"
@@ -14,10 +15,10 @@ import (
 	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libp2pHost "github.com/libp2p/go-libp2p-host"
+	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	protocol "github.com/libp2p/go-libp2p-protocol"
-	transport "github.com/libp2p/go-libp2p-transport"
 )
 
 // TODO ...
@@ -162,7 +163,7 @@ type ConfigPeer struct {
 	// BestNumber TODO
 	BestNumber *big.Int
 	// ID is the peer id
-	ID *libpeer.ID
+	ID libpeer.ID
 	// PeerInfo is the peer metadata
 	PeerInfo *pstore.PeerInfo
 	// ShortID TODO
@@ -182,7 +183,7 @@ type KnownPeer struct {
 
 // Connection ...
 type Connection struct {
-	Connection transport.Conn
+	Connection inet.Conn
 	Pushable   chan<- interface{} // note: a write only channel
 }
 
@@ -227,6 +228,7 @@ type ConfigRPC struct {
 	Host          libp2pHost.Host
 	SystemService system.ServiceInterface
 	StateService  state.ServiceInterface
+	// TODO: What's the diff between rpc chain and p2p chain?
 	ChainService  chain.ServiceInterface
 	AuthorService author.ServiceInterface
 	ID            *protocol.ID
@@ -302,4 +304,16 @@ type Status struct {
 	BestHash    *pcrypto.Blake2b256Hash
 	GenesisHash *pcrypto.Blake2b256Hash
 	Version     string
+}
+
+// QueuedPeer ...
+type QueuedPeer struct {
+	Peer     InterfacePeer
+	NextDial time.Time
+}
+
+// OnMessage ...
+type OnMessage struct {
+	Peer    InterfacePeer
+	Message InterfaceMessage
 }
