@@ -8,6 +8,8 @@ import (
 	"github.com/perlin-network/life/exec"
 )
 
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client-wasm/src/index.ts
+
 // Config ...
 type Config struct {
 	Input []byte

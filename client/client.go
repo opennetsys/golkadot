@@ -8,6 +8,8 @@ import (
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts
+
 // TODO: these are placeholders. need to implement in their respective package
 
 // InformantDelay ...

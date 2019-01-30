@@ -5,6 +5,8 @@ import (
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
+// TODO: https://github.com/polkadot-js/client/blob/master/packages/client-chains/src/loader.ts
+
 // Loader ...
 type Loader struct {
 	chain *clientchaintypes.ChainJSON
