@@ -69,7 +69,7 @@ func Shorten(value string, prefixLength int) string {
 	}
 
 	start := value[0:prefixLength]
-	end := value[len(value)-prefixLength : len(value)]
+	end := value[len(value)-prefixLength:]
 	return fmt.Sprintf("%s..%s", start, end)
 }
 

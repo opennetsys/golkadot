@@ -23,8 +23,8 @@ func TestEncode(t *testing.T) {
 			NewNull(),
 			NewNull(),
 			[][]uint8{
-				[]uint8{0x3A},
-				[]uint8{0xAA},
+				{0x3A},
+				{0xAA},
 			},
 			NewNull(),
 			NewNull(),
@@ -45,12 +45,12 @@ func TestEncode(t *testing.T) {
 			NewNull(),
 			NewNull(),
 			[][]uint8{
-				[]uint8{0x3A},
-				[]uint8{0xAA},
+				{0x3A},
+				{0xAA},
 			},
 			[][]uint8{
-				[]uint8{0x3B},
-				[]uint8{0xAB},
+				{0x3B},
+				{0xAB},
 			},
 			NewNull(),
 			NewNull(),

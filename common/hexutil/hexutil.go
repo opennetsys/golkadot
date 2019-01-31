@@ -80,7 +80,7 @@ func HexFixLength(hexStr string, bitLength int, withPadding bool) string {
 
 	paddedHexStr := fmt.Sprintf("%s%s", strings.Repeat("0", strLen), strippedHexStr)
 	return AddPrefix(
-		paddedHexStr[len(paddedHexStr)-strLen : len(paddedHexStr)],
+		paddedHexStr[len(paddedHexStr)-strLen:],
 	)
 }
 

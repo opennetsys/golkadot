@@ -3,7 +3,7 @@ package compiler
 func (c *SSAFunctionCompiler) InsertGasCounters(gp GasPolicy) {
 	cfg := c.NewCFGraph()
 
-	for i, _ := range cfg.Blocks {
+	for i := range cfg.Blocks {
 		blk := &cfg.Blocks[i]
 		totalCost := int64(0)
 		for _, ins := range blk.Code {

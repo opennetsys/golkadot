@@ -16,7 +16,7 @@ func TestSnapshots(t *testing.T) {
 		back := newTrie(codec)
 
 		values := []*triehash.TriePair{
-			&triehash.TriePair{K: []uint8("test"), V: []uint8("one")},
+			{K: []uint8("test"), V: []uint8("one")},
 		}
 
 		root := triehash.TrieRoot(values)
@@ -49,11 +49,11 @@ func TestSnapshots(t *testing.T) {
 
 		// TODO: fix trie encoder to fix tests
 		values := []*triehash.TriePair{
-			&triehash.TriePair{K: []uint8("one"), V: []uint8("testing")},
-			&triehash.TriePair{K: []uint8("two"), V: []uint8("testing with a much longer value here")},
-			&triehash.TriePair{K: []uint8("twzei"), V: []uint8("und Deutch")},
-			&triehash.TriePair{K: []uint8("do"), V: []uint8("do it")},
-			&triehash.TriePair{K: []uint8("dog"), V: []uint8("doggie")},
+			{K: []uint8("one"), V: []uint8("testing")},
+			{K: []uint8("two"), V: []uint8("testing with a much longer value here")},
+			{K: []uint8("twzei"), V: []uint8("und Deutch")},
+			{K: []uint8("do"), V: []uint8("do it")},
+			{K: []uint8("dog"), V: []uint8("doggie")},
 			//&triehash.TriePair{K: []uint8("dogge"), V: []uint8("bigger doge")},
 			//&triehash.TriePair{K: []uint8("dodge"), V: []uint8("coin")},
 		}
