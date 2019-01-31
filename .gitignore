@@ -23,11 +23,10 @@
 # Session
 Session.vim
 
-.bin
-
 # Binaries for programs and plugins
 bin/
 build/
+.bin
 
 # test dirs
 common/db/test

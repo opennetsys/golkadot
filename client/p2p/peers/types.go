@@ -3,7 +3,9 @@ package peers
 import (
 	"errors"
 
+	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
+	libp2pHost "github.com/libp2p/go-libp2p-host"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
@@ -31,4 +33,7 @@ type Peers struct {
 	Store         pstore.Peerstore
 	KnownPeersMap map[libpeer.ID]*clienttypes.KnownPeer
 	cfg           *clienttypes.ConfigClient
+	handlers      map[peerstypes.EventEnum]clienttypes.PeersEventCallback
+	chain         clienttypes.InterfaceChains
+	host          libp2pHost.Host
 }

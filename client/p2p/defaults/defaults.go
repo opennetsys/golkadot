@@ -39,6 +39,8 @@ var Defaults = struct {
 	PingInterval uint
 	// PingTimeout ...
 	PingTimeout uint
+	// Name is the version name.
+	Name string
 }{
 	MaxRequestBlocks: 64,
 	ProtocolBase:     "/substrate",
@@ -59,4 +61,5 @@ var Defaults = struct {
 	RequestInterval: 15000,
 	PingInterval:    30000,
 	PingTimeout:     5000,
+	Name:            "dot",
 }

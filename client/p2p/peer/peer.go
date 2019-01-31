@@ -135,9 +135,9 @@ func (p *Peer) GetNextID() (uint, error) {
 }
 
 // On defines the event handlers
-func (p *Peer) On(event peertypes.EventEnum, cb clienttypes.PeerEventCallback) (interface{}, error) {
+func (p *Peer) On(event peertypes.EventEnum, cb clienttypes.PeerEventCallback) {
 	// TODO
-	return nil, nil
+	return
 }
 
 // Send is used to send the peer a message

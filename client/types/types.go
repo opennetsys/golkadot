@@ -6,13 +6,13 @@ import (
 	"time"
 
 	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
+	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
 	"github.com/c3systems/go-substrate/client/rpc/author"
 	"github.com/c3systems/go-substrate/client/rpc/chain"
 	"github.com/c3systems/go-substrate/client/rpc/state"
 	"github.com/c3systems/go-substrate/client/rpc/system"
 	pcrypto "github.com/c3systems/go-substrate/common/crypto"
 
-	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libp2pHost "github.com/libp2p/go-libp2p-host"
 	inet "github.com/libp2p/go-libp2p-net"
@@ -138,7 +138,7 @@ type StateBlockRequests map[string]*StateRequest
 // StateBlock ...
 type StateBlock struct {
 	// Block ...
-	Block BlockData
+	Block *BlockData
 	// Peer ...
 	Peer InterfacePeer
 }
@@ -171,7 +171,7 @@ type ConfigPeer struct {
 }
 
 // PeerEventCallback is a function that is called on a peer event
-type PeerEventCallback func(msg InterfaceMessage) (interface{}, error)
+type PeerEventCallback func(iface interface{}) (interface{}, error)
 
 // KnownPeer is a peer that has been discovered
 type KnownPeer struct {
@@ -317,3 +317,6 @@ type OnMessage struct {
 	Peer    InterfacePeer
 	Message InterfaceMessage
 }
+
+// PeersEventCallback ...
+type PeersEventCallback func(iface interface{}) (interface{}, error)

@@ -16,7 +16,7 @@ import (
 // InterfaceSync defines the methods of the sync service
 type InterfaceSync interface {
 	// On handles events
-	On(event synctypes.EventEnum, cb EventCallback) (interface{}, error)
+	On(event synctypes.EventEnum, cb EventCallback)
 	// QueueBlocks ...
 	// TODO ...
 	QueueBlocks(pr InterfacePeer, response *BlockResponse) error
@@ -24,8 +24,7 @@ type InterfaceSync interface {
 	// TODO ...
 	RequestBlocks(pr InterfacePeer) error
 	// ProvideBlocks ...
-	// TODO ...
-	ProvideBlocks()
+	ProvideBlocks(pr InterfacePeer, request *BlockRequest) error
 	// PeerRequests ...
 	PeerRequests(pr InterfacePeer) (Requests, error)
 }
@@ -55,7 +54,7 @@ type InterfacePeer interface {
 	// GetNextID TODO
 	GetNextID() (uint, error)
 	// On defines the event handlers
-	On(event peertypes.EventEnum, cb PeerEventCallback) (interface{}, error)
+	On(event peertypes.EventEnum, cb PeerEventCallback)
 	// Send is used to send the peer a message
 	Send(msg InterfaceMessage) (bool, error)
 	// SetBest sets a new block
@@ -70,14 +69,16 @@ type InterfacePeer interface {
 type InterfacePeers interface {
 	// Add adds a peer to peers
 	Add(pi pstore.PeerInfo) (*KnownPeer, error)
+	// CountAll returns the number of known peers
+	CountAll() (uint, error)
 	// Count returns the number of connected peers
 	Count() (uint, error)
 	// Get returns a peer
 	Get(pi pstore.PeerInfo) (*KnownPeer, error)
 	// Log TODO
-	Log(event peerstypes.EventEnum, kp *KnownPeer) error
+	Log(event peerstypes.EventEnum, iface interface{}) error
 	// On handles peers events
-	On(event peerstypes.EventEnum, cb peerstypes.EventCallback) (interface{}, error)
+	On(event peerstypes.EventEnum, cb PeersEventCallback)
 	// KnownPeers returns the peers
 	KnownPeers() ([]*KnownPeer, error)
 }
@@ -111,7 +112,7 @@ type InterfaceP2P interface {
 	// GetNumPeers returns the number of connected peers
 	GetNumPeers() (uint, error)
 	// On handles messages
-	On(event p2ptypes.EventEnum, cb EventCallback) (interface{}, error)
+	On(event p2ptypes.EventEnum, cb EventCallback)
 	// Start starts the p2p service
 	Start() error
 	// Stop stops the p2p service

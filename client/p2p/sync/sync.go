@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/c3systems/go-substrate/client/p2p/defaults"
@@ -27,11 +28,16 @@ func New(ctx context.Context, cfg *clienttypes.ConfigClient, chn clienttypes.Int
 	}
 
 	s := &Sync{
-		Chain:  chn,
-		Config: cfg,
+		bestQueued: new(big.Int),
+		chain:      chn,
+		config:     cfg,
+		ctx:        ctx,
+		handlers:   make(map[synctypes.EventEnum]clienttypes.EventCallback),
+		BestSeen:   new(big.Int),
+		Status:     synctypes.Idle,
 	}
 
-	go s.processBlocks(ctx)
+	go s.processBlocks()
 
 	return s, nil
 }
@@ -45,11 +51,9 @@ func (s *Sync) PeerRequests(pr clienttypes.InterfacePeer) (clienttypes.Requests,
 	prID := pr.GetID()
 
 	var ret clienttypes.Requests
-	for k := range s.BlockRequests {
-		sr, ok := s.BlockRequests[k]
-		if !ok {
-			continue
-		}
+	for k := range s.blockRequests {
+		// note: don't need to check "ok" because using range
+		sr, _ := s.blockRequests[k]
 
 		if sr.Peer != nil && sr.Peer.GetID() != "" && sr.Peer.GetID() == prID {
 			ret = append(ret, sr)
@@ -59,12 +63,12 @@ func (s *Sync) PeerRequests(pr clienttypes.InterfacePeer) (clienttypes.Requests,
 	return ret, nil
 }
 
-func (s *Sync) processBlocks(ctx context.Context) {
+func (s *Sync) processBlocks() {
 	for {
 		select {
-		case <-ctx.Done():
+		case <-s.ctx.Done():
 			{
-				logger.Printf("[sync] processBlocks context done\n%v", ctx.Err())
+				logger.Printf("[sync] processBlocks context done\n%v", s.ctx.Err())
 				return
 			}
 		default:
@@ -87,7 +91,7 @@ func (s *Sync) processBlocks(ctx context.Context) {
 
 func (s *Sync) setStatus() {
 	status := synctypes.Idle
-	if uint(len(s.BlockQueue)) > defaults.Defaults.MinIdleBlocks {
+	if uint(len(s.blockQueue)) > defaults.Defaults.MinIdleBlocks {
 		status = synctypes.Sync
 	}
 
@@ -96,7 +100,7 @@ func (s *Sync) setStatus() {
 
 func (s *Sync) processBlock() (bool, error) {
 	// const start = Date.now();
-	bestNumber, err := s.Chain.GetBestBlocksNumber()
+	bestNumber, err := s.chain.GetBestBlocksNumber()
 	if err != nil {
 		logger.Errorf("[sync] err getting best chain blocks number")
 		return false, err
@@ -107,10 +111,10 @@ func (s *Sync) processBlock() (bool, error) {
 
 	s.setStatus()
 
-	if block, ok := s.BlockQueue[nextNumber.String()]; ok {
+	if block, ok := s.blockQueue[nextNumber.String()]; ok {
 		logger.Infof("Importing block #%s", nextNumber.String())
 
-		ok, err := s.Chain.ImportBlock(block)
+		ok, err = s.chain.ImportBlock(block)
 		if err != nil {
 			logger.Errorf("[sync] err importing block\n%v", err)
 			return false, err
@@ -119,15 +123,14 @@ func (s *Sync) processBlock() (bool, error) {
 			return false, nil
 		}
 
-		delete(s.BlockQueue, nextNumber.String())
+		delete(s.blockQueue, nextNumber.String())
 
 		mod := new(big.Int)
 		mod = mod.Set(nextNumber)
-		mod = mod.Mod(nextNumber, big.NewInt(int64(REPORT_COUNT)))
+		mod = mod.Mod(mod, big.NewInt(int64(REPORT_COUNT)))
 		zero := big.NewInt(0)
-		if mod.Cmp(zero) == 0 || len(s.BlockQueue) < 10 {
-			// TODO...
-			//this.emit('imported');
+		if mod.Cmp(zero) == 0 || len(s.blockQueue) < 10 {
+			s.handleEvent(synctypes.Imported)
 		}
 
 		hasImported = true
@@ -148,10 +151,17 @@ func (s *Sync) processBlock() (bool, error) {
 	// }
 }
 
-// TODO finish...
-func (s *Sync) provideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.BlockRequest) error {
+// ProvideBlocks ...
+func (s *Sync) ProvideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.BlockRequest) error {
+	if pr == nil {
+		return errors.New("nil peer")
+	}
+	if request == nil {
+		return errors.New("nil request")
+	}
+
 	current := request.FromValue
-	best, err := s.Chain.GetBestBlocksNumber()
+	best, err := s.chain.GetBestBlocksNumber()
 	if err != nil {
 		return err
 	}
@@ -172,7 +182,7 @@ func (s *Sync) provideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.
 
 	// note: use enum?
 	increment := big.NewInt(-1)
-	if request.Direction == "Ascending" {
+	if strings.ToUpper(request.Direction) == "ASCENDING" {
 		increment = big.NewInt(1)
 	}
 
@@ -212,8 +222,8 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 		return errors.New("nil response")
 	}
 
-	request, ok := s.BlockRequests[pr.GetID()]
-	defer delete(s.BlockRequests, pr.GetID())
+	request, ok := s.blockRequests[pr.GetID()]
+	defer delete(s.blockRequests, pr.GetID())
 
 	if !ok {
 		// TODO: nil check
@@ -225,34 +235,40 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 		//return nil
 	}
 
-	bestNumber, err := s.Chain.GetBestBlocksNumber()
+	bestNumber, err := s.chain.GetBestBlocksNumber()
 	if err != nil {
 		return err
 	}
 
 	var (
-		firstNumber *big.Int
-		count       int
+		firstNumber            *big.Int
+		count                  int
+		block, dbBlock         *clienttypes.StateBlock
+		header                 *clienttypes.Header
+		queueNumber            string
+		isImportable, canQueue bool
 	)
-
 	for idx := range response.Blocks {
-		block := response.Blocks[idx]
-		// TODO: why dbBlock not used?!
-		//dbBlock, err := s.Chain.GetBlockDataByHash(block.Block.Hash)
+		block = response.Blocks[idx]
+		if block == nil {
+			continue
+		}
+
+		dbBlock, err = s.chain.GetBlockDataByHash(block.Block.Hash)
 		if err != nil {
 			logger.Errorf("[sync] err getting block by hash\n%v", err)
 			return err
 		}
 
-		header := block.Block.Header
-		queueNumber := header.BlockNumber.String()
-		// TODO: len?
-		isImportable := bestNumber.Cmp(header.BlockNumber) == -1
-		_, ok = s.BlockQueue[queueNumber]
-		canQueue := isImportable && !ok
+		header = block.Block.Header
+		queueNumber = header.BlockNumber.String()
+		// TODO: why dbBlock == nil ?
+		isImportable = dbBlock == nil || dbBlock.Block == nil || len(dbBlock.Block.Body) == 0 || bestNumber.Cmp(header.BlockNumber) == -1
+		_, ok = s.blockQueue[queueNumber]
+		canQueue = isImportable && !ok
 
 		if canQueue {
-			s.BlockQueue[queueNumber] = &clienttypes.StateBlock{
+			s.blockQueue[queueNumber] = &clienttypes.StateBlock{
 				Block: block.Block,
 				Peer:  pr,
 			}
@@ -260,8 +276,8 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 				firstNumber = header.BlockNumber
 			}
 
-			if s.BestQueued.Cmp(header.BlockNumber) == -1 {
-				s.BestQueued = header.BlockNumber
+			if s.bestQueued.Cmp(header.BlockNumber) == -1 {
+				s.bestQueued = header.BlockNumber
 			}
 
 			count++
@@ -289,21 +305,21 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 	}
 
 	one := big.NewInt(1)
-	nextNumber, err := s.Chain.GetBestBlocksNumber()
+	nextNumber, err := s.chain.GetBestBlocksNumber()
 	if err != nil {
 		return err
 	}
 	nextNumber = nextNumber.Add(nextNumber, one)
 	from := new(big.Int)
-	if s.BestQueued.Cmp(nextNumber) == -1 {
+	if s.bestQueued.Cmp(nextNumber) == -1 {
 		from.Set(nextNumber)
 	} else {
 		tmpBest := new(big.Int)
-		tmpBest.Set(s.BestQueued)
+		tmpBest.Set(s.bestQueued)
 		tmpMaxQueued := big.NewInt(int64(defaults.Defaults.MaxQueuedBlocks / 2))
 		tmpBest = tmpBest.Sub(tmpBest, nextNumber)
 		if tmpBest.Cmp(tmpMaxQueued) == -1 {
-			s.BestQueued = s.BestQueued.Add(s.BestQueued, one)
+			s.bestQueued = s.bestQueued.Add(s.bestQueued, one)
 		}
 	}
 
@@ -312,7 +328,7 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 	}
 
 	// TODO: This assumes no stale block downloading
-	_, ok := s.BlockRequests[pr.GetID()]
+	_, ok := s.blockRequests[pr.GetID()]
 	if ok || from == nil || from.Cmp(pr.Cfg().Peer.BestNumber) == 1 {
 		return nil
 	}
@@ -330,7 +346,7 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 		Max:  uint64(defaults.Defaults.MaxRequestBlocks),
 	}
 
-	s.BlockRequests[pr.GetID()] = &clienttypes.StateRequest{
+	s.blockRequests[pr.GetID()] = &clienttypes.StateRequest{
 		Peer:    pr,
 		Request: request,
 		Timeout: timeout.UnixNano() / int64(time.Millisecond),
@@ -354,21 +370,33 @@ func (s *Sync) timeoutRequests() {
 	// note: get time in ms
 	now := time.Now().UnixNano() / int64(time.Millisecond)
 
-	for k := range s.BlockRequests {
-		if s.BlockRequests[k].Timeout <= now {
-			delete(s.BlockRequests, k)
+	for k := range s.blockRequests {
+		if s.blockRequests[k].Timeout <= now {
+			delete(s.blockRequests, k)
 		}
 	}
 }
 
-// ProvideBlocks ...
-// TODO ...
-func (s *Sync) ProvideBlocks() {
+// On ...
+func (s *Sync) On(event synctypes.EventEnum, cb clienttypes.EventCallback) {
+	s.handlers[event] = cb
 
+	return
 }
 
-// On ...
-// TODO ...
-func (s *Sync) On(event synctypes.EventEnum, cb clienttypes.EventCallback) (interface{}, error) {
-	return nil, nil
+func (s *Sync) handleEvent(event synctypes.EventEnum) {
+	if event == nil {
+		logger.Info("nil event")
+		return
+	}
+
+	cb, ok := s.handlers[event]
+	if !ok {
+		logger.Infof("[sync] no event for %s", event.String())
+		return
+	}
+
+	iface, err := cb()
+	logger.Infof("[sync] handled event %s\nresults:\n%v\n%v", event.String(), iface, err)
+	return
 }

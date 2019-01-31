@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"context"
 	"errors"
 	"math/big"
 
@@ -25,11 +26,13 @@ var (
 
 // Sync ...
 type Sync struct {
-	Chain         clienttypes.InterfaceChains
-	BlockRequests clienttypes.StateBlockRequests
-	BlockQueue    clienttypes.StateBlockQueue
-	BestQueued    *big.Int
+	bestQueued    *big.Int
+	blockRequests clienttypes.StateBlockRequests
+	blockQueue    clienttypes.StateBlockQueue
+	chain         clienttypes.InterfaceChains
+	config        *clienttypes.ConfigClient
+	ctx           context.Context
+	handlers      map[synctypes.EventEnum]clienttypes.EventCallback
 	BestSeen      *big.Int
 	Status        synctypes.StatusEnum
-	Config        *clienttypes.ConfigClient
 }

@@ -2,28 +2,38 @@ package peers
 
 import (
 	"errors"
+	"time"
 
+	"github.com/c3systems/go-substrate/client/p2p/defaults"
 	"github.com/c3systems/go-substrate/client/p2p/peer"
+	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
 	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/logger"
 
+	libp2pHost "github.com/libp2p/go-libp2p-host"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	"github.com/libp2p/go-libp2p-peerstore/pstoremem"
+	"github.com/libp2p/go-libp2p/p2p/discovery"
 )
 
 // Ensure the struct implements the interface
 var _ clienttypes.InterfacePeers = (*Peers)(nil)
 
 // New ...
-func New(cfg *clienttypes.ConfigClient) (*Peers, error) {
-	// TODO ...
+func New(cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains, host libp2pHost.Host) (*Peers, error) {
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}
 	if cfg.Peers == nil {
 		return nil, errors.New("nil peers config")
+	}
+	if chn == nil {
+		return nil, errors.New("nil chain")
+	}
+	if host == nil {
+		return nil, errors.New("nil host")
 	}
 
 	ps := pstoremem.NewPeerstore()
@@ -36,13 +46,22 @@ func New(cfg *clienttypes.ConfigClient) (*Peers, error) {
 		return nil, err
 	}
 
-	pMap := make(map[libpeer.ID]*clienttypes.KnownPeer)
-
-	return &Peers{
+	p := &Peers{
 		Store:         ps,
-		KnownPeersMap: pMap,
+		KnownPeersMap: make(map[libpeer.ID]*clienttypes.KnownPeer),
 		cfg:           cfg,
-	}, nil
+		handlers:      make(map[peerstypes.EventEnum]clienttypes.PeersEventCallback),
+		chain:         chn,
+		host:          host,
+	}
+	if err := p.onDiscovery(); err != nil {
+		return nil, err
+	}
+	if err := p.onConnectAndDisconnect(); err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
 
 // Add ...
@@ -54,11 +73,15 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 		return nil, ErrNoPeerMap
 	}
 
+	if kp, ok := p.KnownPeersMap[pi.ID]; ok {
+		return kp, nil
+	}
+
 	// note: connect as well???
 	p.Store.AddAddrs(pi.ID, pi.Addrs, pstore.PermanentAddrTTL)
 
 	// TODO...
-	pr, err := peer.New(p.cfg, nil, pi)
+	pr, err := peer.New(p.cfg, p.chain, pi)
 	if err != nil {
 		logger.Errorf("[peers] err building new peer\n%v", err)
 		return nil, err
@@ -67,9 +90,67 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 	kp := &clienttypes.KnownPeer{
 		Peer: pr,
 		// TODO: true?
-		IsConnected: true,
+		IsConnected: false,
 	}
 	p.KnownPeersMap[pi.ID] = kp
+
+	kp.Peer.On(peertypes.Active, func(iface interface{}) (interface{}, error) {
+		//kp, ok := p.KnownPeersMap[pi.ID]
+		//if !ok {
+		//return nil, errors.New("peer not known")
+		//}
+		//if kp == nil {
+		//return nil, errors.New("nil peer")
+		//}
+
+		kp.IsConnected = true
+		if err := p.Log(peerstypes.Active, kp); err != nil {
+			logger.Errorf("[peers] logging err\n%v", err)
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	kp.Peer.On(peertypes.Disconnected, func(iface interface{}) (interface{}, error) {
+		//kp, ok := p.KnownPeersMap[pi.ID]
+		//if !ok {
+		//return nil, errors.New("peer not known")
+		//}
+		//if kp == nil {
+		//return nil, errors.New("nil peer")
+		//}
+
+		if !kp.IsConnected {
+			return nil, nil
+		}
+
+		kp.IsConnected = false
+		if err := p.Log(peerstypes.Disconnected, kp); err != nil {
+			logger.Errorf("[peers] logging err\n%v", err)
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	kp.Peer.On(peertypes.Message, func(iface interface{}) (interface{}, error) {
+		if iface == nil {
+			return nil, errors.New("nil message")
+		}
+		msg, ok := iface.(clienttypes.InterfaceMessage)
+		if !ok {
+			logger.Errorf("[peers] want InterfaceMessagel have %T", iface)
+			return nil, errors.New("iface not message")
+		}
+
+		p.handleEvent(peerstypes.Message, &clienttypes.OnMessage{
+			Peer:    kp.Peer,
+			Message: msg,
+		})
+
+		return nil, nil
+	})
 
 	return kp, nil
 }
@@ -81,6 +162,16 @@ func (p *Peers) Count() (uint, error) {
 	}
 
 	pCount := p.Store.PeersWithAddrs().Len()
+	return uint(pCount), nil
+}
+
+// CountAll returns the number of known peers
+func (p *Peers) CountAll() (uint, error) {
+	if p.KnownPeersMap == nil {
+		return 0, errors.New("no known peers map")
+	}
+
+	pCount := len(p.KnownPeersMap)
 	return uint(pCount), nil
 }
 
@@ -99,21 +190,24 @@ func (p *Peers) Get(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 }
 
 // Log TODO
-func (p *Peers) Log(event peerstypes.EventEnum, kp *clienttypes.KnownPeer) error {
+func (p *Peers) Log(event peerstypes.EventEnum, iface interface{}) error {
 	if event == nil {
 		return ErrNilEvent
 	}
 
 	// TODO: log pinfo? or peer id?
-	logger.Infof("[peers] peer event: %s, from peer: %v", event.String(), p)
+	logger.Infof("[peers] peer event: %s, interface: %v", event.String(), iface)
+
+	p.handleEvent(event, iface)
 
 	return nil
 }
 
 // On handles peers events
-func (p *Peers) On(event peerstypes.EventEnum, cb peerstypes.EventCallback) (interface{}, error) {
-	// TODO ...
-	return nil, nil
+func (p *Peers) On(event peerstypes.EventEnum, cb clienttypes.PeersEventCallback) {
+	p.handlers[event] = cb
+
+	return
 }
 
 // KnownPeers returns the peers
@@ -130,4 +224,46 @@ func (p *Peers) KnownPeers() ([]*clienttypes.KnownPeer, error) {
 	return knownPeers, nil
 }
 
-// TODO: implement _onConnect, _onDisconnect, _onDiscovery
+func (p *Peers) handleEvent(event peerstypes.EventEnum, iface interface{}) {
+	if event == nil {
+		logger.Info("[peers] nil event")
+		return
+	}
+
+	cb, ok := p.handlers[event]
+	if !ok {
+		logger.Infof("[peers] no event for %s", event.String())
+		return
+	}
+
+	// TODO: need iface
+	iface, err := cb(iface)
+	logger.Infof("[peers] handled event %s\nresults:\n%v\n%v", event.String(), iface, err)
+	return
+}
+
+func (p *Peers) onDiscovery() error {
+	// TODO: nil check
+	// TODO: we already have a discovery service in P2P, is this duplicating? How else to notify on peer found?
+	discoverySvc, err := discovery.NewMdnsService(p.cfg.P2P.Context, p.host, time.Second, defaults.Defaults.Name)
+	if err != nil {
+		logger.Errorf("[peers] err starting discover service\n%v", err)
+		return err
+	}
+
+	discoverySvc.RegisterNotifee(&DiscoveryNotifee{p})
+
+	return nil
+}
+
+func (p *Peers) onConnectAndDisconnect() error {
+	if p.host == nil {
+		return errors.New("nil host")
+	}
+
+	n := &Notifiee{p}
+	// TODO: nil check?
+	p.host.Network().Notify(n)
+
+	return nil
+}

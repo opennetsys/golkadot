@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 
+	p2ptypes "github.com/c3systems/go-substrate/client/p2p/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 )
 
 const (
-	// Name is the version name.
-	Name string = "dot"
 	// Version is the semvar version of the build.
 	Version string = "0.0.0"
 )
@@ -36,4 +35,5 @@ type P2P struct {
 	ctx       context.Context
 	ch        chan interface{}
 	cancel    context.CancelFunc
+	handlers  map[p2ptypes.EventEnum]clienttypes.EventCallback
 }

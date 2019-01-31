@@ -12,6 +12,7 @@ import (
 // TODO ...
 
 // DiscoveryNotifee ...
+// TODO: make this private?
 type DiscoveryNotifee struct {
 	h host.Host
 }
