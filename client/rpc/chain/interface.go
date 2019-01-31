@@ -3,7 +3,7 @@ package chain
 import (
 	"github.com/c3systems/go-substrate/client/p2p/pubsub"
 	rpctypes "github.com/c3systems/go-substrate/client/rpc/types"
-	"github.com/c3systems/go-substrate/runtime"
+	"github.com/c3systems/go-substrate/client/runtime"
 )
 
 // ServiceInterface defines the methods implemented by the chain service

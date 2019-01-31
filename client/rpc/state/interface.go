@@ -3,8 +3,8 @@ package state
 import (
 	"github.com/c3systems/go-substrate/client/p2p/pubsub"
 	rpctypes "github.com/c3systems/go-substrate/client/rpc/types"
+	"github.com/c3systems/go-substrate/client/runtime"
 	"github.com/c3systems/go-substrate/common/storage"
-	"github.com/c3systems/go-substrate/runtime"
 )
 
 // ServiceInterface described the methods performed by the state rpc api.

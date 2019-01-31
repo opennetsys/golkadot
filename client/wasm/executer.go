@@ -2,8 +2,8 @@ package wasm
 
 import (
 	clientdb "github.com/c3systems/go-substrate/client/db"
+	"github.com/c3systems/go-substrate/client/runtime"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/runtime"
 	"github.com/c3systems/go-substrate/types"
 )
 

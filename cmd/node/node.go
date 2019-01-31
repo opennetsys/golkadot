@@ -7,11 +7,11 @@ import (
 	"github.com/c3systems/go-substrate/client"
 	"github.com/c3systems/go-substrate/client/p2p"
 	"github.com/c3systems/go-substrate/client/rpc"
+	"github.com/c3systems/go-substrate/client/telemetry"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
+	"github.com/c3systems/go-substrate/client/wasm"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/logger"
-	"github.com/c3systems/go-substrate/telemetry"
-	"github.com/c3systems/go-substrate/wasm"
 	"github.com/spf13/cobra"
 )
 
