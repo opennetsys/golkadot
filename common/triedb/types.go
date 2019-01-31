@@ -225,7 +225,7 @@ func NewUint8ListFromNode(value interface{}) [][]uint8 {
 
 // NewFirstUint8ListFromNode ...
 func NewFirstUint8ListFromNode(node Node) []uint8 {
-	// note: check array lenght, first?
+	// note: check array length, first?
 	switch v := node.(type) {
 	case []Node:
 		return NewUint8FromNode(v[0])

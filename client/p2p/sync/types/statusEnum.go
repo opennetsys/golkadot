@@ -23,7 +23,7 @@ type StatusEnum interface {
 	String() string
 }
 
-// every base must fullfill the supported interface
+// every base must fulfill the supported interface
 func (s statusEnum) Type() statusEnum {
 	return s
 }

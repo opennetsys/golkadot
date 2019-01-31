@@ -8,23 +8,32 @@ import (
 type prefixEnum int
 
 const (
-	Zero       prefixEnum = 0
-	One        prefixEnum = 1
-	Three      prefixEnum = 3
-	FortyTwo   prefixEnum = 42
+	// Zero ...
+	Zero prefixEnum = 0
+	// One ...
+	One prefixEnum = 1
+	// Three ..
+	Three prefixEnum = 3
+	// FortyTwo ...
+	FortyTwo prefixEnum = 42
+	// FortyThree ...
 	FortyThree prefixEnum = 43
+	// SixtyEight ...
 	SixtyEight prefixEnum = 68
-	SixtyNine  prefixEnum = 69
+	// SixtyNine ...
+	SixtyNine prefixEnum = 69
 )
 
 // ErrUnknownPrefix ...
 var ErrUnknownPrefix = errors.New("prefix: unknown")
 
+// PrefixEnum ...
 type PrefixEnum interface {
 	Type() prefixEnum
 	String() string
 }
 
+// Type ...
 func (p prefixEnum) Type() prefixEnum {
 	return p
 }

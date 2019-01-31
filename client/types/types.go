@@ -69,7 +69,7 @@ type RawMessage struct {
 // Node contains information about a peer node
 type Node struct {
 	// Address is the address of the node
-	Addres string
+	Address string
 	// Port is the port on which the node is communicating
 	Port uint
 }

@@ -17,10 +17,12 @@ type LruDB struct {
 var defaultItemCount = 4096
 
 // NewLruDB ...
+// TODO: itemCount not used?
 func NewLruDB(backing BaseDB, itemCount int) *LruDB {
-	if itemCount == -1 {
-		itemCount = defaultItemCount
-	}
+	// TODO: this is an ineffassign...
+	//if itemCount == -1 {
+	//itemCount = defaultItemCount
+	//}
 
 	return &LruDB{
 		backing: backing,

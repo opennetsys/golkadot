@@ -58,7 +58,8 @@ func (e *encodingContentEnum) UnmarshalJSON(data []byte) error {
 	}
 
 	typ := ECE.Type()
-	e = &typ
+	// TODO: nil check?
+	*e = typ
 
 	return nil
 }

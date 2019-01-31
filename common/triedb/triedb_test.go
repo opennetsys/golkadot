@@ -167,13 +167,13 @@ func TestTrieDB(t *testing.T) {
 
 	})
 
-	t.Run("test 3: testing Extentions and branches", func(t *testing.T) {
+	t.Run("test 3: testing Extensions and branches", func(t *testing.T) {
 		trie := newTrie(codec)
 
 		t.Run("should store a value", func(t *testing.T) {
 			trie.Put([]uint8("doge"), []uint8("coin"))
 		})
-		t.Run("should create extention to store this value", func(t *testing.T) {
+		t.Run("should create extension to store this value", func(t *testing.T) {
 			trie.Put([]uint8("do"), []uint8("verb"))
 			if !reflect.DeepEqual(trie.Get([]uint8("do")), []uint8("verb")) {
 				t.Fail()
@@ -185,7 +185,7 @@ func TestTrieDB(t *testing.T) {
 				t.Errorf("expected %v\nreceived %v", expectedRoot, root)
 			}
 		})
-		t.Run("should store this value under the extention", func(t *testing.T) {
+		t.Run("should store this value under the extension", func(t *testing.T) {
 			trie.Put([]uint8("done"), []uint8("finished"))
 			root := trie.GetRoot()
 			expectedRoot := []uint8{192, 214, 81, 170, 221, 82, 60, 25, 190, 123, 112, 7, 138, 253, 63, 178, 198, 192, 194, 173, 133, 193, 240, 169, 194, 176, 141, 106, 11, 13, 117, 97}
@@ -195,10 +195,10 @@ func TestTrieDB(t *testing.T) {
 		})
 	})
 
-	t.Run("test 4: testing Extentions and branches - reverse", func(t *testing.T) {
+	t.Run("test 4: testing Extensions and branches - reverse", func(t *testing.T) {
 		trie := newTrie(codec)
 
-		t.Run("should create extention to store this value", func(t *testing.T) {
+		t.Run("should create extension to store this value", func(t *testing.T) {
 			trie.Put([]uint8("do"), []uint8("verb"))
 			if !reflect.DeepEqual(trie.Get([]uint8("do")), []uint8("verb")) {
 				t.Fail()
@@ -209,7 +209,7 @@ func TestTrieDB(t *testing.T) {
 			trie.Put([]uint8("doge"), []uint8("coin"))
 		})
 
-		t.Run("should store this value under the extention", func(t *testing.T) {
+		t.Run("should store this value under the extension", func(t *testing.T) {
 			trie.Put([]uint8("done"), []uint8("finished"))
 			root := trie.GetRoot()
 			expectedRoot := []uint8{192, 214, 81, 170, 221, 82, 60, 25, 190, 123, 112, 7, 138, 253, 63, 178, 198, 192, 194, 173, 133, 193, 240, 169, 194, 176, 141, 106, 11, 13, 117, 97}

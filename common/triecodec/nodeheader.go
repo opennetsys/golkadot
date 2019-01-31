@@ -267,11 +267,11 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 		case []uint8:
 			value = v != nil
 		case *crypto.Blake2b256Hash:
-			isNull = v != nil
+			value = v != nil
 		case *crypto.Blake2b512Hash:
-			isNull = v != nil
+			value = v != nil
 		case *crypto.Hash:
-			isNull = v != nil
+			value = v != nil
 		case *Null:
 			value = false
 		case *BranchHeader:

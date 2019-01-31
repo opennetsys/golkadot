@@ -114,6 +114,10 @@ func TestKeyRing(t *testing.T) {
 
 	t.Run("allows retrieval of a specific item", func(t *testing.T) {
 		addr, err := address.Encode(publicKeyOne[:], nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
 		p, err := kr.GetPair([]byte(addr))
 		if err != nil {
 			t.Error(err)

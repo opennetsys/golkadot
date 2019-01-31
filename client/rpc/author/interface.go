@@ -5,6 +5,7 @@ import (
 	rpctypes "github.com/c3systems/go-substrate/client/rpc/types"
 )
 
+// ServiceInterface ...
 type ServiceInterface interface {
 	// SubmitExtrinsic submits a hex-encoded extrinsic for inclusion in block.
 	SubmitExtrinsic(extrinsic []byte, response *string) error

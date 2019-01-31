@@ -11,6 +11,7 @@ var (
 	DefaultPrefix = FortyTwo
 )
 
+// SetDefaultPrefix ...
 func SetDefaultPrefix(prefix PrefixEnum) {
 	DefaultPrefix = prefix.Type()
 }

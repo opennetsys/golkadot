@@ -2,7 +2,6 @@ package pair
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 )
@@ -66,16 +65,15 @@ func TestPair(t *testing.T) {
 	if !ok {
 		t.Fatal("err getting alice")
 	}
-	jsn, err := alice.ToJSON(nil)
+	_, err = alice.ToJSON(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	password := "password"
-	jsn, err = alice.ToJSON(&password)
+	_, err = alice.ToJSON(&password)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println(string(jsn))
 
 	t.Run("has a publicKey", func(t *testing.T) {
 		apk, err := alice.PublicKey()

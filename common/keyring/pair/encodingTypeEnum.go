@@ -66,7 +66,7 @@ func (e encodingTypeEnum) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, e.String())), nil
 }
 
-// Unmarshal ...
+// UnmarshalJSON ...
 func (e *encodingTypeEnum) UnmarshalJSON(data []byte) error {
 	ETE, err := EncodingTypeEnumFromString(strings.Replace(string(data), "\"", "", -1))
 	if err != nil {
@@ -74,7 +74,8 @@ func (e *encodingTypeEnum) UnmarshalJSON(data []byte) error {
 	}
 
 	typ := ETE.Type()
-	e = &typ
+	// TODO: nil check?
+	*e = typ
 
 	return nil
 }

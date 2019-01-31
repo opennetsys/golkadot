@@ -74,7 +74,7 @@ func CompactToUint8Slice(value *big.Int, bitLength int) []uint8 {
 	}
 
 	return u8util.Concat(
-		// substract 4 as minimum (also catered for in decoding)
+		// subtract 4 as minimum (also catered for in decoding)
 		[]uint8{uint8(((length - 4) << 2) + 0x3)}, // NOTE: 0x3 = 0b11
 		slice[0:length],
 	)

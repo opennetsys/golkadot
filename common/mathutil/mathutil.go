@@ -87,7 +87,7 @@ func inotn(n *big.Int, width int) *big.Int {
 		words[i] = big.Word(^int(words[i]) & (0x3ffffff >> (26 - uint(bitsLeft))))
 	}
 
-	words, isNegative = stripZerosFromWords(words, isNegative)
+	words, _ = stripZerosFromWords(words, isNegative)
 
 	ret := new(big.Int)
 	ret.SetBits(words)
