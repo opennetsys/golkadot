@@ -17,10 +17,10 @@ const (
 	// BlockResponse ...
 	BlockResponse
 	// Request ...
-	Request
-	// StateRequest ...
-	StateRequest
-	// Status ...
+	//Request
+	//// StateRequest ...
+	//StateRequest
+	//// Status ...
 	Status
 	// Transactions ...
 	Transactions
@@ -47,8 +47,8 @@ func AllFuncEnums() []FuncEnum {
 		BlockAnnounce,
 		BlockRequest,
 		BlockResponse,
-		Request,
-		StateRequest,
+		//Request,
+		//StateRequest,
 		Status,
 		Transactions,
 	}
@@ -65,10 +65,10 @@ func FuncEnumFromString(s string) (FuncEnum, error) {
 		return BlockRequest, nil
 	case "BLOCKRESPONSE":
 		return BlockResponse, nil
-	case "REQUEST":
-		return Request, nil
-	case "STATEREQUEST":
-		return StateRequest, nil
+	//case "REQUEST":
+	//return Request, nil
+	//case "STATEREQUEST":
+	//return StateRequest, nil
 	case "STATUS":
 		return Status, nil
 	case "TRANSACTIONS":

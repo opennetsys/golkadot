@@ -1,21 +1,22 @@
 package peer
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/binary"
 	"errors"
-	"log"
 	"math/big"
 
 	"github.com/c3systems/go-substrate/client/p2p/defaults"
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
+	"github.com/c3systems/go-substrate/common/stringutil"
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/c3systems/go-substrate/logger"
 
 	inet "github.com/libp2p/go-libp2p-net"
-	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
-	transport "github.com/libp2p/go-libp2p-transport"
 )
 
 // TODO ...
@@ -31,54 +32,49 @@ func New(cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains, pInfo p
 		return nil, ErrNoChain
 	}
 
-	m := make(map[libpeer.ID]*clienttypes.KnownPeer)
-	svc := &Peer{
-		Chain:  chn,
-		Config: cfg,
-		Map:    m,
+	p := &Peer{
+		chain:       chn,
+		config:      cfg,
+		connections: make(map[uint]inet.Conn),
+		peerInfo:    pInfo,
+		// TODO: base58?
+		id:       string(pInfo.ID),
+		shortID:  stringutil.Shorten(string(pInfo.ID), 6),
+		handlers: make(map[peertypes.EventEnum]clienttypes.PeerEventCallback),
 	}
 
-	return svc, nil
+	return p, nil
 }
 
 // AddConnection ...
 func (p *Peer) AddConnection(conn inet.Conn, isWritable bool) (uint, error) {
 	// TODO: check for chain nil, etc.
-	// note: set first, and then increment?
-	connID := p.NextConnID
-	p.NextConnID++
-
-	// TODO??? only make chan if isWritable?
-	ch := make(chan interface{})
-	p.Connections[int(connID)] = &clienttypes.Connection{
-		Connection: conn,
-		Pushable:   ch,
-	}
-
-	// TODO ...
-	//this._receive(connection, connId);
+	connID := p.nextConnID
+	p.nextConnID++
 
 	if isWritable {
-		// TODO ...
+		p.connections[connID] = conn
+		//go p.Receive(conn, connID)
 		//pull(pushable, connection);
-		bn, err := p.Chain.GetBestBlocksNumber()
+
+		bn, err := p.chain.GetBestBlocksNumber()
 		if err != nil {
 			logger.Errorf("[peer] err getting chain best blocks number\n%v", err)
 			return 0, err
 		}
-		bh, err := p.Chain.GetBestBlocksHash()
+		bh, err := p.chain.GetBestBlocksHash()
 		if err != nil {
 			logger.Errorf("[peer] err getting chain best blocks hash\n%v", err)
 			return 0, err
 		}
-		gh, err := p.Chain.GetGenesisHash()
+		gh, err := p.chain.GetGenesisHash()
 		if err != nil {
 			logger.Errorf("[peer] err getting chain genesis hash\n%v", err)
 			return 0, err
 		}
 
 		ok, err := p.Send(&clienttypes.Status{
-			Roles:       p.Config.Roles,
+			Roles:       p.config.Roles,
 			BestNumber:  bn,
 			BestHash:    bh,
 			GenesisHash: gh,
@@ -99,22 +95,21 @@ func (p *Peer) AddConnection(conn inet.Conn, isWritable bool) (uint, error) {
 
 // Disconnect disconnects from the peer
 func (p *Peer) Disconnect() error {
-	p.Connections = nil
-	// TODO ...
-	//this.emit('disconnected');
+	p.connections = nil
+	p.handleEvent(peertypes.Disconnected, nil)
 
 	return nil
 }
 
 // IsActive returns whether the peer is active or not
 func (p *Peer) IsActive() (bool, error) {
-	pushables, err := p.pushables()
+	isWritable, err := p.IsWritable()
 	if err != nil {
-		logger.Errorf("[peer] err getting pushables\n%v", err)
+		logger.Errorf("[peer] err getting isWritable\n%v", err)
 		return false, err
 	}
 
-	return len(pushables) != 0, nil
+	return len(p.BestHash) != 0 && isWritable, nil
 }
 
 // IsWritable returns whether the peer is writable or not
@@ -127,16 +122,16 @@ func (p *Peer) IsWritable() (bool, error) {
 	return len(pushables) != 0, nil
 }
 
-// GetNextID TODO
-func (p *Peer) GetNextID() (uint, error) {
-	// note: increment first and then return?
-	p.NextID++
-	return p.NextID, nil
+// GetNextID ...
+func (p *Peer) GetNextID() uint {
+	p.nextID++
+	return p.nextID
 }
 
 // On defines the event handlers
 func (p *Peer) On(event peertypes.EventEnum, cb clienttypes.PeerEventCallback) {
-	// TODO
+	p.handlers[event] = cb
+
 	return
 }
 
@@ -144,30 +139,117 @@ func (p *Peer) On(event peertypes.EventEnum, cb clienttypes.PeerEventCallback) {
 func (p *Peer) Send(msg clienttypes.InterfaceMessage) (bool, error) {
 	encoded, err := msg.Encode()
 	if err != nil {
-		logger.Errorf("[peer] %v message encoding send error\n%v", p.ShortID, err)
+		logger.Errorf("[peer] %v message encoding send error\n%v", p.shortID, err)
 		return false, err
 	}
 
 	lengthBuf := make([]byte, binary.MaxVarintLen64)
 	// TODO: correct to be ignoring bytes written, here?
-	_ = binary.PutUvarint(lengthBuf, uint64(len(encoded)))
-	buffer, err := u8util.ToBuffer(u8util.Concat(lengthBuf, encoded))
-	if err != nil {
-		return false, err
-	}
+	_ = binary.PutVarint(lengthBuf, int64(len(encoded)))
+	buffer := u8util.Concat(lengthBuf, encoded)
 
-	logger.Infof("[peer] sending %v -> %v", p.ShortID, u8util.ToHex(encoded, -1, true))
+	logger.Infof("[peer] sending %v -> %v", p.shortID, u8util.ToHex(encoded, -1, true))
 
 	pushables, err := p.pushables()
 	if err != nil {
 		return false, err
 	}
 
+	// TODO: use goroutines?
+	ret := true
 	for idx := range pushables {
-		pushables[idx] <- buffer
+		if pushables[idx] == nil {
+			continue
+		}
+
+		// TODO: get stream or open a new one?
+		stream, err := pushables[idx].NewStream()
+		if err != nil {
+			logger.Errorf("[peer] err getting new stream\n%v", err)
+			ret = false
+			continue
+		}
+
+		w := bufio.NewWriter(stream)
+		if _, err = w.Write(buffer); err != nil {
+			// TODO: unhandled err...
+			stream.Close()
+			ret = false
+			logger.Errorf("[peer] err writing message\n%v", err)
+			continue
+		}
+		if err = w.Flush(); err != nil {
+			// TODO: unhandled err...
+			stream.Close()
+			ret = false
+			logger.Errorf("[peer] err flushing message\n%v", err)
+			continue
+		}
+
+		// TODO: unhandled err...
+		stream.Close()
 	}
 
-	return true, nil
+	return ret, nil
+}
+
+// Receive ...
+func (p *Peer) Receive(stream inet.Stream) error {
+	if stream == nil {
+		return errors.New("nil stream")
+	}
+
+	defer stream.Close()
+
+	//r := bufio.NewReader(stream)
+	buf := new(bytes.Buffer)
+	n, err := buf.ReadFrom(stream)
+	if err != nil {
+		return err
+	}
+
+	logger.Infof("[peer] read %v bytes", n)
+	//// TODO: add max # of bytes to read?
+	//for {
+	//_, err := r.Read(buf)
+	//if err == io.EOF {
+	//break
+	//}
+	//if err != nil {
+	//return err
+	//}
+	//}
+
+	b := buf.Bytes()
+	lengthBuf := make([]byte, binary.MaxVarintLen64)
+
+	if len(b) <= len(lengthBuf) {
+		logger.Errorf("[peer] have bytes len %d; need minimum %d", len(b), len(lengthBuf)+1)
+		return errors.New("bytes length below minimum")
+	}
+
+	data := b[len(lengthBuf):]
+	lengthBuf = b[:len(lengthBuf)]
+	dataLen, err := binary.ReadVarint(bytes.NewBuffer(lengthBuf))
+
+	if dataLen != int64(len(data)) {
+		logger.Errorf("[peer] expected data length %v, received %v", dataLen, len(data))
+		return errors.New("incorrect bytes length")
+	}
+
+	msg, err := clienttypes.DecodeMessage(data)
+	if err != nil {
+		return err
+	}
+
+	p.handleEvent(peertypes.Message, msg)
+
+	// TODO: is this correct?
+	if msg.Kind() == handlertypes.BFT {
+		p.handleEvent(peertypes.Active, nil)
+	}
+
+	return nil
 }
 
 // SetBest sets a new block
@@ -181,39 +263,76 @@ func (p *Peer) SetBest(blockNumber *big.Int, hash []byte) error {
 
 // Cfg ...
 func (p *Peer) Cfg() clienttypes.ConfigClient {
-	if p.Config == nil {
+	if p.config == nil {
 		return clienttypes.ConfigClient{}
 	}
 
-	return *p.Config
-}
-
-func (p *Peer) clearConnection(connID int) {
-	delete(p.Connections, connID)
-
-	isWriteable, err := p.IsWritable()
-	// TODO: fix!
-	log.Println(err)
-
-	logger.Infof("[peer] clearConnection %v %v %v", connID, p.ShortID, isWriteable)
-
-	// TODO ...
-	//if (!this.isWritable()) {
-	//this.emit('disconnected');
-	//}
-}
-
-func (p *Peer) pushables() ([]chan<- interface{}, error) {
-	// TODO...
-	return nil, nil
-}
-
-// TODO ...
-func (p *Peer) receive(conn transport.Conn, connID int) (bool, error) {
-	return false, nil
+	return *p.config
 }
 
 // GetID ...
 func (p *Peer) GetID() string {
-	return p.ID
+	return p.id
+}
+
+// GetChain ...
+func (p *Peer) GetChain() (clienttypes.InterfaceChains, error) {
+	if p.chain == nil {
+		return nil, errors.New("nil chain")
+	}
+
+	return p.chain, nil
+}
+
+// GetPeerInfo ...
+func (p *Peer) GetPeerInfo() pstore.PeerInfo {
+	return p.peerInfo
+}
+
+// GetShortID ...
+func (p *Peer) GetShortID() string {
+	return p.shortID
+}
+
+func (p *Peer) handleEvent(event peertypes.EventEnum, iface interface{}) {
+	if event == nil {
+		logger.Info("[peer] nil event")
+		return
+	}
+
+	cb, ok := p.handlers[event]
+	if !ok {
+		logger.Infof("[peer] no event for %s", event.String())
+		return
+	}
+
+	iface, err := cb(iface)
+	logger.Infof("[peers] handled event %s\nresults:\n%v\n%v", event.String(), iface, err)
+	return
+}
+
+func (p *Peer) clearConnection(connID uint) {
+	// TODO: Dialer.ClosePeer?
+	delete(p.connections, connID)
+
+	isWriteable, err := p.IsWritable()
+	if err != nil {
+		logger.Errorf("[peer] err clearing connection\n%v", err)
+		return
+	}
+
+	logger.Infof("[peer] clearConnection %v %v %v", connID, p.shortID, isWriteable)
+
+	if !isWriteable {
+		p.handleEvent(peertypes.Disconnected, nil)
+	}
+}
+
+func (p *Peer) pushables() ([]inet.Conn, error) {
+	var pushables []inet.Conn
+	for k := range p.connections {
+		pushables = append(pushables, p.connections[k])
+	}
+
+	return pushables, nil
 }

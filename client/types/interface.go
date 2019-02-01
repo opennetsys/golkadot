@@ -9,7 +9,9 @@ import (
 	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
 	p2ptypes "github.com/c3systems/go-substrate/client/p2p/types"
 	"github.com/c3systems/go-substrate/common/crypto"
+
 	inet "github.com/libp2p/go-libp2p-net"
+	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
 
@@ -51,8 +53,6 @@ type InterfacePeer interface {
 	IsActive() (bool, error)
 	// IsWritable returns whether the peer is writable or not
 	IsWritable() (bool, error)
-	// GetNextID TODO
-	GetNextID() (uint, error)
 	// On defines the event handlers
 	On(event peertypes.EventEnum, cb PeerEventCallback)
 	// Send is used to send the peer a message
@@ -61,8 +61,18 @@ type InterfacePeer interface {
 	SetBest(blockNumber *big.Int, hash []byte) error
 	// Cfg returns the peer config
 	Cfg() ConfigClient
+	// GetChain ...
+	GetChain() (InterfaceChains, error)
 	// GetID ...
 	GetID() string
+	// GetNextID ...
+	GetNextID() uint
+	// GetPeerInfo ...
+	GetPeerInfo() pstore.PeerInfo
+	// GetShortID ...
+	GetShortID() string
+	// Receive ...
+	Receive(stream inet.Stream) error
 }
 
 // InterfacePeers defines the methods of the peers
@@ -75,6 +85,8 @@ type InterfacePeers interface {
 	Count() (uint, error)
 	// Get returns a peer
 	Get(pi pstore.PeerInfo) (*KnownPeer, error)
+	// GetFromID returns a peer
+	GetFromID(id libpeer.ID) (*KnownPeer, error)
 	// Log TODO
 	Log(event peerstypes.EventEnum, iface interface{}) error
 	// On handles peers events

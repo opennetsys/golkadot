@@ -4,8 +4,9 @@ import (
 	"errors"
 	"math/big"
 
+	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
-	libpeer "github.com/libp2p/go-libp2p-peer"
+	inet "github.com/libp2p/go-libp2p-net"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
 
@@ -18,16 +19,17 @@ var (
 
 // Peer ...
 type Peer struct {
-	Map        map[libpeer.ID]*clienttypes.KnownPeer
+	// TODO: map?!?
 	BestHash   []byte
 	BestNumber *big.Int
-	Chain      clienttypes.InterfaceChains
-	Config     *clienttypes.ConfigClient
+	chain      clienttypes.InterfaceChains
+	config     *clienttypes.ConfigClient
 	//Config      *clienttypes.ConfigPeer
-	ID          string
-	Connections map[int]*clienttypes.Connection
-	NextID      uint
-	NextConnID  uint
-	PeerInfo    pstore.PeerInfo
-	ShortID     string
+	id          string
+	connections map[uint]inet.Conn
+	nextID      uint
+	nextConnID  uint
+	peerInfo    pstore.PeerInfo
+	shortID     string
+	handlers    map[peertypes.EventEnum]clienttypes.PeerEventCallback
 }

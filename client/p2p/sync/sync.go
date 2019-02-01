@@ -333,17 +333,14 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 		return nil
 	}
 
-	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from)
+	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from.String())
 
 	timeout := time.Now().Add(time.Duration(REQUEST_TIMEOUT) * time.Millisecond)
-	nextID, err := pr.GetNextID()
-	if err != nil {
-		return err
-	}
-	request := &clienttypes.Request{
-		From: from,
-		ID:   nextID,
-		Max:  uint64(defaults.Defaults.MaxRequestBlocks),
+	nextID := pr.GetNextID()
+	request := &clienttypes.BlockRequest{
+		From: int(from.Int64()),
+		ID:   uint64(nextID),
+		Max:  int(defaults.Defaults.MaxRequestBlocks),
 	}
 
 	s.blockRequests[pr.GetID()] = &clienttypes.StateRequest{

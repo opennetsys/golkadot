@@ -15,7 +15,6 @@ import (
 
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libp2pHost "github.com/libp2p/go-libp2p-host"
-	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	protocol "github.com/libp2p/go-libp2p-protocol"
@@ -127,7 +126,7 @@ type StateRequest struct {
 	// Peer ..
 	Peer InterfacePeer
 	// Request ...
-	Request *Request
+	Request *BlockRequest
 	// Timeout ...
 	Timeout int64
 }
@@ -181,11 +180,11 @@ type KnownPeer struct {
 	IsConnected bool
 }
 
-// Connection ...
-type Connection struct {
-	Connection inet.Conn
-	Pushable   chan<- interface{} // note: a write only channel
-}
+//// Connection ...
+//type Connection struct {
+//Connection inet.Conn
+//Pushable   chan<- []byte // note: a write only channel
+//}
 
 // BlockNumber ...
 // note: required by sync.provideBlocks
@@ -212,6 +211,15 @@ type BlockResponse struct {
 	// TODO: big.Int?
 	ID uint64
 }
+
+// BFT ...
+type BFT struct{}
+
+// BlockAnnounce ...
+type BlockAnnounce struct{}
+
+// Transactions ...
+type Transactions struct{}
 
 // ConfigPeers ...
 type ConfigPeers struct {
@@ -277,12 +285,12 @@ type Header struct {
 	Digest         *Digest
 }
 
-// Request TODO
-type Request struct {
-	From *big.Int
-	ID   uint
-	Max  uint64
-}
+//// Request TODO
+//type Request struct {
+//From *big.Int
+//ID   uint
+//Max  uint64
+//}
 
 // BlockData TODO
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/BlockData.ts

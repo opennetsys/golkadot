@@ -64,6 +64,7 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 
 	// 3. build the peerstore and save the keys
 	// TODO: pass in pstore?
+	// TODO: this is being built in peers, too!
 	ps := pstoremem.NewPeerstore()
 	if err := ps.AddPrivKey(pid, cfg.P2P.Priv); err != nil {
 		logger.Errorf("[p2p] err adding private keey to peer store\n%v", err)
@@ -176,7 +177,8 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 	}
 
 	nb := &inet.NotifyBundle{
-		ConnectedF: p.onConn,
+		ConnectedF:    p.onConn,
+		OpenedStreamF: p.onStream,
 	}
 	newNode.Network().Notify(nb)
 
@@ -278,6 +280,52 @@ func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
 	logger.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
 	p.addAddr(conn)
+}
+
+func (p *P2P) onStream(network inet.Network, stream inet.Stream) {
+	if network == nil || stream == nil {
+		logger.Errorf("[p2p] network or stream is nil")
+		return
+	}
+
+	switch stream.Protocol() {
+	case protocol.ID(defaults.Defaults.ProtocolPing), protocol.ID(defaults.Defaults.ProtocolDot):
+		{
+			logger.Info("[p2p] new stream was opened")
+			return
+		}
+
+	default:
+		{
+			if p.state == nil {
+				logger.Error("[p2p] nil state")
+				return
+			}
+			if p.state.Peers == nil {
+				logger.Error("[p2p] nil peers")
+				return
+			}
+
+			kp, err := p.state.Peers.GetFromID(stream.Conn().RemotePeer())
+			if err != nil {
+				logger.Errorf("[p2p] err getting known peer from id\n%v", err)
+				return
+			}
+			if kp == nil || kp.Peer == nil {
+				logger.Error("[p2p] known peer is nil")
+				return
+			}
+
+			go func() {
+				if err = kp.Peer.Receive(stream); err != nil {
+					logger.Errorf("[p2p] err receiving stream\n%v", err)
+					return
+				}
+
+				logger.Infof("[p2p] message received from %s", kp.Peer.GetShortID())
+			}()
+		}
+	}
 }
 
 func (p *P2P) addAddr(conn inet.Conn) {

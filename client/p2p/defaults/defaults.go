@@ -43,10 +43,12 @@ var Defaults = struct {
 	Name string
 }{
 	MaxRequestBlocks: 64,
-	ProtocolBase:     "/substrate",
-	ProtocolType:     "/sup",
-	ProtocolVersion:  "1.0.0",
-	Address:          "127.0.0.1",
+	// TODO: substrate?
+	ProtocolBase: "/substrate",
+	// TODO: type?
+	ProtocolType:    "/sup",
+	ProtocolVersion: "1.0.0",
+	Address:         "127.0.0.1",
 	// TODO: ClientID?
 	ClientID:        "polkadot-go/0.0.0",
 	MaxPeers:        25,
@@ -54,6 +56,7 @@ var Defaults = struct {
 	MinIdleBlocks:   16,
 	Port:            31333,
 	Role:            "full",
+	// TODO: substrate?
 	ProtocolDot:     "/substrate/sup/1.0.0", // {ProtocolBase}/{ProtocolType}/{ProtocolVersion}
 	ProtocolPing:    "/ipfs/ping/1.0.0",
 	DialBackoff:     5 * 60000,
