@@ -3,24 +3,18 @@ package types
 import (
 	"reflect"
 
+	"github.com/c3systems/go-substrate/common"
 	"github.com/c3systems/go-substrate/common/u8util"
 )
 
 // Option is an optional field. Basically the first byte indicates that there is is value to follow. If the byte is `1` there is an actual value. So the Option implements that - decodes, checks for optionality and wraps the required structure with a value if/as required/found.
 type Option struct {
 	kind  reflect.Type
-	value InterfaceType
+	value interface{}
 }
 
 // NewOption ...
-func NewOption(value InterfaceType) *Option {
-	switch v := value.(type) {
-	case *Text:
-		if v.Value() == nil {
-			value = NewNull()
-		}
-	}
-
+func NewOption(value interface{}) *Option {
 	return &Option{
 		kind:  reflect.TypeOf(value),
 		value: value,
@@ -34,11 +28,7 @@ func (o *Option) Value() interface{} {
 
 // IsNone ...
 func (o *Option) IsNone() bool {
-	switch o.value.(type) {
-	case *Null:
-		return true
-	}
-	return false
+	return common.TypeIsNil(o.value)
 }
 
 // IsSome ...
@@ -48,7 +38,7 @@ func (o *Option) IsSome() bool {
 
 // String ...
 func (o *Option) String() string {
-	return o.value.String()
+	return common.TypeToString(o.value)
 }
 
 // Hex ...
@@ -59,14 +49,14 @@ func (o *Option) Hex() string {
 // ToU8a ...
 func (o *Option) ToU8a(isBare bool) []uint8 {
 	if isBare {
-		o.value.ToU8a(true)
+		return common.TypeToU8a(o.value, true)
 	}
 
 	slice := make([]uint8, o.EncodedLen())
 
 	if o.IsSome() {
 		copy(slice[:], []uint8{1})
-		copy(slice[1:], o.value.ToU8a(false))
+		copy(slice[1:], common.TypeToU8a(o.value, false))
 	}
 
 	return slice
@@ -74,18 +64,18 @@ func (o *Option) ToU8a(isBare bool) []uint8 {
 
 // Len ...
 func (o *Option) Len() int {
-	return o.value.Len()
+	return common.TypeLen(o.value)
 }
 
 // EncodedLen ...
 func (o *Option) EncodedLen() int {
 	// boolean byte (has value, doesn't have) along with wrapped length
-	return 1 + o.value.EncodedLen()
+	return 1 + common.TypeEncodedLen(o.value)
 }
 
 // Bytes ...
 func (o *Option) Bytes() []byte {
-	return o.value.Bytes()
+	return common.TypeToBytes(o.value)
 }
 
 // Unwrap returns the value that the Option represents (if available)
@@ -103,18 +93,7 @@ func (o *Option) Equals(other interface{}) bool {
 	switch v := other.(type) {
 	case *Option:
 		return o.String() == v.String()
-	case InterfaceType:
-		return o.Equals(v)
 	default:
-		switch u := o.value.(type) {
-		case *Text:
-			return u.Equals(other)
-		case *Int:
-			return u.Equals(other)
-		case *U8Fixed:
-			return u.Equals(other)
-		}
+		return common.TypeEquals(o.value, other)
 	}
-
-	return false
 }

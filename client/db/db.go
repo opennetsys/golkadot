@@ -1,18 +1,19 @@
 package db
 
 import (
+	"math/big"
+
 	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
 	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/common/db"
 	"github.com/c3systems/go-substrate/common/triedb"
-	types "github.com/c3systems/go-substrate/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-db/src/index.ts
 
-// DBConfig ...
-type DBConfig struct {
+// Config ...
+type Config struct {
 	Compact  bool
 	IsTrieDb bool
 	Path     string
@@ -82,18 +83,18 @@ func (s *StorageMethodBn) Del(params ...interface{}) {
 }
 
 // Get ...
-func (s *StorageMethodBn) Get(params ...interface{}) *types.Int {
+func (s *StorageMethodBn) Get(params ...interface{}) *big.Int {
 	// TODO
 	return nil
 }
 
 // Set ...
-func (s *StorageMethodBn) Set(value *types.Int, params ...interface{}) {
+func (s *StorageMethodBn) Set(value *big.Int, params ...interface{}) {
 	// TODO
 }
 
 // OnUpdate ...
-func (s *StorageMethodBn) OnUpdate(callback func(value *types.Int)) {
+func (s *StorageMethodBn) OnUpdate(callback func(value *big.Int)) {
 	// TODO
 }
 

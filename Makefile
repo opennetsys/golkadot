@@ -48,9 +48,13 @@ test/clientdb:
 test/clientchain:
 	@go test -v clientchain/*.go
 
+.PHONY: test/common/all
+test/common/all:
+	@go test -v $$(go list ./... | grep common/)
+
 .PHONY: test/common
 test/common:
-	@go test -v $$(go list ./... | grep common/)
+	@go test -v common/common*.go
 
 .PHONY: test/common/hexutil
 test/common/hexutil:

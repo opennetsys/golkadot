@@ -3,6 +3,7 @@ package chains
 import (
 	"fmt"
 	"log"
+	"math/big"
 
 	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
 	clientchaintypes "github.com/c3systems/go-substrate/client/chains/types"
@@ -17,7 +18,6 @@ import (
 	"github.com/c3systems/go-substrate/common/u8util"
 	"github.com/c3systems/go-substrate/logger"
 	"github.com/c3systems/go-substrate/storagetypes"
-	"github.com/c3systems/go-substrate/types"
 )
 
 // Chain ...
@@ -46,7 +46,7 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 	bestHash := c.Blocks.BestHash.Get()
 	bestNumber := c.Blocks.BestNumber.Get()
 	logGenesis := ""
-	if !bestNumber.IsZero() {
+	if bestNumber.Cmp(big.NewInt(0)) != 0 {
 		logGenesis = fmt.Sprintf("(genesis %s)", u8util.ToHex(c.Genesis.Block.Hash[:], 48, true))
 	}
 
@@ -115,7 +115,7 @@ func (c *Chain) RollbackBlock(bestHeader *clienttypes.Header, rollback bool) *cl
 		prevBlock := c.GetBlock(prevHash)
 
 		c.Blocks.BestHash.Set(prevHash)
-		c.Blocks.BestNumber.Set(types.NewInt(prevBlock.Header.BlockNumber.String(), 64))
+		c.Blocks.BestNumber.Set(prevBlock.Header.BlockNumber)
 
 		return c.InitGenesisFromBest(prevBlock.Header, false)
 	}
@@ -153,7 +153,7 @@ func (c *Chain) CreateGenesis() *clientchaintypes.ChainGenesis {
 	genesis := c.CreateGenesisBlock()
 
 	c.Blocks.BestHash.Set(genesis.Block.Hash[:])
-	c.Blocks.BestNumber.Set(types.NewInt(0, 64))
+	c.Blocks.BestNumber.Set(big.NewInt(0))
 	c.Blocks.BlockData.Set(genesis.Block.ToU8a(), genesis.Block.Hash)
 	c.Blocks.Hash.Set(genesis.Block.Hash[:], 0)
 

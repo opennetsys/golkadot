@@ -36,6 +36,16 @@ func (b *BlockNumber) Value() uint64 {
 	return b.value
 }
 
+// Uint64 ...
+func (b *BlockNumber) Uint64() uint64 {
+	return b.value
+}
+
+// BN ...
+func (b *BlockNumber) BN() *big.Int {
+	return big.NewInt(int64(b.value))
+}
+
 // String ...
 func (b *BlockNumber) String() string {
 	return strconv.FormatUint(b.value, 10)
