@@ -73,6 +73,8 @@ type InterfacePeer interface {
 	GetShortID() string
 	// Receive ...
 	Receive(stream inet.Stream) error
+	// GetBestNumber ...
+	GetBestNumber() *big.Int
 }
 
 // InterfacePeers defines the methods of the peers
@@ -104,8 +106,10 @@ type InterfaceMessage interface {
 	// Decode deserializes a bytes array into a message
 	Decode(bytes []byte) error
 	// Marshal returns json
+	// TODO: change to MarshalJSON
 	Marshal() ([]byte, error)
 	// Unmarshal converts json to a message
+	// TODO: change to UnmarshalJSON
 	Unmarshal(bytes []byte) error
 	// Header ...
 	Header() *Header
@@ -131,4 +135,6 @@ type InterfaceP2P interface {
 	Stop() error
 	// Cfg returns the config
 	Cfg() ConfigClient
+	// GetSyncer ...
+	GetSyncer() (InterfaceSync, error)
 }

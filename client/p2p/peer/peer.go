@@ -156,38 +156,45 @@ func (p *Peer) Send(msg clienttypes.InterfaceMessage) (bool, error) {
 	}
 
 	// TODO: use goroutines?
-	ret := true
+	var (
+		ret    = true
+		stream inet.Stream
+		w      *bufio.Writer
+	)
 	for idx := range pushables {
 		if pushables[idx] == nil {
 			continue
 		}
 
 		// TODO: get stream or open a new one?
-		stream, err := pushables[idx].NewStream()
+		stream, err = pushables[idx].NewStream()
 		if err != nil {
 			logger.Errorf("[peer] err getting new stream\n%v", err)
 			ret = false
 			continue
 		}
 
-		w := bufio.NewWriter(stream)
+		w = bufio.NewWriter(stream)
 		if _, err = w.Write(buffer); err != nil {
-			// TODO: unhandled err...
-			stream.Close()
-			ret = false
 			logger.Errorf("[peer] err writing message\n%v", err)
+			if err = stream.Close(); err != nil {
+				logger.Errorf("[peer] err closing stream\n%v", err)
+			}
+			ret = false
 			continue
 		}
 		if err = w.Flush(); err != nil {
-			// TODO: unhandled err...
-			stream.Close()
-			ret = false
 			logger.Errorf("[peer] err flushing message\n%v", err)
+			if err = stream.Close(); err != nil {
+				logger.Errorf("[peer] err closing stream\n%v", err)
+			}
+			ret = false
 			continue
 		}
 
-		// TODO: unhandled err...
-		stream.Close()
+		if err = stream.Close(); err != nil {
+			logger.Errorf("[peer] err closing stream\n%v", err)
+		}
 	}
 
 	return ret, nil
@@ -198,10 +205,10 @@ func (p *Peer) Receive(stream inet.Stream) error {
 	if stream == nil {
 		return errors.New("nil stream")
 	}
-
+	// TODO: unhandled err...
 	defer stream.Close()
 
-	//r := bufio.NewReader(stream)
+	// TODO: limit the number of bytes that can be read?
 	buf := new(bytes.Buffer)
 	n, err := buf.ReadFrom(stream)
 	if err != nil {
@@ -209,16 +216,6 @@ func (p *Peer) Receive(stream inet.Stream) error {
 	}
 
 	logger.Infof("[peer] read %v bytes", n)
-	//// TODO: add max # of bytes to read?
-	//for {
-	//_, err := r.Read(buf)
-	//if err == io.EOF {
-	//break
-	//}
-	//if err != nil {
-	//return err
-	//}
-	//}
 
 	b := buf.Bytes()
 	lengthBuf := make([]byte, binary.MaxVarintLen64)
@@ -292,6 +289,11 @@ func (p *Peer) GetPeerInfo() pstore.PeerInfo {
 // GetShortID ...
 func (p *Peer) GetShortID() string {
 	return p.shortID
+}
+
+// GetBestNumber ...
+func (p *Peer) GetBestNumber() *big.Int {
+	return p.BestNumber
 }
 
 func (p *Peer) handleEvent(event peertypes.EventEnum, iface interface{}) {

@@ -28,13 +28,15 @@ func New(ctx context.Context, cfg *clienttypes.ConfigClient, chn clienttypes.Int
 	}
 
 	s := &Sync{
-		bestQueued: new(big.Int),
-		chain:      chn,
-		config:     cfg,
-		ctx:        ctx,
-		handlers:   make(map[synctypes.EventEnum]clienttypes.EventCallback),
-		BestSeen:   new(big.Int),
-		Status:     synctypes.Idle,
+		bestQueued:    new(big.Int),
+		blockQueue:    make(clienttypes.StateBlockQueue),
+		blockRequests: make(clienttypes.StateBlockRequests),
+		chain:         chn,
+		config:        cfg,
+		ctx:           ctx,
+		handlers:      make(map[synctypes.EventEnum]clienttypes.EventCallback),
+		BestSeen:      new(big.Int),
+		Status:        synctypes.Idle,
 	}
 
 	go s.processBlocks()
@@ -112,8 +114,9 @@ func (s *Sync) processBlock() (bool, error) {
 	s.setStatus()
 
 	if block, ok := s.blockQueue[nextNumber.String()]; ok {
-		logger.Infof("Importing block #%s", nextNumber.String())
+		logger.Infof("[sync ] importing block #%s", nextNumber.String())
 
+		// TODO: executor?
 		ok, err = s.chain.ImportBlock(block)
 		if err != nil {
 			logger.Errorf("[sync] err importing block\n%v", err)

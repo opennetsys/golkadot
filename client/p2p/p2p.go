@@ -276,6 +276,15 @@ func (p *P2P) Cfg() clienttypes.ConfigClient {
 	return *p.cfg
 }
 
+// GetSyncer ...
+func (p *P2P) GetSyncer() (clienttypes.InterfaceSync, error) {
+	if p.sync == nil {
+		return nil, errors.New("nil sync")
+	}
+
+	return p.sync, nil
+}
+
 func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
 	logger.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
