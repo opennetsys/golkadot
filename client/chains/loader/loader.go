@@ -9,7 +9,9 @@ import (
 
 // Loader ...
 type Loader struct {
-	chain *clientchaintypes.ChainJSON
+	chain       *clientchaintypes.ChainJSON
+	ID          string
+	GenesisRoot []uint8
 }
 
 // NewLoader ...

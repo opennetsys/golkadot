@@ -1,4 +1,9 @@
-package db
+package clientdb
+
+import (
+	storagetypes "github.com/c3systems/go-substrate/storagetypes"
+	types "github.com/c3systems/go-substrate/types"
+)
 
 // StorageFunctionMetadata, StorageFunctionModifier, StorageFunctionType from @polkadot/types/Metadata/Modules
 // createFunction from @polkadot/storage/utils/createFunction
@@ -15,52 +20,31 @@ type SubstrateMetadata struct {
 	Type          MetadataType
 }
 
-// CreateItemOptions ...
-type CreateItemOptions struct {
-	IsUnhashed bool
-	Key        string
-}
-
-// StorageFunctionMetadata ...
-type StorageFunctionMetadata struct {
-	//Documention *Vector
-	//Modifier *Modifier
-	//Type *StorageFunction
-	//ToJSON *
-}
-
-// CreateFunc ...
-func CreateFunc(StorageFunctionMetadata, CreateItemOptions) func() {
-	// TODO
-	return func() {
-		// TODO
-
-	}
-}
-
 // CreateMethod is small helper function to factorize code on this page
-func CreateMethod(method string, key string, meta SubstrateMetadata) func() {
+func CreateMethod(method string, key string, meta SubstrateMetadata) types.StorageFunction {
 	b := 1
 	if meta.Type.Value == "" {
 		b = 0
 	}
 	_ = b
 
+	section := "Block"
+
 	// TODO
-	return CreateFunc(
-		//NewText("Block"), // @polkadot/types/Text
-		//NewText(method),
-		StorageFunctionMetadata{
-			/*
-				Documentation: NewVector(Text, meta.Documention), // @polkadot/types/codec/Vector
-				Modifier: NewStorageFunctionModifier(0),
-				Type: NewStorageFunction(meta.Type, b),
-			*/
-			//ToJSON: func() interface{} {
-			//	return key
-			//},
+	return storagetypes.CreateFunc(
+		&section,
+		&method,
+		&storagetypes.StorageFunctionMetadata{
+		/*
+			Documentation: NewVector(Text, meta.Documention), // @polkadot/types/codec/Vector
+			Modifier: NewStorageFunctionModifier(0),
+			Type: NewStorageFunction(meta.Type, b),
+		*/
+		//ToJSON: func() interface{} {
+		//	return key
+		//},
 		},
-		CreateItemOptions{
+		&storagetypes.CreateItemOptions{
 			IsUnhashed: false,
 			Key:        key,
 		},
@@ -68,7 +52,7 @@ func CreateMethod(method string, key string, meta SubstrateMetadata) func() {
 }
 
 // KeyBestHash ...
-func KeyBestHash() func() {
+func KeyBestHash() types.StorageFunction {
 	return CreateMethod("bestHash", "bst:hsh", SubstrateMetadata{
 		Documentation: []string{"Best hash"},
 		Type: MetadataType{
@@ -78,7 +62,7 @@ func KeyBestHash() func() {
 }
 
 // KeyBestNumber ...
-func KeyBestNumber() func() {
+func KeyBestNumber() types.StorageFunction {
 	return CreateMethod("bestNumber", "bst:num", SubstrateMetadata{
 		Documentation: []string{"Best block"},
 		Type: MetadataType{
@@ -88,7 +72,7 @@ func KeyBestNumber() func() {
 }
 
 // KeyBlockByHash ...
-func KeyBlockByHash() func() {
+func KeyBlockByHash() types.StorageFunction {
 	return CreateMethod("blockByHash", "blk:hsh", SubstrateMetadata{
 		Documentation: []string{"Retrieve block by hash"},
 		Type: MetadataType{
@@ -99,7 +83,7 @@ func KeyBlockByHash() func() {
 }
 
 // KeyHashByNumber ...
-func KeyHashByNumber() func() {
+func KeyHashByNumber() types.StorageFunction {
 	return CreateMethod("hashByNumber", "hsh:num", SubstrateMetadata{
 		Documentation: []string{"Retrieve hash by number"},
 		Type: MetadataType{
@@ -110,7 +94,7 @@ func KeyHashByNumber() func() {
 }
 
 // KeyHeaderByHash ...
-func KeyHeaderByHash() func() {
+func KeyHeaderByHash() types.StorageFunction {
 	return CreateMethod("headerByHash", "hdr:hsh", SubstrateMetadata{
 		Documentation: []string{"Retrieve header by hash"},
 		Type: MetadataType{

@@ -1,23 +1,24 @@
-package db
+package clientdb
 
 import (
 	"github.com/c3systems/go-substrate/common/db"
+	types "github.com/c3systems/go-substrate/types"
 )
 
-func createU8a(dbs *db.BaseDB, fn func()) StorageMethodU8a {
+func createU8a(dbs db.BaseDB, fn types.StorageFunction) StorageMethodU8a {
 	// TODO
 	return StorageMethodU8a{}
 }
 
-func createBn(dbs *db.BaseDB, fn func(), n int) StorageMethodBn {
+func createBn(dbs db.BaseDB, fn types.StorageFunction, n int) StorageMethodBn {
 	// TODO
 	return StorageMethodBn{}
 }
 
 // NewBlockDB ...
-func NewBlockDB(dbs *db.BaseDB) *BlockDB {
+func NewBlockDB(dbs db.BaseDB) *BlockDB {
 	return &BlockDB{
-		DB:         *dbs,
+		DB:         dbs,
 		BestHash:   createU8a(dbs, KeyBestHash()),
 		BestNumber: createBn(dbs, KeyBestNumber(), 64),
 		BlockData:  createU8a(dbs, KeyBlockByHash()),

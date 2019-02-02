@@ -16,8 +16,8 @@ type TrieDB struct {
 	Debug bool
 }
 
-// NewTrie ...
-func NewTrie(db db.TXDB, rootHash []byte, codec InterfaceCodec) *TrieDB {
+// NewTrieDB ...
+func NewTrieDB(db db.TXDB, rootHash []byte, codec InterfaceCodec) *TrieDB {
 	impl := NewImpl(db, rootHash, codec)
 	return &TrieDB{
 		impl:  impl,
@@ -79,8 +79,9 @@ func (t *TrieDB) Drop() {
 }
 
 // Maintain ...
-func (t *TrieDB) Maintain(fn *db.ProgressCB) {
+func (t *TrieDB) Maintain(fn *db.ProgressCB) error {
 	t.impl.db.Maintain(fn)
+	return nil
 }
 
 // Rename ...

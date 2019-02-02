@@ -1,12 +1,18 @@
-package db
+package clientdb
 
 import (
+	"encoding/hex"
+	"fmt"
+	"log"
 	"math/big"
+	"strings"
+	"time"
 
 	clientchainloader "github.com/c3systems/go-substrate/client/chains/loader"
 	clientdbtypes "github.com/c3systems/go-substrate/client/db/types"
 	clienttypes "github.com/c3systems/go-substrate/client/types"
 	"github.com/c3systems/go-substrate/common/db"
+	diskdb "github.com/c3systems/go-substrate/common/diskdb"
 	"github.com/c3systems/go-substrate/common/triedb"
 )
 
@@ -29,12 +35,6 @@ type BlockDB struct {
 	BlockData  StorageMethodU8a
 	Hash       StorageMethodU8a
 	Header     StorageMethodU8a
-}
-
-// StateDB ...
-type StateDB struct {
-	DB   *triedb.TrieDB
-	Code StorageMethodU8a
 }
 
 // InterfaceChainDbs ...
@@ -100,57 +100,119 @@ func (s *StorageMethodBn) OnUpdate(callback func(value *big.Int)) {
 
 // DB ...
 type DB struct {
-	blocks   *BlockDB
-	state    *StateDB
-	basePath string
-	config   *clientdbtypes.InterfaceDBConfig
+	BlocksDB *BlockDB
+	StateDB  *StateDB
+	BasePath string
+	Config   *clientdbtypes.Config
 }
 
 // NewDB ...
 func NewDB(config *clienttypes.ConfigClient, chain *clientchainloader.Loader) *DB {
-	d := &DB{}
-	d.config = config.DB
-	_ = d
-	//blocks := NewBlockDB(config)
-	/*
-	   this.config = db;
-	    this.basePath = db.type === 'disk'
-	      ? path.join(db.path, 'chains', chain.id, u8aToHex(chain.genesisRoot))
-	      : '';
-
-	    // NOTE blocks compress very well
-	    this.blocks = createBlockDb(
-	      this.createBackingDb('block.db', true)
-	    );
-	    // NOTE state RLP does not compress well here
-	    this.state = createStateDb(
-	      new TrieDb(
-	        this.createBackingDb('state.db', false)
-	      )
-	    );
-
-	    this.blocks.db.open();
-	    this.state.db.open();
-	*/
-
-	// TODO
-	return &DB{
-		blocks: nil,
-		state:  nil,
+	if config == nil {
+		log.Fatal("config must not be nil")
 	}
+
+	ret := &DB{}
+	ret.Config = config.DB
+
+	if config.DB.Type == "disk" {
+		ret.BasePath = fmt.Sprintf("%s/chains/%s/%s", config.DB.Path, chain.ID, hex.EncodeToString(chain.GenesisRoot))
+	}
+
+	// NOTE: blocks compress very well
+	ret.BlocksDB = NewBlockDB(ret.createBackingDB("block.db", true))
+
+	basedb := ret.createBackingDB("state.db", false)
+	codec := triedb.NewTrieCodec()
+	// NOTE: state RLP does not compress well here
+	ret.StateDB = createStateDB(
+		triedb.NewTrieDB(
+			db.TXDB(db.NewTransactionDB(&basedb)),
+			nil,
+			codec,
+		),
+	)
+
+	ret.BlocksDB.DB.Open()
+	ret.StateDB.DB.Open()
+
+	return ret
+}
+
+// createBackingDB ...
+func (c *DB) createBackingDB(name string, isCompressed bool) db.BaseDB {
+	var dbs db.BaseDB
+	if c.Config.Type == "disk" {
+		diskdbs := diskdb.NewDiskDB(c.BasePath, name, &db.BaseDBOptions{
+			IsCompressed: isCompressed,
+		})
+		dbs = db.BaseDB(diskdbs)
+	} else {
+		memdb := db.NewMemoryDB(nil)
+		dbs = db.BaseDB(memdb)
+	}
+
+	return dbs
 }
 
 // Snapshot ...
 func (c *DB) Snapshot() {
-	// TODO
+	if !c.Config.Snapshot {
+		return
+	}
+
+	basedb := c.createBackingDB("state.db.snapshot", false)
+	codec := triedb.NewTrieCodec()
+	newDb := triedb.NewTrieDB(
+		db.TXDB(db.NewTransactionDB(&basedb)),
+		nil,
+		codec,
+	)
+
+	newDb.Open()
+
+	c.StateDB.DB.Snapshot(newDb, c.createProgress())
+	c.StateDB.DB.Close()
+	c.StateDB.DB.Rename(c.BasePath, fmt.Sprintf("state.db.backup-%d", time.Now().Unix()))
+
+	newDb.Close()
+	newDb.Rename(c.BasePath, "state.db")
+	newDb.Open()
+}
+
+// createProgress ...
+func (c *DB) createProgress() db.ProgressCB {
+	var lastUpdate int64
+	var spin int
+
+	spinner := []string{"|", "/", "-", "\\"}
+	prepend := strings.Repeat(" ", 37)
+
+	return func(progress *db.ProgressValue) {
+		now := time.Now().Unix()
+
+		if (now - lastUpdate) > 200 {
+			percent := fmt.Sprintf("      %v", progress.Percent)
+			percent = percent[len(percent)-6 : len(percent)]
+			keys := fmt.Sprintf("%d", progress.Keys)
+			if progress.Keys > 9999 {
+				keys = fmt.Sprintf("%vk", progress.Keys/1e3)
+			}
+
+			log.Printf("%s%s %s%%, %s keys\n", prepend, spinner[spin%len(spinner)], percent, keys)
+
+			lastUpdate = now
+			spin++
+		}
+	}
 }
 
 // Blocks ...
 func (c *DB) Blocks() *BlockDB {
-	return c.blocks
+	return c.BlocksDB
 }
 
 // State ...
 func (c *DB) State() *StateDB {
-	return c.state
+	return c.StateDB
 }
