@@ -23,9 +23,6 @@ import (
 
 // TODO ...
 
-// ChainName ...
-type ChainName struct{}
-
 // DevConfig ...
 type DevConfig struct {
 	genBlocks bool
@@ -43,7 +40,7 @@ type WasmConfig struct{}
 // ConfigClient ...
 type ConfigClient struct {
 	// TODO: types
-	Chain     *ChainName
+	Chain     *string
 	DB        *clientdbtypes.Config
 	Dev       *DevConfig
 	P2P       *ConfigP2P

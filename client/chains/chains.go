@@ -36,7 +36,7 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 	dbs := clientdb.NewDB(config, chain)
 
 	c := &Chain{
-		Chain:  chain.Chain(),
+		Chain:  chain.Chain,
 		Blocks: dbs.Blocks(),
 		State:  dbs.State(),
 	}
