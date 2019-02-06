@@ -15,7 +15,7 @@ import (
 	mocknet "github.com/libp2p/go-libp2p/p2p/net/mock"
 )
 
-func TestAdd(t *testing.T) {
+func TestPeers(t *testing.T) {
 	mn := mocknet.New(context.Background())
 	mh, err := mn.GenPeer()
 	if err != nil {
@@ -28,10 +28,6 @@ func TestAdd(t *testing.T) {
 	pi := pstore.PeerInfo{
 		ID: id,
 	}
-	//pr, err := peer.New(&clienttypes.ConfigClient{}, mockChains, pi)
-	//if err != nil {
-	//t.Fatalf("err generating peer\n%v", err)
-	//}
 
 	priv, pub, err := ic.GenerateKeyPairWithReader(ic.RSA, 256, rand.Reader)
 	if err != nil {
@@ -151,7 +147,7 @@ func TestAdd(t *testing.T) {
 			return
 		}
 
-		if _, err = prs.Get(pstore.PeerInfo{}); err == nil {
+		if _, err = prs.Get(pstore.PeerInfo{}); err == nil || err != ErrNoSuchPeer {
 			t.Error("expected err but got nil")
 			return
 		}
