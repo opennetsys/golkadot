@@ -21,13 +21,13 @@ func (t *Transactions) Decode(bytes []byte) error {
 	return nil
 }
 
-// Marshal returns json
-func (t *Transactions) Marshal() ([]byte, error) {
+// MarshalJSON returns json
+func (t *Transactions) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
-// Unmarshal converts json to a message
-func (t *Transactions) Unmarshal(bytes []byte) error {
+// UnmarshalJSON converts json to a message
+func (t *Transactions) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 

@@ -550,6 +550,7 @@ func (p *P2P) pingHandler(stream inet.Stream) {
 
 	// TODO: use read writer?
 	//rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
+	// TODO: use io.Pipe()?
 	r := bufio.NewReader(stream)
 	w := bufio.NewWriter(stream)
 

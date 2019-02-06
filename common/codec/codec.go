@@ -8,6 +8,7 @@ import (
 
 	codectypes "github.com/c3systems/go-substrate/common/codec/types"
 	"github.com/c3systems/go-substrate/common/u8compact"
+	"github.com/c3systems/go-substrate/logger"
 )
 
 func writeBinary(v interface{}) ([]byte, error) {
@@ -23,6 +24,7 @@ func writeBinary(v interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// TODO: this is an incomplete implementation...
 func encodeStruct(v *reflect.Value) ([]byte, error) {
 	if v == nil {
 		return nil, codectypes.ErrNilKind
@@ -106,14 +108,25 @@ func encode(v *reflect.Value) ([]byte, error) {
 		{
 			return encodeStruct(v)
 		}
-	case reflect.Array, reflect.Slice:
+	case reflect.Slice:
 		{
-			s := reflect.ValueOf(v)
-
 			// TODO: is this correct? What about len?
 			var tmpBytes []byte
-			for i := 0; i < s.Len(); i++ {
-				tmpBytes, err = Encode(s.Index(i))
+			for i := 0; i < (*v).Len(); i++ {
+				tmpBytes, err = Encode((*v).Index(i).Interface())
+				if err != nil {
+					return nil, err
+				}
+				ret = append(ret, tmpBytes...)
+			}
+			logger.Infof("ret %v", ret)
+		}
+	case reflect.Array:
+		{
+			// TODO: is this correct? What about len?
+			var tmpBytes []byte
+			for i := 0; i < (*v).Type().Len(); i++ {
+				tmpBytes, err = Encode((*v).Index(i).Interface())
 				if err != nil {
 					return nil, err
 				}

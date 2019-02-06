@@ -27,7 +27,7 @@ func (b *BlockRequestHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.In
 		return errors.New("nil message")
 	}
 
-	byt, err := msg.Marshal()
+	byt, err := msg.MarshalJSON()
 	if err != nil {
 		logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
 		return err

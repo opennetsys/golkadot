@@ -106,11 +106,9 @@ type InterfaceMessage interface {
 	// Decode deserializes a bytes array into a message
 	Decode(bytes []byte) error
 	// Marshal returns json
-	// TODO: change to MarshalJSON
-	Marshal() ([]byte, error)
+	MarshalJSON() ([]byte, error)
 	// Unmarshal converts json to a message
-	// TODO: change to UnmarshalJSON
-	Unmarshal(bytes []byte) error
+	UnmarshalJSON(bytes []byte) error
 	// Header ...
 	Header() *Header
 }

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io"
 	"math/big"
 
 	"github.com/c3systems/go-substrate/client/p2p/defaults"
@@ -211,7 +212,8 @@ func (p *Peer) Receive(stream inet.Stream) error {
 	// TODO: limit the number of bytes that can be read?
 	buf := new(bytes.Buffer)
 	n, err := buf.ReadFrom(stream)
-	if err != nil {
+	if err != nil && err != io.EOF {
+		logger.Errorf("[peer] err reading from stream\n%v", err)
 		return err
 	}
 
@@ -228,6 +230,10 @@ func (p *Peer) Receive(stream inet.Stream) error {
 	data := b[len(lengthBuf):]
 	lengthBuf = b[:len(lengthBuf)]
 	dataLen, err := binary.ReadVarint(bytes.NewBuffer(lengthBuf))
+	if err != nil {
+		logger.Errorf("[peer] err reading var int\n%v", err)
+		return err
+	}
 
 	if dataLen != int64(len(data)) {
 		logger.Errorf("[peer] expected data length %v, received %v", dataLen, len(data))
@@ -235,14 +241,14 @@ func (p *Peer) Receive(stream inet.Stream) error {
 	}
 
 	msg, err := clienttypes.DecodeMessage(data)
-	if err != nil {
+	if err != nil && err != io.EOF {
+		logger.Errorf("[peer] err decoding message\n%v", err)
 		return err
 	}
 
 	p.handleEvent(peertypes.Message, msg)
 
-	// TODO: is this correct?
-	if msg.Kind() == handlertypes.BFT {
+	if msg.Kind() == handlertypes.Status {
 		p.handleEvent(peertypes.Active, nil)
 	}
 

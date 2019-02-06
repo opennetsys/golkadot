@@ -1,10 +1,16 @@
 package clienttypes
 
 import (
-	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
-)
+	"encoding/json"
+	"errors"
+	"math/big"
 
-// TODO...
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
+	"github.com/c3systems/go-substrate/common/bnutil"
+	"github.com/c3systems/go-substrate/common/codec"
+	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/c3systems/go-substrate/logger"
+)
 
 // Kind ...
 func (b *BFT) Kind() handlertypes.FuncEnum {
@@ -12,22 +18,54 @@ func (b *BFT) Kind() handlertypes.FuncEnum {
 }
 
 // Encode serializes the message into a bytes array
+// TODO: fix...
 func (b *BFT) Encode() ([]byte, error) {
-	return nil, nil
+	jsn, err := b.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	msgBytes, err := codec.Encode(jsn)
+	if err != nil {
+		return nil, err
+	}
+
+	return u8util.Concat(bnutil.ToUint8Slice(big.NewInt(int64(handlertypes.BFT)), 8, true, false), msgBytes), nil
 }
 
 // Decode deserializes a bytes array into a message
-func (b *BFT) Decode(bytes []byte) error {
-	return nil
+// TODO: fix...
+func (b *BFT) Decode(data []byte) error {
+	if data == nil || len(data) == 0 {
+		return errors.New("nil data")
+	}
+
+	bn := bnutil.ToBN(data[0], true)
+	if bn == nil {
+		return errors.New("nil kind")
+	}
+
+	if bn.Int64() != int64(handlertypes.BFT) {
+		logger.Errorf("[bft] expected BFT, but received %v", bn.Int64())
+		return errors.New("wrong kind")
+	}
+
+	return b.UnmarshalJSON(data[1:])
 }
 
-// Marshal returns json
-func (b *BFT) Marshal() ([]byte, error) {
-	return nil, nil
+// MarshalJSON returns json
+func (b *BFT) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.Message)
 }
 
-// Unmarshal converts json to a message
-func (b *BFT) Unmarshal(bytes []byte) error {
+// UnmarshalJSON converts json to a message
+func (b *BFT) UnmarshalJSON(bytes []byte) error {
+	var msg map[string]interface{}
+	if err := json.Unmarshal(bytes, &msg); err != nil {
+		return err
+	}
+
+	b.Message = msg
 	return nil
 }
 

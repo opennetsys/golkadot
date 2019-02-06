@@ -21,6 +21,8 @@ github.com/go-interpreter/wagon/wasm/internal/readpos
 # github.com/gogo/protobuf v1.2.0
 github.com/gogo/protobuf/io
 github.com/gogo/protobuf/proto
+# github.com/golang/mock v1.2.0
+github.com/golang/mock/gomock
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
 # github.com/google/uuid v1.1.0
@@ -87,6 +89,7 @@ github.com/libp2p/go-libp2p/p2p/host/basic
 github.com/libp2p/go-libp2p/p2p/host/routed
 github.com/libp2p/go-libp2p/p2p/protocol/identify
 github.com/libp2p/go-libp2p/p2p/protocol/ping
+github.com/libp2p/go-libp2p/p2p/net/mock
 github.com/libp2p/go-libp2p/p2p/protocol/identify/pb
 # github.com/libp2p/go-libp2p-circuit v2.3.2+incompatible
 github.com/libp2p/go-libp2p-circuit
@@ -118,9 +121,12 @@ github.com/libp2p/go-libp2p-metrics
 github.com/libp2p/go-libp2p-nat
 # github.com/libp2p/go-libp2p-net v3.0.15+incompatible
 github.com/libp2p/go-libp2p-net
+# github.com/libp2p/go-libp2p-netutil v0.4.12
+github.com/libp2p/go-libp2p-netutil
 # github.com/libp2p/go-libp2p-peer v2.4.0+incompatible
 github.com/libp2p/go-libp2p-peer
 github.com/libp2p/go-libp2p-peer/peerset
+github.com/libp2p/go-libp2p-peer/test
 # github.com/libp2p/go-libp2p-peerstore v2.0.6+incompatible
 github.com/libp2p/go-libp2p-peerstore
 github.com/libp2p/go-libp2p-peerstore/pstoremem
@@ -156,6 +162,8 @@ github.com/libp2p/go-reuseport-transport
 github.com/libp2p/go-stream-muxer
 # github.com/libp2p/go-tcp-transport v2.0.16+incompatible
 github.com/libp2p/go-tcp-transport
+# github.com/libp2p/go-testutil v1.2.10
+github.com/libp2p/go-testutil
 # github.com/mattn/go-colorable v0.0.9
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.4

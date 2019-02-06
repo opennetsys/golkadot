@@ -129,7 +129,7 @@ func NewVirtualMachine(
 				}
 				m.Base.Memory = &wasm.SectionMemories{
 					Entries: []wasm.Memory{
-						{
+						wasm.Memory{
 							Limits: wasm.ResizableLimits{
 								Initial: uint32(config.DefaultMemoryPages),
 							},
@@ -143,7 +143,7 @@ func NewVirtualMachine(
 				}
 				m.Base.Table = &wasm.SectionTables{
 					Entries: []wasm.Table{
-						{
+						wasm.Table{
 							Limits: wasm.ResizableLimits{
 								Initial: uint32(config.DefaultTableSize),
 							},

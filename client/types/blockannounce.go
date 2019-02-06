@@ -21,13 +21,13 @@ func (b *BlockAnnounce) Decode(bytes []byte) error {
 	return nil
 }
 
-// Marshal returns json
-func (b *BlockAnnounce) Marshal() ([]byte, error) {
+// MarshalJSON returns json
+func (b *BlockAnnounce) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
-// Unmarshal converts json to a message
-func (b *BlockAnnounce) Unmarshal(bytes []byte) error {
+// UnmarshalJSON converts json to a message
+func (b *BlockAnnounce) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 

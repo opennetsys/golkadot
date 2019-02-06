@@ -4,6 +4,8 @@ import (
 	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 )
 
+// TODO
+
 // Kind ...
 func (s *Status) Kind() handlertypes.FuncEnum {
 	return handlertypes.Status
@@ -19,13 +21,13 @@ func (s *Status) Decode(bytes []byte) error {
 	return nil
 }
 
-// Marshal returns json
-func (s *Status) Marshal() ([]byte, error) {
+// MarshalJSON returns json
+func (s *Status) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
-// Unmarshal converts json to a message
-func (s *Status) Unmarshal(bytes []byte) error {
+// UnmarshalJSON converts json to a message
+func (s *Status) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 

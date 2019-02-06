@@ -213,10 +213,14 @@ type BlockResponse struct {
 }
 
 // BFT ...
-type BFT struct{}
+type BFT struct {
+	Message map[string]interface{}
+}
 
 // BlockAnnounce ...
-type BlockAnnounce struct{}
+type BlockAnnounce struct {
+	Message map[string]interface{}
+}
 
 // Transactions ...
 type Transactions struct{}

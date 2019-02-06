@@ -92,34 +92,34 @@ func (m *Module) populateTables() error {
 	if m.Table == nil || len(m.Table.Entries) == 0 || m.Elements == nil || len(m.Elements.Entries) == 0 {
 		return nil
 	}
-	/*
-		for _, elem := range m.Elements.Entries {
-			// the MVP dictates that index should always be zero, we shuold
-			// probably check this
-			if int(elem.Index) >= len(m.TableIndexSpace) {
-				return InvalidTableIndexError(elem.Index)
-			}
+/*
+	for _, elem := range m.Elements.Entries {
+		// the MVP dictates that index should always be zero, we shuold
+		// probably check this
+		if int(elem.Index) >= len(m.TableIndexSpace) {
+			return InvalidTableIndexError(elem.Index)
+		}
 
-			val, err := m.ExecInitExpr(elem.Offset)
-			if err != nil {
-				return err
-			}
-			offset, ok := val.(int32)
-			if !ok {
-				return InvalidValueTypeInitExprError{reflect.Int32, reflect.TypeOf(val).Kind()}
-			}
+		val, err := m.ExecInitExpr(elem.Offset)
+		if err != nil {
+			return err
+		}
+		offset, ok := val.(int32)
+		if !ok {
+			return InvalidValueTypeInitExprError{reflect.Int32, reflect.TypeOf(val).Kind()}
+		}
 
-			table := m.TableIndexSpace[int(elem.Index)]
-			if int(offset)+len(elem.Elems) > len(table) {
-				data := make([]uint32, int(offset)+len(elem.Elems))
-				copy(data[offset:], elem.Elems)
-				copy(data, table)
-				m.TableIndexSpace[int(elem.Index)] = data
-			} else {
-				copy(table[int(offset):], elem.Elems)
-				m.TableIndexSpace[int(elem.Index)] = table
-			}
-		}*/
+		table := m.TableIndexSpace[int(elem.Index)]
+		if int(offset)+len(elem.Elems) > len(table) {
+			data := make([]uint32, int(offset)+len(elem.Elems))
+			copy(data[offset:], elem.Elems)
+			copy(data, table)
+			m.TableIndexSpace[int(elem.Index)] = data
+		} else {
+			copy(table[int(offset):], elem.Elems)
+			m.TableIndexSpace[int(elem.Index)] = table
+		}
+	}*/
 
 	logger.Printf("There are %d entries in the table index space.", len(m.TableIndexSpace))
 	return nil
@@ -140,32 +140,32 @@ func (m *Module) populateLinearMemory() error {
 		return nil
 	}
 	// each module can only have a single linear memory in the MVP
-	/*
-		for _, entry := range m.Data.Entries {
-			if entry.Index != 0 {
-				return InvalidLinearMemoryIndexError(entry.Index)
-			}
+/*
+	for _, entry := range m.Data.Entries {
+		if entry.Index != 0 {
+			return InvalidLinearMemoryIndexError(entry.Index)
+		}
 
-			val, err := m.ExecInitExpr(entry.Offset)
-			if err != nil {
-				return err
-			}
-			offset, ok := val.(int32)
-			if !ok {
-				return InvalidValueTypeInitExprError{reflect.Int32, reflect.TypeOf(val).Kind()}
-			}
+		val, err := m.ExecInitExpr(entry.Offset)
+		if err != nil {
+			return err
+		}
+		offset, ok := val.(int32)
+		if !ok {
+			return InvalidValueTypeInitExprError{reflect.Int32, reflect.TypeOf(val).Kind()}
+		}
 
-			memory := m.LinearMemoryIndexSpace[int(entry.Index)]
-			if int(offset)+len(entry.Data) > len(memory) {
-				data := make([]byte, int(offset)+len(entry.Data))
-				copy(data[offset:], entry.Data)
-				copy(data, memory)
-				m.LinearMemoryIndexSpace[int(entry.Index)] = data
-			} else {
-				copy(memory[int(offset):], entry.Data)
-				m.LinearMemoryIndexSpace[int(entry.Index)] = memory
-			}
-		}*/
+		memory := m.LinearMemoryIndexSpace[int(entry.Index)]
+		if int(offset)+len(entry.Data) > len(memory) {
+			data := make([]byte, int(offset)+len(entry.Data))
+			copy(data[offset:], entry.Data)
+			copy(data, memory)
+			m.LinearMemoryIndexSpace[int(entry.Index)] = data
+		} else {
+			copy(memory[int(offset):], entry.Data)
+			m.LinearMemoryIndexSpace[int(entry.Index)] = memory
+		}
+	}*/
 
 	return nil
 }

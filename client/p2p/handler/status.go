@@ -28,7 +28,7 @@ func (s *StatusHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.Interfac
 		return errors.New("nil message")
 	}
 
-	b, err := msg.Marshal()
+	b, err := msg.MarshalJSON()
 	if err != nil {
 		logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
 		return err

@@ -3,6 +3,7 @@ package clienttypes
 import (
 	"errors"
 
+	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
 	"github.com/c3systems/go-substrate/logger"
 )
 
@@ -12,51 +13,51 @@ func DecodeMessage(data []byte) (InterfaceMessage, error) {
 		return nil, errors.New("data is nil")
 	}
 
-	switch data[0] {
-	case 0:
-		{
-			ret := &BFT{}
-			err := ret.Decode(data)
-			return ret, err
-		}
-	case 1:
-		{
-			ret := &BlockAnnounce{}
-			err := ret.Decode(data)
-			return ret, err
-
-		}
-	case 2:
-		{
-			ret := &BlockRequest{}
-			err := ret.Decode(data)
-			return ret, err
-
-		}
-	case 3:
-		{
-			ret := &BlockResponse{}
-			err := ret.Decode(data)
-			return ret, err
-
-		}
-	case 4:
+	switch int(data[0]) {
+	case int(handlertypes.Status):
 		{
 			ret := &Status{}
 			err := ret.Decode(data)
 			return ret, err
 
 		}
-	case 5:
+	case int(handlertypes.BlockRequest):
+		{
+			ret := &BlockRequest{}
+			err := ret.Decode(data)
+			return ret, err
+
+		}
+	case int(handlertypes.BlockResponse):
+		{
+			ret := &BlockResponse{}
+			err := ret.Decode(data)
+			return ret, err
+
+		}
+	case int(handlertypes.BlockAnnounce):
+		{
+			ret := &BlockAnnounce{}
+			err := ret.Decode(data)
+			return ret, err
+
+		}
+	case int(handlertypes.Transactions):
 		{
 			ret := &Transactions{}
 			err := ret.Decode(data)
 			return ret, err
 
 		}
+	case int(handlertypes.BFT):
+		{
+			ret := &BFT{}
+			err := ret.Decode(data)
+			return ret, err
+		}
 	default:
 		{
-			logger.Errorf("[client types] received message with id %d", int(data[0]))
+			logger.Errorf("[client types] received unknown message with id %d", int(data[0]))
 			return nil, errors.New("unknown message")
 		}
 	}
