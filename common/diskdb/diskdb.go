@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/c3systems/go-substrate/common/db"
-	"github.com/c3systems/go-substrate/common/fileflatdb"
+	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/go-substrate/common/fileflatdb"
 )
 
 // DiskDB ...

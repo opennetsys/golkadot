@@ -3,8 +3,8 @@ package types
 import (
 	"reflect"
 
-	"github.com/c3systems/go-substrate/common"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 // Option is an optional field. Basically the first byte indicates that there is is value to follow. If the byte is `1` there is an actual value. So the Option implements that - decodes, checks for optionality and wraps the required structure with a value if/as required/found.

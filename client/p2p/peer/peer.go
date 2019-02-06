@@ -6,11 +6,11 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/c3systems/go-substrate/client/p2p/defaults"
-	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/common/u8util"
-	"github.com/c3systems/go-substrate/logger"
+	"github.com/opennetsys/go-substrate/client/p2p/defaults"
+	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/logger"
 
 	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"

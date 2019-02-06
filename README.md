@@ -40,6 +40,11 @@ For contributions please create a new branch and submit a pull request for revie
 
 Please follow [best practices](https://chris.beams.io/posts/git-commit/) such as using [present-tense](https://stackoverflow.com/a/3580764/1439168) commit messages.
 
+## Resources
+
+- [Polkadot Spec](https://github.com/w3f/polkadot-spec/blob/master/spec.md)
+- [Polkadot Runtime Environment Spec](https://github.com/w3f/polkadot-re-spec/blob/master/polkadot_re_spec.pdf)
+
 ## License
 
 [GNU GPLv3](LICENSE)

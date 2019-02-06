@@ -1,8 +1,8 @@
 package triedb
 
 import (
-	"github.com/c3systems/go-substrate/common/triecodec"
-	"github.com/c3systems/go-substrate/common/triehash"
+	"github.com/opennetsys/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/triehash"
 )
 
 // Checkpoint ...

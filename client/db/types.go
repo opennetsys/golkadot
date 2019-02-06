@@ -1,6 +1,6 @@
 package clientdb
 
-import "github.com/c3systems/go-substrate/common/triedb"
+import "github.com/opennetsys/go-substrate/common/triedb"
 
 // DefaultPath ...
 var DefaultPath = "~/.go-substrate"

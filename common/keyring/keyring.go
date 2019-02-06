@@ -3,11 +3,11 @@ package keyring
 import (
 	"errors"
 
-	"github.com/c3systems/go-substrate/common/crypto"
-	"github.com/c3systems/go-substrate/common/keyring/address"
-	"github.com/c3systems/go-substrate/common/keyring/pair"
-	keytypes "github.com/c3systems/go-substrate/common/keyring/types"
-	"github.com/c3systems/go-substrate/common/mnemonic"
+	"github.com/opennetsys/go-substrate/common/crypto"
+	"github.com/opennetsys/go-substrate/common/keyring/address"
+	"github.com/opennetsys/go-substrate/common/keyring/pair"
+	keytypes "github.com/opennetsys/go-substrate/common/keyring/types"
+	"github.com/opennetsys/go-substrate/common/mnemonic"
 )
 
 // New ...

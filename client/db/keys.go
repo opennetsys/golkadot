@@ -1,8 +1,8 @@
 package clientdb
 
 import (
-	storagetypes "github.com/c3systems/go-substrate/storagetypes"
-	types "github.com/c3systems/go-substrate/types"
+	storagetypes "github.com/opennetsys/go-substrate/client/storage/types"
+	types "github.com/opennetsys/go-substrate/types"
 )
 
 // StorageFunctionMetadata, StorageFunctionModifier, StorageFunctionType from @polkadot/types/Metadata/Modules

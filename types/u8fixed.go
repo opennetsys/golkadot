@@ -3,7 +3,7 @@ package types
 import (
 	"reflect"
 
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 // DefaultBitLength ...

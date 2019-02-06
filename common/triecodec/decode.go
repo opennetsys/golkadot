@@ -4,7 +4,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/c3systems/go-substrate/common/u8compact"
+	"github.com/opennetsys/go-substrate/common/u8compact"
 )
 
 // Decode ...

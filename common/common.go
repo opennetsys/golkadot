@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/c3systems/go-substrate/common/bnutil"
-	"github.com/c3systems/go-substrate/common/hexutil"
-	"github.com/c3systems/go-substrate/common/u8compact"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/bnutil"
+	"github.com/opennetsys/go-substrate/common/hexutil"
+	"github.com/opennetsys/go-substrate/common/u8compact"
+	"github.com/opennetsys/go-substrate/common/u8util"
 	"github.com/davecgh/go-spew/spew"
 )
 

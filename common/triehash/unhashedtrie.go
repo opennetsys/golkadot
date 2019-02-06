@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"sort"
 
-	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/triecodec"
 )
 
 // UnhashedTrie ...

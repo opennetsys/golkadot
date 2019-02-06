@@ -3,14 +3,14 @@ package clienttypes
 import (
 	"math/big"
 
-	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
-	peertypes "github.com/c3systems/go-substrate/client/p2p/peer/types"
-	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
-	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
-	p2ptypes "github.com/c3systems/go-substrate/client/p2p/types"
-	"github.com/c3systems/go-substrate/common/crypto"
 	inet "github.com/libp2p/go-libp2p-net"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
+	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
+	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
+	peerstypes "github.com/opennetsys/go-substrate/client/p2p/peers/types"
+	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
+	p2ptypes "github.com/opennetsys/go-substrate/client/p2p/types"
+	"github.com/opennetsys/go-substrate/common/crypto"
 )
 
 // InterfaceSync defines the methods of the sync service

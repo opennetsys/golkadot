@@ -3,8 +3,8 @@ package keyring
 import (
 	"testing"
 
-	"github.com/c3systems/go-substrate/common/keyring/address"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/keyring/address"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 func TestKeyRing(t *testing.T) {

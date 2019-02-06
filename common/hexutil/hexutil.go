@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/c3systems/go-substrate/common/mathutil"
+	"github.com/opennetsys/go-substrate/common/mathutil"
 )
 
 var (

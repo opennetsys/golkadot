@@ -1,8 +1,8 @@
 package loader
 
 import (
-	clientchaintypes "github.com/c3systems/go-substrate/client/chains/types"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	clientchaintypes "github.com/opennetsys/go-substrate/client/chains/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-chains/src/loader.ts

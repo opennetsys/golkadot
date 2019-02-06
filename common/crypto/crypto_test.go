@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 func TestNewSHA256(t *testing.T) {

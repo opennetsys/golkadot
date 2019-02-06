@@ -3,8 +3,8 @@ package triehash
 import (
 	"math/big"
 
-	"github.com/c3systems/go-substrate/common/triecodec"
-	"github.com/c3systems/go-substrate/common/u8compact"
+	"github.com/opennetsys/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/u8compact"
 )
 
 // TrieRoot creates a trie hash from the supplied pairs.

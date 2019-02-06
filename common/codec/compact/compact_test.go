@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	codectypes "github.com/c3systems/go-substrate/common/codec/types"
-	"github.com/c3systems/go-substrate/common/u8util"
+	codectypes "github.com/opennetsys/go-substrate/common/codec/types"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 func TestBNToCompact(t *testing.T) {

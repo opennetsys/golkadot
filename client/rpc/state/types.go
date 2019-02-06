@@ -1,8 +1,8 @@
 package state
 
 import (
-	"github.com/c3systems/go-substrate/client/p2p/pubsub"
-	"github.com/c3systems/go-substrate/common/storage"
+	"github.com/opennetsys/go-substrate/client/p2p/pubsub"
+	"github.com/opennetsys/go-substrate/common/storage"
 )
 
 // Service implements the service interface

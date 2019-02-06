@@ -1,8 +1,8 @@
 package clientdb
 
 import (
-	"github.com/c3systems/go-substrate/common/db"
-	types "github.com/c3systems/go-substrate/types"
+	"github.com/opennetsys/go-substrate/common/db"
+	types "github.com/opennetsys/go-substrate/types"
 )
 
 func createU8a(dbs db.BaseDB, fn types.StorageFunction) StorageMethodU8a {

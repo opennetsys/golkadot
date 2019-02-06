@@ -1,7 +1,7 @@
 package clienttypes
 
 import (
-	"github.com/c3systems/go-substrate/common/keyring/address"
+	"github.com/opennetsys/go-substrate/common/keyring/address"
 )
 
 // Encode ...

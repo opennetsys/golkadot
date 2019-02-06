@@ -3,8 +3,8 @@ package peers
 import (
 	"errors"
 
-	peerstypes "github.com/c3systems/go-substrate/client/p2p/peers/types"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	peerstypes "github.com/opennetsys/go-substrate/client/p2p/peers/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 	libp2pHost "github.com/libp2p/go-libp2p-host"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"

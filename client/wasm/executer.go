@@ -1,10 +1,10 @@
 package wasm
 
 import (
-	clientdb "github.com/c3systems/go-substrate/client/db"
-	"github.com/c3systems/go-substrate/client/runtime"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/types"
+	clientdb "github.com/opennetsys/go-substrate/client/db"
+	"github.com/opennetsys/go-substrate/client/runtime"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/types"
 )
 
 // Executer ...

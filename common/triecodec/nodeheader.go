@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/c3systems/go-substrate/common/crypto"
+	"github.com/opennetsys/go-substrate/common/crypto"
 	"github.com/davecgh/go-spew/spew"
 )
 

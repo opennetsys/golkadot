@@ -1,6 +1,6 @@
 package clienttypes
 
-import pcrypto "github.com/c3systems/go-substrate/common/crypto"
+import pcrypto "github.com/opennetsys/go-substrate/common/crypto"
 
 // TODO
 // https://github.com/polkadot-js/api/blob/master/packages/types/src/Header.ts

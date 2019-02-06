@@ -1,7 +1,7 @@
 package types
 
 import (
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 )
 
 // ChainJSON ...

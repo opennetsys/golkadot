@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/c3systems/go-substrate/client/p2p/defaults"
-	synctypes "github.com/c3systems/go-substrate/client/p2p/sync/types"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/common/u8util"
-	"github.com/c3systems/go-substrate/logger"
+	"github.com/opennetsys/go-substrate/client/p2p/defaults"
+	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/logger"
 )
 
 // note: ensure the struct emplements the interface

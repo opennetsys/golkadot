@@ -1,7 +1,7 @@
 package storagetypes
 
 import (
-	types "github.com/c3systems/go-substrate/types"
+	types "github.com/opennetsys/go-substrate/types"
 )
 
 // TODO https://github.com/polkadot-js/api/blob/master/packages/type-storage/src/utils/createFunction.ts#L48

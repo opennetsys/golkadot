@@ -3,8 +3,8 @@ package rpc
 import (
 	"errors"
 
-	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/logger"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/logger"
 	gorpc "github.com/libp2p/go-libp2p-gorpc"
 )
 

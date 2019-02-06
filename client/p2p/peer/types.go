@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math/big"
 
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 )

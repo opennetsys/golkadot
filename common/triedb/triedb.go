@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/c3systems/go-substrate/common/db"
-	"github.com/c3systems/go-substrate/common/triecodec"
-	"github.com/c3systems/go-substrate/common/triehash"
+	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/triehash"
 )
 
 // TrieDB ...

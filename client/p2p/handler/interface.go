@@ -1,8 +1,8 @@
 package handler
 
 import (
-	handlertypes "github.com/c3systems/go-substrate/client/p2p/handler/types"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 )
 
 // InterfaceHandler describes the methods of the handler package

@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"time"
 
-	clienttypes "github.com/c3systems/go-substrate/client/types"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts

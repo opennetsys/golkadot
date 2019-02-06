@@ -3,7 +3,7 @@ package fileflatdb
 import (
 	"log"
 
-	"github.com/c3systems/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/triecodec"
 	"github.com/golang/snappy"
 )
 

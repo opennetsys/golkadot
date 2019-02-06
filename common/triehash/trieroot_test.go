@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/c3systems/go-substrate/common/chainspec"
-	"github.com/c3systems/go-substrate/common/stringutil"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/chainspec"
+	"github.com/opennetsys/go-substrate/common/stringutil"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 func TestTrieRoot(t *testing.T) {

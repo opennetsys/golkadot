@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/c3systems/go-substrate/client"
-	"github.com/c3systems/go-substrate/client/p2p"
-	"github.com/c3systems/go-substrate/client/rpc"
-	"github.com/c3systems/go-substrate/client/telemetry"
-	clienttypes "github.com/c3systems/go-substrate/client/types"
-	"github.com/c3systems/go-substrate/client/wasm"
-	"github.com/c3systems/go-substrate/common/db"
-	"github.com/c3systems/go-substrate/logger"
+	"github.com/opennetsys/go-substrate/client"
+	"github.com/opennetsys/go-substrate/client/p2p"
+	"github.com/opennetsys/go-substrate/client/rpc"
+	"github.com/opennetsys/go-substrate/client/telemetry"
+	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/client/wasm"
+	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/go-substrate/logger"
 	"github.com/spf13/cobra"
 )
 

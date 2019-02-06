@@ -5,9 +5,9 @@ import (
 	"log"
 	"math"
 
-	"github.com/c3systems/go-substrate/common/db"
-	"github.com/c3systems/go-substrate/common/triecodec"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/go-substrate/common/triecodec"
+	"github.com/opennetsys/go-substrate/common/u8util"
 	"github.com/davecgh/go-spew/spew"
 )
 

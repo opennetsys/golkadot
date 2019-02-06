@@ -1,6 +1,6 @@
 package triecodec
 
-import "github.com/c3systems/go-substrate/common/hexutil"
+import "github.com/opennetsys/go-substrate/common/hexutil"
 
 // helper
 func hexToU8a(s string) []uint8 {

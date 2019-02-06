@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/c3systems/go-substrate/common/triehash"
+	"github.com/opennetsys/go-substrate/common/triehash"
 )
 
 func TestSnapshots(t *testing.T) {

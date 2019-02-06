@@ -1,8 +1,8 @@
 package triedb
 
 import (
-	"github.com/c3systems/go-substrate/common/crypto"
-	"github.com/c3systems/go-substrate/common/db"
+	"github.com/opennetsys/go-substrate/common/crypto"
+	"github.com/opennetsys/go-substrate/common/db"
 	"github.com/davecgh/go-spew/spew"
 )
 

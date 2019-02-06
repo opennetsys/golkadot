@@ -1,7 +1,7 @@
 package pair
 
 import (
-	ktypes "github.com/c3systems/go-substrate/common/keyring/types"
+	ktypes "github.com/opennetsys/go-substrate/common/keyring/types"
 )
 
 // InterfacePair ...

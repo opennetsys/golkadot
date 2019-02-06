@@ -4,9 +4,9 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/c3systems/go-substrate/common/codec"
-	codectypes "github.com/c3systems/go-substrate/common/codec/types"
-	"github.com/c3systems/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/common/codec"
+	codectypes "github.com/opennetsys/go-substrate/common/codec/types"
+	"github.com/opennetsys/go-substrate/common/u8util"
 )
 
 // BNToCompact ...
