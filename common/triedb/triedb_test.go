@@ -1,6 +1,7 @@
 package triedb
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -13,7 +14,9 @@ func newTrie(codec InterfaceCodec) *TrieDB {
 	txdbt := db.NewTransactionDB(&basedb)
 	txdb := db.TXDB(txdbt)
 	trie := NewTrieDB(txdb, nil, codec)
-	trie.SetDebug(true)
+	if os.Getenv("DEBUG") != "" {
+		trie.SetDebug(true)
+	}
 	return trie
 }
 

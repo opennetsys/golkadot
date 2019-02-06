@@ -46,7 +46,7 @@ test/clientdb:
 
 .PHONY: test/clientchain
 test/clientchain:
-	@go test -v client/chains/*.go
+	@go test -v client/chain/*.go
 
 .PHONY: test/client/chainloader
 test/client/chainloader:

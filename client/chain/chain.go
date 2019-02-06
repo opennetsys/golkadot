@@ -1,17 +1,17 @@
-package chains
+package clientchain
 
 import (
 	"fmt"
 	"log"
 	"math/big"
 
-	clientchainloader "github.com/opennetsys/go-substrate/client/chains/loader"
-	clientchaintypes "github.com/opennetsys/go-substrate/client/chains/types"
+	clientchainloader "github.com/opennetsys/go-substrate/client/chain/loader"
+	clientchaintypes "github.com/opennetsys/go-substrate/client/chain/types"
 	clientdb "github.com/opennetsys/go-substrate/client/db"
-	"github.com/opennetsys/go-substrate/client/runtime"
+	clientruntime "github.com/opennetsys/go-substrate/client/runtime"
 	storagetypes "github.com/opennetsys/go-substrate/client/storage/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/client/wasm"
+	clientwasm "github.com/opennetsys/go-substrate/client/wasm"
 	"github.com/opennetsys/go-substrate/common/crypto"
 	"github.com/opennetsys/go-substrate/common/hexutil"
 	"github.com/opennetsys/go-substrate/common/triehash"
@@ -24,13 +24,12 @@ import (
 type Chain struct {
 	Blocks   *clientdb.BlockDB
 	Chain    *clientchaintypes.ChainJSON
-	Executor *wasm.Executer
+	Executor *clientwasm.Executer
 	Genesis  *clientchaintypes.ChainGenesis
 	State    *clientdb.StateDB
 }
 
 // NewChain ...
-// TODO: configClient?
 func NewChain(config *clienttypes.ConfigClient) *Chain {
 	chain := clientchainloader.NewLoader(config)
 	dbs := clientdb.NewDB(config, chain)
@@ -42,7 +41,6 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 	}
 
 	c.Genesis = c.InitGenesis()
-
 	bestHash := c.Blocks.BestHash.Get()
 	bestNumber := c.Blocks.BestNumber.Get()
 	logGenesis := ""
@@ -55,8 +53,8 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 	// NOTE: Snapshot _before_ we attach the runtime since it ties directly to the backing DBs
 	dbs.Snapshot()
 
-	runtime := runtime.NewRuntime(c.State.DB)
-	c.Executor = wasm.NewExecuter(config, c.Blocks, c.State, runtime)
+	runtime := clientruntime.NewRuntime(c.State.DB)
+	c.Executor = clientwasm.NewExecuter(config, c.Blocks, c.State, runtime)
 
 	return c
 }
@@ -137,6 +135,7 @@ func (c *Chain) GetBlock(headerHash []uint8) *clienttypes.BlockData {
 // GetCode ...
 func (c *Chain) GetCode() []uint8 {
 	_, decodedValue := u8compact.StripLength(storagetypes.Substrate.Code(), 32)
+
 	code := c.State.DB.Get(decodedValue)
 
 	if code == nil || len(code) == 0 {

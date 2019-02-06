@@ -3,7 +3,7 @@ package clientdb
 import (
 	"testing"
 
-	clientchainloader "github.com/opennetsys/go-substrate/client/chains/loader"
+	clientchainloader "github.com/opennetsys/go-substrate/client/chain/loader"
 	clientdbtypes "github.com/opennetsys/go-substrate/client/db/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
 )

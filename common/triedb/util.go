@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 
 	"github.com/opennetsys/go-substrate/common/crypto"
 	"github.com/opennetsys/go-substrate/common/triecodec"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // GetNodeType ...
@@ -202,55 +202,54 @@ func Size(value interface{}) int {
 
 // DecodeNode ...
 func DecodeNode(encoded Node, codec InterfaceCodec) Node {
-	fmt.Println("Debug: DecodedNode, encoded input", encoded)
+	debugLog("DecodedNode, encoded input", encoded)
 	if IsNull(encoded) || Size(encoded) == 0 {
-		fmt.Println("Debug: DecodedNode, is null, returning nil")
+		debugLog("DecodedNode, is null, returning nil")
 		return nil
 	}
 
 	// replaces above isSlice func
 	// TODO: refactor
 	if IsMultiSlice(encoded) {
-		fmt.Println("Debug: DecodeNode is 'array', returning", encoded)
+		debugLog("DecodeNode is 'array', returning", encoded)
 		return encoded
 	}
 
 	encodedSlice := NewUint8FromNode(encoded)
 
-	fmt.Println(encodedSlice)
-	spew.Dump(encodedSlice)
+	debugLog("DecodeNode: encodedslice", encodedSlice)
 
-	fmt.Println("Debug: DecodeNode is not 'array'")
-	fmt.Println("Debug: DecodeNode, encoded arg to codec decoder", encodedSlice)
+	debugLog("DecodeNode is not 'array'")
+	debugLog("DecodeNode, encoded arg to codec decoder", encodedSlice)
 
 	var decoded []interface{}
 	if err := codec.Decode(encodedSlice, &decoded); err != nil {
-		log.Println("Debug: DecodedNode, DecodeBytes err", err)
+		debugLog("DecodedNode, DecodeBytes err", err)
 		return encoded
 	}
 
-	fmt.Println("Debug: DecodeNode, decoded bytes from codec decoder", decoded)
+	debugLog("DecodeNode, decoded bytes from codec decoder", decoded)
 
 	var nodes []Node
 	for _, s := range decoded {
 		nodes = append(nodes, NewNode(s))
 	}
 
-	fmt.Println("Debug: DecodeNode, decoded bytes to Node type", nodes)
+	debugLog("DecodeNode, decoded bytes to Node type", nodes)
 
 	return nodes
 }
 
 // EncodeNode ...
 func EncodeNode(node Node, codec InterfaceCodec) []uint8 {
-	fmt.Println("Debug: EncodeNode, node input", node)
+	debugLog("EncodeNode, node input", node)
 
 	encoded, err := codec.Encode(node)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Debug: EncodeNode, encoded bytes from codec encoder", encoded)
+	debugLog("EncodeNode, encoded bytes from codec encoder", encoded)
 
 	return encoded
 }
@@ -360,4 +359,17 @@ func IsMultiSlice(value interface{}) bool {
 	default:
 		return false
 	}
+}
+
+var debugEnabled bool
+
+func debugLog(args ...interface{}) {
+	if debugEnabled {
+		args = append([]interface{}{"Debug: "}, args...)
+		fmt.Println(args...)
+	}
+}
+
+func init() {
+	debugEnabled = os.Getenv("DEBUG") != ""
 }

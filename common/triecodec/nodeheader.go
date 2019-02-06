@@ -1,11 +1,10 @@
 package triecodec
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/opennetsys/go-substrate/common/crypto"
 )
 
 // Null ...
@@ -178,22 +177,22 @@ func (n *NodeHeader) ToUint8Slice() []uint8 {
 
 // DecodeNodeHeader ...
 func DecodeNodeHeader(input interface{}) (int, interface{}) {
-	fmt.Println("Debug: triecodec, DecodeNodeHeader, input", input)
+	debugLog("triecodec, DecodeNodeHeader, input", input)
 
 	switch v := input.(type) {
 	case []uint8:
-		fmt.Println("Debug: triecodec, DecodeNodeHeader, is []uint8")
+		debugLog("triecodec, DecodeNodeHeader, is []uint8")
 		return DecodeNodeHeaderUint8Slice(v)
 	case []interface{}:
 		if len(v) == 1 {
 			arr, ok := v[0].([]uint8)
 			if ok {
-				fmt.Println("Debug: triecodec, DecodeNodeHeader, 0 is []uint8")
+				debugLog("triecodec, DecodeNodeHeader, 0 is []uint8")
 				return DecodeNodeHeaderUint8Slice(arr)
 			}
 		}
 
-		fmt.Println("Debug: triecodec, DecodeNodeHeader, slices")
+		debugLog("triecodec, DecodeNodeHeader, slices")
 		return DecodeNodeHeaderUint8Slices(v)
 	}
 
@@ -232,7 +231,7 @@ func DecodeNodeHeaderUint8Slice(input []uint8) (int, interface{}) {
 
 // DecodeNodeHeaderUint8Slices ...
 func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
-	fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices")
+	debugLog("triecodec, DecodeNodeHeaderUint8Slices")
 	var isNull bool
 	if len(input) == 1 {
 		switch input[0].(type) {
@@ -243,7 +242,7 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 		}
 	}
 
-	fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices size", len(input))
+	debugLog("triecodec, DecodeNodeHeaderUint8Slices size", len(input))
 	if len(input) == 0 || isNull {
 		return NODE_TYPE_NULL, NewNull()
 	} else if len(input) == 2 {
@@ -282,7 +281,7 @@ func DecodeNodeHeaderUint8Slices(input []interface{}) (int, interface{}) {
 			value = true
 		}
 
-		fmt.Println("Debug: triecodec, DecodeNodeHeaderUint8Slices returning new branch header", NODE_TYPE_BRANCH, value)
+		debugLog("triecodec, DecodeNodeHeaderUint8Slices returning new branch header", NODE_TYPE_BRANCH, value)
 		return NODE_TYPE_BRANCH, NewBranchHeader(value)
 	}
 

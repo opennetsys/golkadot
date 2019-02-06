@@ -13,7 +13,6 @@ import (
 	"github.com/opennetsys/go-substrate/common/hexutil"
 	"github.com/opennetsys/go-substrate/common/u8compact"
 	"github.com/opennetsys/go-substrate/common/u8util"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // ErrTypeUnsupported ...
@@ -200,7 +199,6 @@ func TypeToString(value interface{}) string {
 
 // TypeToHex ...
 func TypeToHex(value interface{}) string {
-	spew.Dump()
 	switch v := value.(type) {
 	case *big.Int:
 		return hexutil.HexFixLength(hex.EncodeToString(v.Bytes()), TypeBitLen(v), true)

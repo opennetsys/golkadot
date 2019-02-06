@@ -40,7 +40,7 @@ type WasmConfig struct{}
 // ConfigClient ...
 type ConfigClient struct {
 	// TODO: types
-	Chain     *string
+	Chain     string
 	DB        *clientdbtypes.Config
 	Dev       *DevConfig
 	P2P       *ConfigP2P

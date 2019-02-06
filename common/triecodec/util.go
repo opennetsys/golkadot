@@ -3,7 +3,9 @@ package triecodec
 import (
 	"fmt"
 	"math"
+	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/opennetsys/go-substrate/common/assert"
 	"github.com/opennetsys/go-substrate/common/u8util"
 )
@@ -91,4 +93,23 @@ func FuseNibbles(nibbles []uint8, isLeaf bool) []uint8 {
 	result = append(result, FromNibbles(nibbles[oddFlag:]))
 
 	return u8util.Concat(result...)
+}
+
+var debugEnabled bool
+
+func debugLog(args ...interface{}) {
+	if debugEnabled {
+		args = append([]interface{}{"Debug: "}, args...)
+		fmt.Println(args...)
+	}
+}
+
+func debugDump(i interface{}) {
+	if debugEnabled {
+		spew.Dump(i)
+	}
+}
+
+func init() {
+	debugEnabled = os.Getenv("DEBUG") != ""
 }

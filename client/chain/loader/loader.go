@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
-	clientchaintypes "github.com/opennetsys/go-substrate/client/chains/types"
+	chainjson "github.com/opennetsys/go-substrate/client/chain/json"
+	clientchaintypes "github.com/opennetsys/go-substrate/client/chain/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
 	"github.com/opennetsys/go-substrate/common/triehash"
 	"github.com/opennetsys/go-substrate/common/u8util"
@@ -19,18 +21,17 @@ type Loader struct {
 	GenesisRoot []uint8
 }
 
-var defaultChain = "../json/dev.json"
+var defaultChain = "dev"
 
 // NewLoader ...
 func NewLoader(config *clienttypes.ConfigClient) *Loader {
 	loader := &Loader{}
-	chain := config.Chain
 
-	if chain == nil {
-		chain = &defaultChain
+	if config.Chain == "" || config.Chain == "dev" {
+		loader.Chain = loadJSON([]byte(chainjson.Dev))
+	} else {
+		loader.Chain = loadJSONPath(config.Chain)
 	}
-
-	loader.Chain = LoadJSON(*chain)
 
 	loader.GenesisRoot = loader.CalculateGenesisRoot()
 	loader.ID = loader.Chain.ID
@@ -54,9 +55,15 @@ func (loader *Loader) CalculateGenesisRoot() []uint8 {
 	return triehash.TrieRoot(pairs)
 }
 
-// LoadJSON ...
-func LoadJSON(path string) *clientchaintypes.ChainJSON {
+// loadJSONPath...
+func loadJSONPath(path string) *clientchaintypes.ChainJSON {
 	var chain *clientchaintypes.ChainJSON
+
+	path, err := filepath.Abs(path)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		log.Fatalf("file at path %q does not exist", path)
@@ -70,6 +77,18 @@ func LoadJSON(path string) *clientchaintypes.ChainJSON {
 	}
 
 	err = json.Unmarshal(data, &chain)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
+	return chain
+}
+
+// loadJSON ...
+func loadJSON(data []byte) *clientchaintypes.ChainJSON {
+	var chain *clientchaintypes.ChainJSON
+	err := json.Unmarshal(data, &chain)
 	if err != nil {
 		log.Fatal(err)
 		return nil

@@ -1,14 +1,13 @@
 package triedb
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/triecodec"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/opennetsys/go-substrate/common/crypto"
+	"github.com/opennetsys/go-substrate/common/triecodec"
 )
 
 // InterfaceCodec ....
@@ -86,7 +85,7 @@ func (r *RLPCodec) Encode(value interface{}) ([]uint8, error) {
 		}
 	}
 
-	fmt.Println("Debug: Codec, Encode: normalized decoded arg to codec encoder", i)
+	debugLog("Codec, Encode: normalized decoded arg to codec encoder", i)
 
 	return rlp.EncodeToBytes(&i)
 }
@@ -199,7 +198,7 @@ func enc(input interface{}) interface{} {
 
 // Encode ...
 func (r *TrieCodec) Encode(value interface{}) ([]uint8, error) {
-	fmt.Println("Debug: triedb triecodec, Encode raw input", value)
+	debugLog("triedb triecodec, Encode raw input", value)
 
 	var input []interface{}
 
@@ -237,7 +236,7 @@ func (r *TrieCodec) Encode(value interface{}) ([]uint8, error) {
 		}
 	}
 
-	fmt.Println("Debug: triedb triecodec, Encode, normalized input", input)
+	debugLog("triedb triecodec, Encode, normalized input", input)
 
 	result := triecodec.Encode(input)
 	return result, nil

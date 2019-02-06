@@ -1,9 +1,9 @@
 package triedb
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/opennetsys/go-substrate/common/crypto"
 	"github.com/opennetsys/go-substrate/common/db"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // TODO: refactor
@@ -171,7 +171,6 @@ func NewUint8FromNode(value interface{}) []uint8 {
 
 // NewUint8ListFromNode ...
 func NewUint8ListFromNode(value interface{}) [][]uint8 {
-	spew.Dump(value)
 	var ret [][]uint8
 	switch v := value.(type) {
 	case [][]uint8:

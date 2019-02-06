@@ -1,4 +1,4 @@
-package types
+package clientchaintypes
 
 import (
 	clienttypes "github.com/opennetsys/go-substrate/client/types"

@@ -8,7 +8,6 @@ import (
 	"github.com/opennetsys/go-substrate/common/db"
 	"github.com/opennetsys/go-substrate/common/triecodec"
 	"github.com/opennetsys/go-substrate/common/u8util"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // TODO: refactor
@@ -399,7 +398,6 @@ func (i *Impl) NormalizeBranchNode(node []Node) Node {
 
 	for _, entry := range indexed {
 		i.DebugLog("NormalizeBranchNode, map filter, value", entry.value)
-		spew.Dump(entry.value)
 		if n := NewUint8FromNode(entry.value); len(n) > 0 {
 			if entry.value != nil {
 				mapped = append(mapped, entry)

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	clientchainloader "github.com/opennetsys/go-substrate/client/chains/loader"
+	clientchainloader "github.com/opennetsys/go-substrate/client/chain/loader"
 	clientdbtypes "github.com/opennetsys/go-substrate/client/db/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
 	"github.com/opennetsys/go-substrate/common/db"
