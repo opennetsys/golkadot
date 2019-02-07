@@ -3,14 +3,16 @@ package clienttypes
 import (
 	"math/big"
 
-	inet "github.com/libp2p/go-libp2p-net"
-	pstore "github.com/libp2p/go-libp2p-peerstore"
 	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
 	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
 	peerstypes "github.com/opennetsys/go-substrate/client/p2p/peers/types"
 	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
 	p2ptypes "github.com/opennetsys/go-substrate/client/p2p/types"
-	"github.com/opennetsys/go-substrate/common/crypto"
+	pcrypto "github.com/opennetsys/go-substrate/common/crypto"
+
+	inet "github.com/libp2p/go-libp2p-net"
+	libpeer "github.com/libp2p/go-libp2p-peer"
+	pstore "github.com/libp2p/go-libp2p-peerstore"
 )
 
 // InterfaceSync defines the methods of the sync service
@@ -33,12 +35,12 @@ type InterfaceSync interface {
 type InterfaceChains interface {
 	// note: required from p2p.peer.AddConnection
 	GetBestBlocksNumber() (*big.Int, error)
-	GetBestBlocksHash() (*crypto.Blake2b256Hash, error)
-	GetGenesisHash() (*crypto.Blake2b256Hash, error)
+	GetBestBlocksHash() (*pcrypto.Blake2b256Hash, error)
+	GetGenesisHash() (*pcrypto.Blake2b256Hash, error)
 	// note: required by sync.processBlock
 	ImportBlock(block *StateBlock) (bool, error)
 	// note required by sync.QueuBlocks
-	GetBlockDataByHash(hash *crypto.Blake2b256Hash) (*StateBlock, error)
+	GetBlockDataByHash(hash *pcrypto.Blake2b256Hash) (*StateBlock, error)
 }
 
 // InterfacePeer defines the methods of peer
@@ -51,8 +53,6 @@ type InterfacePeer interface {
 	IsActive() (bool, error)
 	// IsWritable returns whether the peer is writable or not
 	IsWritable() (bool, error)
-	// GetNextID TODO
-	GetNextID() (uint, error)
 	// On defines the event handlers
 	On(event peertypes.EventEnum, cb PeerEventCallback)
 	// Send is used to send the peer a message
@@ -61,8 +61,20 @@ type InterfacePeer interface {
 	SetBest(blockNumber *big.Int, hash []byte) error
 	// Cfg returns the peer config
 	Cfg() ConfigClient
+	// GetChain ...
+	GetChain() (InterfaceChains, error)
 	// GetID ...
 	GetID() string
+	// GetNextID ...
+	GetNextID() uint
+	// GetPeerInfo ...
+	GetPeerInfo() pstore.PeerInfo
+	// GetShortID ...
+	GetShortID() string
+	// Receive ...
+	Receive(stream inet.Stream) error
+	// GetBestNumber ...
+	GetBestNumber() *big.Int
 }
 
 // InterfacePeers defines the methods of the peers
@@ -75,6 +87,8 @@ type InterfacePeers interface {
 	Count() (uint, error)
 	// Get returns a peer
 	Get(pi pstore.PeerInfo) (*KnownPeer, error)
+	// GetFromID returns a peer
+	GetFromID(id libpeer.ID) (*KnownPeer, error)
 	// Log TODO
 	Log(event peerstypes.EventEnum, iface interface{}) error
 	// On handles peers events
@@ -92,11 +106,11 @@ type InterfaceMessage interface {
 	// Decode deserializes a bytes array into a message
 	Decode(bytes []byte) error
 	// Marshal returns json
-	Marshal() ([]byte, error)
+	MarshalJSON() ([]byte, error)
 	// Unmarshal converts json to a message
-	Unmarshal(bytes []byte) error
-	// Header ...
-	Header() *Header
+	UnmarshalJSON(bytes []byte) error
+	// GetHeader ...
+	GetHeader() *Header
 }
 
 // InterfaceTelemetry ...
@@ -119,4 +133,6 @@ type InterfaceP2P interface {
 	Stop() error
 	// Cfg returns the config
 	Cfg() ConfigClient
+	// GetSyncer ...
+	GetSyncer() (InterfaceSync, error)
 }

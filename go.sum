@@ -39,6 +39,8 @@ github.com/gogo/protobuf v1.2.0 h1:xU6/SpYbvkNYiptHJYEDRseDLvYE7wSqhYYNy0QSUzI=
 github.com/gogo/protobuf v1.2.0 h1:xU6/SpYbvkNYiptHJYEDRseDLvYE7wSqhYYNy0QSUzI=
 github.com/gogo/protobuf v1.2.0/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/gogo/protobuf v1.2.0/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
+github.com/golang/mock v1.2.0 h1:28o5sBqPkBsMGnC6b4MvE2TzSr5/AT4c/1fLqVGIwlk=
+github.com/golang/mock v1.2.0/go.mod h1:oTYuIxOrZwtPieC+H1uAHpcLFnEyAGVDL/k47Jfbm0A=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db h1:woRePGFeVFfLKN/pOkfl+p/TAqKOfFu+7KPlMVpok/w=
@@ -133,6 +135,8 @@ github.com/libp2p/go-libp2p-nat v0.8.8 h1:WUu6PfYMrUmcXb8hdP5tT+hua7o5nYwRZmSm1/
 github.com/libp2p/go-libp2p-nat v0.8.8/go.mod h1:cA6+rN+EcOAzmSL3vQ53VxX/FfOL1WGeJUvZgqjm2eQ=
 github.com/libp2p/go-libp2p-net v3.0.15+incompatible h1:7GDYsyQSXpGxS4SVxBt+iw5nbDnmVJWBg1XLdrzHOlo=
 github.com/libp2p/go-libp2p-net v3.0.15+incompatible/go.mod h1:8W6Wx3AZbTRTe8zSMLoAmT3mGyau+w6kGIRk+Z+MZ7Q=
+github.com/libp2p/go-libp2p-netutil v0.4.12 h1:D2BDSMw7UNK2BBy3/vCmw13W0PTZY2e6eagD1P9jVoY=
+github.com/libp2p/go-libp2p-netutil v0.4.12/go.mod h1:lpxjq1x/eUtPYAZAtnC7dKWjQeTuYIYz2ZIPNDDBj3g=
 github.com/libp2p/go-libp2p-peer v2.4.0+incompatible h1:1THIuO/h7GuITklYS7RgGCyoVl8aP9XH4NcokcdhDZc=
 github.com/libp2p/go-libp2p-peer v2.4.0+incompatible/go.mod h1:fS2eFKRO1IomwBAf+SuE8P1XOT/AAiqSgVPNIFA7Jc0=
 github.com/libp2p/go-libp2p-peerstore v2.0.6+incompatible h1:Jip/IIApZv58SNgSZctjJkLJf1c/zvUgwszTa0ihZbI=
@@ -173,6 +177,8 @@ github.com/libp2p/go-stream-muxer v3.0.1+incompatible h1:w9q15DATxItvgKwr6/z+47A
 github.com/libp2p/go-stream-muxer v3.0.1+incompatible/go.mod h1:bAo8x7YkSpadMTbtTaxGVHWUQsR/l5MEaHbKaliuT14=
 github.com/libp2p/go-tcp-transport v2.0.16+incompatible h1:xw8BoJ47Ra17ZTn+IR3i2VkOtzRjDgP29Lpr5Y7XyTg=
 github.com/libp2p/go-tcp-transport v2.0.16+incompatible/go.mod h1:K6Zi9TkPvn5m/m0bktlJ6Fv9Vna2wvr/jiCtTRC7T8o=
+github.com/libp2p/go-testutil v1.2.10 h1:WvC9YIFDdUcnkY7Z82iACQHE+iJyGqxSPyvgpxIk82U=
+github.com/libp2p/go-testutil v1.2.10/go.mod h1:8FHCRBHdt9BibhKebrOqVTJyW4cOZc52bfrGmw7ja+4=
 github.com/libp2p/go-ws-transport v2.0.15+incompatible h1:hErErrrux0IX4kNl8QTskoBGWkMJ0KH+2o9Y63M4Iwo=
 github.com/libp2p/go-ws-transport v2.0.15+incompatible/go.mod h1:qx7Dcw4onTaVNI3iG6q3XOKwNQWnXYhNEHYmhgQmKKk=
 github.com/mattn/go-colorable v0.0.9 h1:UVL0vNpWh04HeJXV0KLcaT7r06gOH2l4OW6ddYRUIY4=

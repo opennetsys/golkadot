@@ -1,7 +1,7 @@
 GO:=$(shell command type go 2> /dev/null)
 STRINGER:=$(shell command type stringer 2> /dev/null)
 
-all: check sync-event-enum peer-event-enum peers-event-enum p2p-event-enum handler-func-enum digest-enum sync-status-enum
+all: check sync-event-enum peer-event-enum peers-event-enum p2p-event-enum handler-func-enum digest-enum direction-enum sync-status-enum status-message-roles-enum
 
 .PHONY: check
 check: check/go check/stringer
@@ -52,3 +52,11 @@ p2p-event-enum:
 .PHONY: digest-enum
 digest-enum:
 	@(cd ../types && stringer -type=digestEnum && echo "made digest enum")
+
+.PHONY: direction-enum
+direction-enum:
+	@(cd ../types && stringer -type=directionEnum && echo "made direction enum")
+
+.PHONY: status-message-roles-enum
+status-message-roles-enum:
+	@(cd ../types && stringer -type=statusMessageRolesEnum && echo "made status message roles enum")

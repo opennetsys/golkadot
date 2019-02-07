@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"errors"
+
 	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/logger"
 )
 
 // note: ensure the struct implements the interface
@@ -15,22 +18,34 @@ type StatusHandler struct{}
 // TODO ...
 // TODO: We should check the genesisHash here and act appropriately
 func (s *StatusHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
-	//var msgStrBytes []byte
-	//if err := msg.Unmarshal(msgBytes); err != nil {
-	//logger.Errorf("[handler] err unmarshalling status message\n%v", err)
-	//return err
-	//}
+	if p == nil {
+		return errors.New("nil p2p")
+	}
+	if pr == nil {
+		return errors.New("nil peer")
+	}
+	if msg == nil {
+		return errors.New("nil message")
+	}
 
-	//logger.Infof("%v Status: %v", pr.Cfg().ShortID, string(msgStrBytes))
-	//statusMessage, ok := msg.(clienttypes.Status)
-	//if !ok {
-	//err := fmt.Errorf("expected Status, received %T", msg)
-	//logger.Errorf("[handler] err casting message\n%v", err)
-	//return err
-	//}
+	b, err := msg.MarshalJSON()
+	if err != nil {
+		logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
+		return err
+	}
 
-	//return pr.SetBest(statusMessage.BestNumber, statusMessag.BestHash)
-	return nil
+	logger.Infof("%v Status: %v", pr.GetShortID(), string(b))
+
+	st, ok := msg.(*clienttypes.Status)
+	if !ok {
+		logger.Errorf("[handler] expected pointer to status, received %T", st)
+		return errors.New("message is not a status")
+	}
+	if st == nil || st.Message == nil {
+		return errors.New("nil status message")
+	}
+
+	return pr.SetBest(st.Message.BestNumber, st.Message.BestHash[:])
 }
 
 // Type returns the func enum

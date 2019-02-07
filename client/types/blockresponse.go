@@ -1,10 +1,16 @@
 package clienttypes
 
 import (
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-)
+	"encoding/json"
+	"errors"
+	"math/big"
 
-// TODO...
+	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
+	"github.com/opennetsys/go-substrate/common/bnutil"
+	"github.com/opennetsys/go-substrate/common/codec"
+	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/go-substrate/logger"
+)
 
 // Kind ...
 func (b *BlockResponse) Kind() handlertypes.FuncEnum {
@@ -12,26 +18,58 @@ func (b *BlockResponse) Kind() handlertypes.FuncEnum {
 }
 
 // Encode serializes the message into a bytes array
+// TODO: fix...
 func (b *BlockResponse) Encode() ([]byte, error) {
-	return nil, nil
+	jsn, err := b.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	msgBytes, err := codec.Encode(jsn)
+	if err != nil {
+		return nil, err
+	}
+
+	return u8util.Concat(bnutil.ToUint8Slice(big.NewInt(int64(handlertypes.BlockResponse)), 8, true, false), msgBytes), nil
 }
 
 // Decode deserializes a bytes array into a message
-func (b *BlockResponse) Decode(bytes []byte) error {
+// TODO: fix...
+func (b *BlockResponse) Decode(data []byte) error {
+	if data == nil || len(data) == 0 {
+		return errors.New("nil data")
+	}
+
+	bn := bnutil.ToBN(data[0], true)
+	if bn == nil {
+		return errors.New("nil kind")
+	}
+
+	if bn.Int64() != int64(handlertypes.BlockResponse) {
+		logger.Errorf("[block request] expected Block Response, but received %v", bn.Int64())
+		return errors.New("wrong kind")
+	}
+
+	return b.UnmarshalJSON(data[1:])
+}
+
+// MarshalJSON returns json
+func (b *BlockResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.Message)
+}
+
+// UnmarshalJSON converts json to a message
+func (b *BlockResponse) UnmarshalJSON(data []byte) error {
+	msg := new(BlockResponseMessage)
+	if err := json.Unmarshal(data, msg); err != nil {
+		return err
+	}
+
+	b.Message = msg
 	return nil
 }
 
-// Marshal returns json
-func (b *BlockResponse) Marshal() ([]byte, error) {
-	return nil, nil
-}
-
-// Unmarshal converts json to a message
-func (b *BlockResponse) Unmarshal(bytes []byte) error {
-	return nil
-}
-
-// Header ...
-func (b *BlockResponse) Header() *Header {
+// GetHeader ...
+func (b *BlockResponse) GetHeader() *Header {
 	return nil
 }

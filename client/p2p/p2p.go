@@ -55,15 +55,9 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 		return nil, err
 	}
 
-	// 2. parse the address
-	listen, err := ma.NewMultiaddr(cfg.P2P.Address)
-	if err != nil {
-		logger.Errorf("[p2p] err parsing address\n%v", err)
-		return nil, err
-	}
-
-	// 3. build the peerstore and save the keys
+	// 2. build the peerstore and save the keys
 	// TODO: pass in pstore?
+	// TODO: this is being built in peers, too!
 	ps := pstoremem.NewPeerstore()
 	if err := ps.AddPrivKey(pid, cfg.P2P.Priv); err != nil {
 		logger.Errorf("[p2p] err adding private keey to peer store\n%v", err)
@@ -74,7 +68,7 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 		return nil, err
 	}
 
-	// 4. build the swarm network
+	// 3. build the swarm network
 	// TODO ...
 	swarmNet := swarm.NewSwarm(cfg.P2P.Context, pid, ps, nil)
 	tcpTransport := tcp.NewTCPTransport(genUpgrader(swarmNet))
@@ -82,13 +76,9 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 		logger.Errorf("[p2p] err adding transport to swarmnet\n%v", err)
 		return nil, err
 	}
-	if err := swarmNet.AddListenAddr(listen); err != nil {
-		logger.Errorf("[p2p] err adding swarm listen addr %v to swarmnet\n%v", listen, err)
-		return nil, err
-	}
 	bNode := bhost.New(swarmNet)
 
-	// 5. build the dht
+	// 4. build the dht
 	// TODO ...
 	dhtSvc, err := dht.New(cfg.P2P.Context, bNode)
 	if err != nil {
@@ -100,13 +90,13 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 		return nil, err
 	}
 
-	// 6. build the host
+	// 5. build the host
 	newNode := rhost.Wrap(bNode, dhtSvc)
 	for i, addr := range newNode.Addrs() {
 		logger.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
 	}
 
-	// 7. build the discovery service
+	// 6. build the discovery service
 	// TODO ...
 	// note: https://libp2p.io/implementations/#discovery
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
@@ -176,7 +166,8 @@ func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cf
 	}
 
 	nb := &inet.NotifyBundle{
-		ConnectedF: p.onConn,
+		ConnectedF:    p.onConn,
+		OpenedStreamF: p.onStream,
 	}
 	newNode.Network().Notify(nb)
 
@@ -214,9 +205,6 @@ func (p *P2P) On(event p2ptypes.EventEnum, cb clienttypes.EventCallback) {
 
 // Start starts the p2p service
 func (p *P2P) Start() error {
-	//if err := n.listenForEvents(); err != nil {
-	//return nil, fmt.Errorf("error starting listener\n%v", err)
-	//}
 	if p.cfg == nil {
 		return errors.New("nil config")
 	}
@@ -227,8 +215,15 @@ func (p *P2P) Start() error {
 		return errors.New("err nil sync")
 	}
 
-	// TODO: call network.Listen(ma)
-	var err error
+	listen, err := ma.NewMultiaddr(p.cfg.P2P.Address)
+	if err != nil {
+		logger.Errorf("[p2p] err parsing address\n%v", err)
+		return err
+	}
+	if err := p.state.Host.Network().Listen(listen); err != nil {
+		logger.Errorf("[p2p] err adding swarm listen addr %v to swarmnet\n%v", listen, err)
+		return err
+	}
 
 	if err = p.handleProtocol(); err != nil {
 		return err
@@ -252,16 +247,13 @@ func (p *P2P) Stop() error {
 		return ErrNoHost
 	}
 
-	// TODO: how to stop the p2p libp2p service...
-	//return p.state.Host.Stop()
-
 	if p.cancel != nil {
 		p.cancel()
 	}
 
 	p.handleEvent(p2ptypes.Stopped)
 
-	return nil
+	return p.state.Host.Close()
 }
 
 // Cfg returns the cfg
@@ -274,10 +266,65 @@ func (p *P2P) Cfg() clienttypes.ConfigClient {
 	return *p.cfg
 }
 
+// GetSyncer ...
+func (p *P2P) GetSyncer() (clienttypes.InterfaceSync, error) {
+	if p.sync == nil {
+		return nil, errors.New("nil sync")
+	}
+
+	return p.sync, nil
+}
+
 func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
 	logger.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
 	p.addAddr(conn)
+}
+
+func (p *P2P) onStream(network inet.Network, stream inet.Stream) {
+	if network == nil || stream == nil {
+		logger.Errorf("[p2p] network or stream is nil")
+		return
+	}
+
+	switch stream.Protocol() {
+	case protocol.ID(defaults.Defaults.ProtocolPing), protocol.ID(defaults.Defaults.ProtocolDot):
+		{
+			logger.Info("[p2p] new stream was opened")
+			return
+		}
+
+	default:
+		{
+			if p.state == nil {
+				logger.Error("[p2p] nil state")
+				return
+			}
+			if p.state.Peers == nil {
+				logger.Error("[p2p] nil peers")
+				return
+			}
+
+			kp, err := p.state.Peers.GetFromID(stream.Conn().RemotePeer())
+			if err != nil {
+				logger.Errorf("[p2p] err getting known peer from id\n%v", err)
+				return
+			}
+			if kp == nil || kp.Peer == nil {
+				logger.Error("[p2p] known peer is nil")
+				return
+			}
+
+			go func() {
+				if err = kp.Peer.Receive(stream); err != nil {
+					logger.Errorf("[p2p] err receiving stream\n%v", err)
+					return
+				}
+
+				logger.Infof("[p2p] message received from %s", kp.Peer.GetShortID())
+			}()
+		}
+	}
 }
 
 func (p *P2P) addAddr(conn inet.Conn) {
@@ -493,6 +540,7 @@ func (p *P2P) pingHandler(stream inet.Stream) {
 
 	// TODO: use read writer?
 	//rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
+	// TODO: use io.Pipe()?
 	r := bufio.NewReader(stream)
 	w := bufio.NewWriter(stream)
 
@@ -550,6 +598,7 @@ func (p *P2P) sendPingToPeer(pr clienttypes.InterfacePeer) error {
 	}
 
 	// TODO: use read writer?
+	// TODO: use io.Pipe?
 	//rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
 	r := bufio.NewReader(stream)
 	w := bufio.NewWriter(stream)
@@ -591,10 +640,6 @@ func (p *P2P) sendPingToPeer(pr clienttypes.InterfacePeer) error {
 
 	return nil
 }
-
-//func (p *P2P) handleDiscovery() {
-//return
-//}
 
 func (p *P2P) handlePeerMessage(msg *clienttypes.OnMessage) error {
 	if msg == nil {

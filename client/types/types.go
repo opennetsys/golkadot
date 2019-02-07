@@ -15,7 +15,6 @@ import (
 
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libp2pHost "github.com/libp2p/go-libp2p-host"
-	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	protocol "github.com/libp2p/go-libp2p-protocol"
@@ -47,7 +46,7 @@ type ConfigClient struct {
 	RPC       *ConfigRPC
 	Peer      *ConfigPeer
 	Peers     *ConfigPeers
-	Roles     []string
+	Roles     []StatusMessageRolesEnum
 	Telemetry *TelemetryConfig
 	Wasm      *WasmConfig
 }
@@ -124,7 +123,7 @@ type StateRequest struct {
 	// Peer ..
 	Peer InterfacePeer
 	// Request ...
-	Request *Request
+	Request *BlockRequest
 	// Timeout ...
 	Timeout int64
 }
@@ -178,36 +177,89 @@ type KnownPeer struct {
 	IsConnected bool
 }
 
-// Connection ...
-type Connection struct {
-	Connection inet.Conn
-	Pushable   chan<- interface{} // note: a write only channel
-}
+//// Connection ...
+//type Connection struct {
+//Connection inet.Conn
+//Pushable   chan<- []byte // note: a write only channel
+//}
 
 // BlockNumber ...
 // note: required by sync.provideBlocks
-type BlockNumber struct {
-	value uint64
+//type BlockNumber struct {
+//value uint64
+//}
+
+// BlockRequestFields ..
+// TODO: use enum? https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockRequest.ts#L13
+type BlockRequestFields struct {
+	Header        int
+	Body          int
+	Receipt       int
+	MessageQueue  int
+	Justification int
+}
+
+// BlockRequestMessageFrom ...
+type BlockRequestMessageFrom struct {
+	Hash        *pcrypto.Blake2b256Hash
+	BlockNumber *big.Int
+}
+
+// BlockRequestMessageTo ...
+type BlockRequestMessageTo struct {
+	Hash        *pcrypto.Blake2b256Hash
+	BlockNumber *big.Int
+}
+
+// BlockRequestMessage ...
+type BlockRequestMessage struct {
+	ID        uint64
+	Fields    *BlockRequestFields
+	From      *BlockRequestMessageFrom
+	To        *BlockRequestMessageTo
+	Max       *uint64
+	Direction DirectionEnum // note: create enums?
 }
 
 // BlockRequest ...
 // note: required by sync.provideBlocks
 // see: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockRequest.ts
 type BlockRequest struct {
-	ID        uint64
-	FromValue *big.Int // TODO: or BlockNumber???
-	Max       int
-	From      int
-	Direction string // note: create enums?
+	Message *BlockRequestMessage
+}
+
+// BlockResponseMessage ...
+type BlockResponseMessage struct {
+	Blocks []*StateBlock
+	// TODO: big.Int?
+	ID uint64
 }
 
 // BlockResponse ...
 // note: required by sync.provideBlocks
 // see: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/BlockResponse.ts
 type BlockResponse struct {
-	Blocks []*StateBlock
-	// TODO: big.Int?
-	ID uint64
+	Message *BlockResponseMessage
+}
+
+// BFT ...
+type BFT struct {
+	Message map[string]interface{}
+}
+
+// BlockAnnounce ...
+type BlockAnnounce struct {
+	Header *Header
+}
+
+// TransactionsMessage ...
+type TransactionsMessage struct {
+	Transactions []byte
+}
+
+// Transactions ...
+type Transactions struct {
+	Message *TransactionsMessage
 }
 
 // ConfigPeers ...
@@ -248,38 +300,35 @@ type ChangesTrieRootObj pcrypto.Hash
 // SealObj ...
 // note: obj suffix is required so as to not interfere with the enum
 type SealObj struct {
+	Slot int
 }
 
 // OtherObj ...
 // note: obj suffix is required so as to not interfere with the enum
 type OtherObj []byte
 
-// DigestItem ..
-// TODO: map[DigestEnum]Digest ???
-type DigestItem map[DigestEnum]interface{}
-
 // Digest ...
 type Digest struct {
-	Logs []*DigestItem
+	Logs map[DigestEnum]interface{}
 }
 
 // Header ...
 type Header struct {
 	BlockNumber    *big.Int
-	Hash           *pcrypto.Blake2b256Hash
 	ParentHash     *pcrypto.Blake2b256Hash
 	Number         *big.Int
 	StateRoot      *pcrypto.Blake2b256Hash
 	ExtrinsicsRoot *pcrypto.Blake2b256Hash
 	Digest         *Digest
+	Author         *AccountID
 }
 
-// Request TODO
-type Request struct {
-	From *big.Int
-	ID   uint
-	Max  uint64
-}
+//// Request TODO
+//type Request struct {
+//From *big.Int
+//ID   uint
+//Max  uint64
+//}
 
 // BlockData TODO
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/BlockData.ts
@@ -292,15 +341,21 @@ type BlockData struct {
 	Justification []byte
 }
 
+// StatusMessage ...
+type StatusMessage struct {
+	Roles       []StatusMessageRolesEnum
+	BestNumber  *big.Int
+	BestHash    *pcrypto.Blake2b256Hash
+	GenesisHash *pcrypto.Blake2b256Hash
+	ChainStatus []byte
+	Version     string
+}
+
 // Status ...
 // TODO: this needs to implement the message interface
 // https://github.com/polkadot-js/client/blob/master/packages/client-types/src/messages/Status.ts
 type Status struct {
-	Roles       []string
-	BestNumber  *big.Int
-	BestHash    *pcrypto.Blake2b256Hash
-	GenesisHash *pcrypto.Blake2b256Hash
-	Version     string
+	Message *StatusMessage
 }
 
 // QueuedPeer ...

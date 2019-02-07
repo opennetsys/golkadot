@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math"
 	"math/big"
-	"strings"
 	"time"
 
 	"github.com/opennetsys/go-substrate/client/p2p/defaults"
@@ -28,13 +27,15 @@ func New(ctx context.Context, cfg *clienttypes.ConfigClient, chn clienttypes.Int
 	}
 
 	s := &Sync{
-		bestQueued: new(big.Int),
-		chain:      chn,
-		config:     cfg,
-		ctx:        ctx,
-		handlers:   make(map[synctypes.EventEnum]clienttypes.EventCallback),
-		BestSeen:   new(big.Int),
-		Status:     synctypes.Idle,
+		bestQueued:    new(big.Int),
+		blockQueue:    make(clienttypes.StateBlockQueue),
+		blockRequests: make(clienttypes.StateBlockRequests),
+		chain:         chn,
+		config:        cfg,
+		ctx:           ctx,
+		handlers:      make(map[synctypes.EventEnum]clienttypes.EventCallback),
+		BestSeen:      new(big.Int),
+		Status:        synctypes.Idle,
 	}
 
 	go s.processBlocks()
@@ -112,8 +113,9 @@ func (s *Sync) processBlock() (bool, error) {
 	s.setStatus()
 
 	if block, ok := s.blockQueue[nextNumber.String()]; ok {
-		logger.Infof("Importing block #%s", nextNumber.String())
+		logger.Infof("[sync ] importing block #%s", nextNumber.String())
 
+		// TODO: executor?
 		ok, err = s.chain.ImportBlock(block)
 		if err != nil {
 			logger.Errorf("[sync] err importing block\n%v", err)
@@ -156,11 +158,11 @@ func (s *Sync) ProvideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.
 	if pr == nil {
 		return errors.New("nil peer")
 	}
-	if request == nil {
+	if request == nil || request.Message == nil {
 		return errors.New("nil request")
 	}
 
-	current := request.FromValue
+	current := request.Message.From.BlockNumber
 	best, err := s.chain.GetBestBlocksNumber()
 	if err != nil {
 		return err
@@ -169,20 +171,20 @@ func (s *Sync) ProvideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.
 	var blocks []*clienttypes.StateBlock
 
 	// FIXME: Also send blocks starting with hash
-	maxReq := uint(request.Max)
+	maxReq := uint(*request.Message.Max)
 	if maxReq == 0 {
 		maxReq = defaults.Defaults.MaxRequestBlocks
 	}
 
 	max := math.Min(float64(maxReq), float64(defaults.Defaults.MaxRequestBlocks))
 	count := 0.0
-	if u8util.IsU8a(request.From) {
+	if u8util.IsU8a(request.Message.From) {
 		count = max
 	}
 
 	// note: use enum?
 	increment := big.NewInt(-1)
-	if strings.ToUpper(request.Direction) == "ASCENDING" {
+	if request.Message.Direction == clienttypes.Ascending {
 		increment = big.NewInt(1)
 	}
 
@@ -199,8 +201,10 @@ func (s *Sync) ProvideBlocks(pr clienttypes.InterfacePeer, request *clienttypes.
 	}
 
 	ok, err := pr.Send(&clienttypes.BlockResponse{
-		Blocks: blocks,
-		ID:     request.ID,
+		Message: &clienttypes.BlockResponseMessage{
+			Blocks: blocks,
+			ID:     request.Message.ID,
+		},
 	})
 
 	if err != nil {
@@ -218,7 +222,7 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 	if pr == nil {
 		return errors.New("nil peer")
 	}
-	if response == nil {
+	if response == nil || response.Message == nil {
 		return errors.New("nil response")
 	}
 
@@ -230,7 +234,9 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 		logger.Warnf("Unrequested response from %v", pr.Cfg().Peer.ShortID)
 		return nil
 
-	} else if response.ID != request.ID {
+	} else if request == nil {
+		return nil
+	} else if response.Message.ID != request.ID {
 		//logger.Warnf("Mismatched response from %v", pr.Cfg().ShortID)
 		//return nil
 	}
@@ -248,8 +254,8 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 		queueNumber            string
 		isImportable, canQueue bool
 	)
-	for idx := range response.Blocks {
-		block = response.Blocks[idx]
+	for idx := range response.Message.Blocks {
+		block = response.Message.Blocks[idx]
 		if block == nil {
 			continue
 		}
@@ -333,17 +339,19 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 		return nil
 	}
 
-	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from)
+	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from.String())
 
 	timeout := time.Now().Add(time.Duration(REQUEST_TIMEOUT) * time.Millisecond)
-	nextID, err := pr.GetNextID()
-	if err != nil {
-		return err
-	}
-	request := &clienttypes.Request{
-		From: from,
-		ID:   nextID,
-		Max:  uint64(defaults.Defaults.MaxRequestBlocks),
+	nextID := pr.GetNextID()
+	max := uint64(defaults.Defaults.MaxRequestBlocks)
+	request := &clienttypes.BlockRequest{
+		Message: &clienttypes.BlockRequestMessage{
+			From: &clienttypes.BlockRequestMessageFrom{
+				BlockNumber: from,
+			},
+			ID:  uint64(nextID),
+			Max: &max,
+		},
 	}
 
 	s.blockRequests[pr.GetID()] = &clienttypes.StateRequest{

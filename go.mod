@@ -15,6 +15,7 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/fd/go-nat v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/google/uuid v1.1.0 // indirect
@@ -50,6 +51,7 @@ require (
 	github.com/libp2p/go-libp2p-metrics v2.1.7+incompatible // indirect
 	github.com/libp2p/go-libp2p-nat v0.8.8 // indirect
 	github.com/libp2p/go-libp2p-net v3.0.15+incompatible
+	github.com/libp2p/go-libp2p-netutil v0.4.12 // indirect
 	github.com/libp2p/go-libp2p-peer v2.4.0+incompatible
 	github.com/libp2p/go-libp2p-peerstore v2.0.6+incompatible
 	github.com/libp2p/go-libp2p-protocol v1.0.0
@@ -57,7 +59,7 @@ require (
 	github.com/libp2p/go-libp2p-routing v2.7.1+incompatible // indirect
 	github.com/libp2p/go-libp2p-secio v2.0.17+incompatible
 	github.com/libp2p/go-libp2p-swarm v3.0.22+incompatible
-	github.com/libp2p/go-libp2p-transport v3.0.15+incompatible
+	github.com/libp2p/go-libp2p-transport v3.0.15+incompatible // indirect
 	github.com/libp2p/go-libp2p-transport-upgrader v0.1.16
 	github.com/libp2p/go-maddr-filter v1.1.10 // indirect
 	github.com/libp2p/go-mplex v0.2.30 // indirect
@@ -65,6 +67,7 @@ require (
 	github.com/libp2p/go-reuseport-transport v0.2.0 // indirect
 	github.com/libp2p/go-stream-muxer v3.0.1+incompatible // indirect
 	github.com/libp2p/go-tcp-transport v2.0.16+incompatible
+	github.com/libp2p/go-testutil v1.2.10 // indirect
 	github.com/libp2p/go-ws-transport v2.0.15+incompatible // indirect
 	github.com/miekg/dns v1.1.1 // indirect
 	github.com/mr-tron/base58 v1.1.0

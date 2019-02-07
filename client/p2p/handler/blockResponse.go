@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"errors"
+
 	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
 	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	"github.com/opennetsys/go-substrate/logger"
 )
 
 // note: ensure the struct implements the interface
@@ -14,23 +17,43 @@ type BlockResponseHandler struct{}
 // Func handles incoming block response messages
 // TODO ...
 func (b *BlockResponseHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.InterfacePeer, msg clienttypes.InterfaceMessage) error {
-	//var msgStrBytes []byte
-	//if err := msg.Unmarshal(msgBytes); err != nil {
-	//logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
-	//return err
-	//}
+	if p == nil {
+		return errors.New("nil p2p")
+	}
+	if pr == nil {
+		return errors.New("nil peer")
+	}
+	if msg == nil {
+		return errors.New("nil message")
+	}
 
-	//logger.Infof("%v BlockResponse: %v", pr.Cfg().ShortID, string(msgStrBytes))
+	byt, err := msg.MarshalJSON()
+	if err != nil {
+		logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
+		return err
+	}
 
-	//s := p.Cfg().Syncer
-	//if s == nil {
-	//return errors.New("syncer is nil")
-	//}
+	logger.Infof("%v BlockResponse: %v", pr.GetShortID(), string(byt))
 
-	//s.QueueBlocks(pr, msg)
-	//s.RequestBlocks(pr)
+	s, err := p.GetSyncer()
+	if err != nil {
+		return err
+	}
+	if s == nil {
+		return errors.New("syncer is nil")
+	}
 
-	return nil
+	br, ok := msg.(*clienttypes.BlockResponse)
+	if !ok {
+		logger.Errorf("[handler] expected pointer to block response, received %T", br)
+		return errors.New("message is not a block response")
+	}
+	if err = s.QueueBlocks(pr, br); err != nil {
+		logger.Errorf("[handler] err queueing blocks\n%v", err)
+		return err
+	}
+
+	return s.RequestBlocks(pr)
 }
 
 // Type returns the func enum

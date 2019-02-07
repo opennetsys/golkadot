@@ -4,9 +4,9 @@ package handler
 
 import "strconv"
 
-const _funcEnum_name = "BFTBlockAnnounceBlockRequestBlockResponseRequestStateRequestStatusTransactions"
+const _funcEnum_name = "BFTBlockAnnounceBlockRequestBlockResponseStatusTransactions"
 
-var _funcEnum_index = [...]uint8{0, 3, 16, 28, 41, 48, 60, 66, 78}
+var _funcEnum_index = [...]uint8{0, 3, 16, 28, 41, 47, 59}
 
 func (i funcEnum) String() string {
 	if i < 0 || i >= funcEnum(len(_funcEnum_index)-1) {

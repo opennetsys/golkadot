@@ -34,7 +34,7 @@ func (bt *basicBatch) Commit() error {
 		}
 	}
 
-	for k := range bt.deletes {
+	for k, _ := range bt.deletes {
 		if err := bt.target.Delete(k); err != nil {
 			return err
 		}

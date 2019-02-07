@@ -29,6 +29,9 @@ func New(cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains, host li
 	if cfg.Peers == nil {
 		return nil, errors.New("nil peers config")
 	}
+	if cfg.P2P == nil {
+		return nil, errors.New("nil p2p config")
+	}
 	if chn == nil {
 		return nil, errors.New("nil chain")
 	}
@@ -189,7 +192,22 @@ func (p *Peers) Get(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 	return pr, nil
 }
 
-// Log TODO
+// GetFromID ...
+func (p *Peers) GetFromID(id libpeer.ID) (*clienttypes.KnownPeer, error) {
+	if p.KnownPeersMap == nil {
+		return nil, ErrNoPeerMap
+	}
+
+	pr, ok := p.KnownPeersMap[id]
+	if !ok {
+		return nil, ErrNoSuchPeer
+	}
+
+	return pr, nil
+
+}
+
+// Log ...
 func (p *Peers) Log(event peerstypes.EventEnum, iface interface{}) error {
 	if event == nil {
 		return ErrNilEvent
@@ -236,14 +254,19 @@ func (p *Peers) handleEvent(event peerstypes.EventEnum, iface interface{}) {
 		return
 	}
 
-	// TODO: need iface
 	iface, err := cb(iface)
 	logger.Infof("[peers] handled event %s\nresults:\n%v\n%v", event.String(), iface, err)
 	return
 }
 
 func (p *Peers) onDiscovery() error {
-	// TODO: nil check
+	if p.cfg == nil {
+		return errors.New("nil config")
+	}
+	if p.cfg.P2P == nil {
+		return errors.New("nil p2p config")
+	}
+
 	// TODO: we already have a discovery service in P2P, is this duplicating? How else to notify on peer found?
 	discoverySvc, err := discovery.NewMdnsService(p.cfg.P2P.Context, p.host, time.Second, defaults.Defaults.Name)
 	if err != nil {

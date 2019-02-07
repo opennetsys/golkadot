@@ -7,23 +7,24 @@ import (
 
 type funcEnum int
 
+// note: do not change this order!
 const (
-	// BFT ...
-	BFT funcEnum = iota
-	// BlockAnnounce ...
-	BlockAnnounce
+	// Status ...
+	Status funcEnum = iota
 	// BlockRequest ...
 	BlockRequest
 	// BlockResponse ...
 	BlockResponse
-	// Request ...
-	Request
-	// StateRequest ...
-	StateRequest
-	// Status ...
-	Status
+	// BlockAnnounce ...
+	BlockAnnounce
 	// Transactions ...
 	Transactions
+	// BFT ...
+	BFT
+	// Request ...
+	//Request
+	//// StateRequest ...
+	//StateRequest
 )
 
 // ErrUnknownFunc is thrown when an unknown handler function is encountered.
@@ -47,8 +48,8 @@ func AllFuncEnums() []FuncEnum {
 		BlockAnnounce,
 		BlockRequest,
 		BlockResponse,
-		Request,
-		StateRequest,
+		//Request,
+		//StateRequest,
 		Status,
 		Transactions,
 	}
@@ -65,10 +66,10 @@ func FuncEnumFromString(s string) (FuncEnum, error) {
 		return BlockRequest, nil
 	case "BLOCKRESPONSE":
 		return BlockResponse, nil
-	case "REQUEST":
-		return Request, nil
-	case "STATEREQUEST":
-		return StateRequest, nil
+	//case "REQUEST":
+	//return Request, nil
+	//case "STATEREQUEST":
+	//return StateRequest, nil
 	case "STATUS":
 		return Status, nil
 	case "TRANSACTIONS":
