@@ -1,18 +1,53 @@
 package clienttypes
 
-import pcrypto "github.com/c3systems/go-substrate/common/crypto"
+import (
+	"errors"
+	"math"
+	"math/big"
 
-// TODO
-// https://github.com/polkadot-js/api/blob/master/packages/types/src/Header.ts
+	pcrypto "github.com/c3systems/go-substrate/common/crypto"
+)
 
 // NewHeader ...
-func NewHeader() *Header {
-	return &Header{}
+func NewHeader(h *Header, sessionValidators []*AccountID) (*Header, error) {
+	hdr := &Header{}
+
+	if h != nil {
+		hdr.BlockNumber = h.BlockNumber
+		hdr.ParentHash = h.ParentHash
+		hdr.Number = h.Number
+		hdr.StateRoot = h.StateRoot
+		hdr.ExtrinsicsRoot = h.ExtrinsicsRoot
+		hdr.Digest = h.Digest
+		hdr.Author = h.Author
+	}
+
+	if sessionValidators != nil && len(sessionValidators) > 0 {
+		if hdr.Digest == nil {
+			return nil, errors.New("nil digest")
+		}
+		if hdr.Digest.Logs == nil {
+			return nil, errors.New("nil digest logs")
+		}
+		digestItem, ok := hdr.Digest.Logs[Seal]
+		if !ok {
+			return nil, errors.New("no seal item")
+		}
+		slotItem, ok := digestItem.(SealObj)
+		if !ok {
+			return nil, errors.New("seal item is not a seal object")
+		}
+
+		idx := math.Mod(float64(slotItem.Slot), float64(len(sessionValidators)))
+		hdr.Author = sessionValidators[int(idx)]
+	}
+
+	return hdr, nil
 }
 
 // GetBlockNumber ...
-func (h *Header) GetBlockNumber() *BlockNumber {
-	return NewBlockNumber(h.Number)
+func (h *Header) GetBlockNumber() *big.Int {
+	return h.Number
 }
 
 // SetStateRoot ...
@@ -30,9 +65,9 @@ func (h *Header) SetParentHash(hash *pcrypto.Blake2b256Hash) {
 	h.ParentHash = hash
 }
 
-// GetHash ...
-func (h *Header) GetHash() *pcrypto.Blake2b256Hash {
-	return h.Hash
+// Hash ...
+func (h *Header) Hash() *pcrypto.Blake2b256Hash {
+	return pcrypto.NewBlake2b256(h.ToU8a())
 }
 
 // ToU8a ...

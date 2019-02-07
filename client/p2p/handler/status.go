@@ -41,11 +41,11 @@ func (s *StatusHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.Interfac
 		logger.Errorf("[handler] expected pointer to status, received %T", st)
 		return errors.New("message is not a status")
 	}
-	if st == nil {
+	if st == nil || st.Message == nil {
 		return errors.New("nil status message")
 	}
 
-	return pr.SetBest(st.BestNumber, st.BestHash[:])
+	return pr.SetBest(st.Message.BestNumber, st.Message.BestHash[:])
 }
 
 // Type returns the func enum

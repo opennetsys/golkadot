@@ -31,7 +31,9 @@ type Chain struct {
 
 // NewChain ...
 // TODO: configClient?
-func NewChain(config *clienttypes.ConfigClient) *Chain {
+func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
+	var err error
+
 	chain := clientchainloader.NewLoader(config)
 	dbs := clientdb.NewDB(config, chain)
 
@@ -41,7 +43,10 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 		State:  dbs.State(),
 	}
 
-	c.Genesis = c.InitGenesis()
+	c.Genesis, err = c.InitGenesis()
+	if err != nil {
+		return nil, err
+	}
 
 	bestHash := c.Blocks.BestHash.Get()
 	bestNumber := c.Blocks.BestNumber.Get()
@@ -58,11 +63,11 @@ func NewChain(config *clienttypes.ConfigClient) *Chain {
 	runtime := runtime.NewRuntime(c.State.DB)
 	c.Executor = wasm.NewExecuter(config, c.Blocks, c.State, runtime)
 
-	return c
+	return c, nil
 }
 
 // InitGenesis ...
-func (c *Chain) InitGenesis() *clientchaintypes.ChainGenesis {
+func (c *Chain) InitGenesis() (*clientchaintypes.ChainGenesis, error) {
 	bestHash := c.Blocks.BestHash.Get()
 	if bestHash == nil || len(bestHash) == 0 {
 		return c.CreateGenesis()
@@ -70,7 +75,7 @@ func (c *Chain) InitGenesis() *clientchaintypes.ChainGenesis {
 
 	bestBlock := c.GetBlock(bestHash)
 
-	return c.InitGenesisFromBest(bestBlock.Header, true)
+	return c.InitGenesisFromBest(bestBlock.Header, true), nil
 }
 
 // InitGenesisFromBest ...
@@ -147,22 +152,28 @@ func (c *Chain) GetCode() []uint8 {
 }
 
 // CreateGenesis ...
-func (c *Chain) CreateGenesis() *clientchaintypes.ChainGenesis {
+func (c *Chain) CreateGenesis() (*clientchaintypes.ChainGenesis, error) {
 	c.CreateGenesisState()
 
-	genesis := c.CreateGenesisBlock()
+	genesis, err := c.CreateGenesisBlock()
+	if err != nil {
+		return nil, err
+	}
 
 	c.Blocks.BestHash.Set(genesis.Block.Hash[:])
 	c.Blocks.BestNumber.Set(types.NewInt(0, 64))
 	c.Blocks.BlockData.Set(genesis.Block.ToU8a(), genesis.Block.Hash)
 	c.Blocks.Hash.Set(genesis.Block.Hash[:], 0)
 
-	return genesis
+	return genesis, nil
 }
 
 // CreateGenesisBlock ...
-func (c *Chain) CreateGenesisBlock() *clientchaintypes.ChainGenesis {
-	header := clienttypes.NewHeader()
+func (c *Chain) CreateGenesisBlock() (*clientchaintypes.ChainGenesis, error) {
+	header, err := clienttypes.NewHeader(nil, nil)
+	if err != nil {
+		return nil, err
+	}
 	header.SetStateRoot(crypto.NewBlake2b256(c.State.DB.GetRoot()))
 	header.SetExtrinsicsRoot(crypto.NewBlake2b256(triehash.TrieRoot(nil)))
 	header.SetParentHash(crypto.NewBlake2b256(make([]uint8, 32)))
@@ -175,7 +186,7 @@ func (c *Chain) CreateGenesisBlock() *clientchaintypes.ChainGenesis {
 	return &clientchaintypes.ChainGenesis{
 		Block: block,
 		Code:  c.GetCode(),
-	}
+	}, nil
 }
 
 // CreateGenesisState ...

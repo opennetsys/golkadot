@@ -109,8 +109,8 @@ type InterfaceMessage interface {
 	MarshalJSON() ([]byte, error)
 	// Unmarshal converts json to a message
 	UnmarshalJSON(bytes []byte) error
-	// Header ...
-	Header() *Header
+	// GetHeader ...
+	GetHeader() *Header
 }
 
 // InterfaceTelemetry ...

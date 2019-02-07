@@ -59,9 +59,9 @@ func (b *BFT) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON converts json to a message
-func (b *BFT) UnmarshalJSON(bytes []byte) error {
+func (b *BFT) UnmarshalJSON(data []byte) error {
 	var msg map[string]interface{}
-	if err := json.Unmarshal(bytes, &msg); err != nil {
+	if err := json.Unmarshal(data, &msg); err != nil {
 		return err
 	}
 
@@ -69,7 +69,7 @@ func (b *BFT) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
-// Header ...
-func (b *BFT) Header() *Header {
+// GetHeader ...
+func (b *BFT) GetHeader() *Header {
 	return nil
 }

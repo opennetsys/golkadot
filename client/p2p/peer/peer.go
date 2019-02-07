@@ -75,11 +75,13 @@ func (p *Peer) AddConnection(conn inet.Conn, isWritable bool) (uint, error) {
 		}
 
 		ok, err := p.Send(&clienttypes.Status{
-			Roles:       p.config.Roles,
-			BestNumber:  bn,
-			BestHash:    bh,
-			GenesisHash: gh,
-			Version:     defaults.Defaults.ProtocolVersion,
+			Message: &clienttypes.StatusMessage{
+				Roles:       p.config.Roles,
+				BestNumber:  bn,
+				BestHash:    bh,
+				GenesisHash: gh,
+				Version:     defaults.Defaults.ProtocolVersion,
+			},
 		})
 		if err != nil {
 			logger.Errorf("[peer] err sending message\n%v", err)

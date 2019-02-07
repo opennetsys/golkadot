@@ -34,14 +34,14 @@ func (b *BlockAnnounceHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.I
 	}
 	logger.Infof("%v BlockAnnounce: %v", pr.GetShortID(), string(byt))
 
-	header := msg.Header()
+	header := msg.GetHeader()
 
 	bn := pr.GetBestNumber()
 	if bn == nil {
 		return errors.New("[handler] peer best number is nil")
 	}
 	if bn.Cmp(header.BlockNumber) == -1 {
-		if err = pr.SetBest(header.BlockNumber, header.Hash[:]); err != nil {
+		if err = pr.SetBest(header.BlockNumber, header.Hash()[:]); err != nil {
 			return err
 		}
 	}
