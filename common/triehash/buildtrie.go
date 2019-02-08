@@ -3,8 +3,8 @@ package triehash
 import (
 	"math"
 
-	"github.com/opennetsys/go-substrate/common/triecodec"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/godot/common/triecodec"
+	"github.com/opennetsys/godot/common/u8util"
 )
 
 // BuildTrie ...

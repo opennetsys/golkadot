@@ -4,8 +4,8 @@ import (
 	"errors"
 	"math/big"
 
-	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	peertypes "github.com/opennetsys/godot/client/p2p/peer/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
 
 	inet "github.com/libp2p/go-libp2p-net"
 	pstore "github.com/libp2p/go-libp2p-peerstore"

@@ -3,7 +3,7 @@ package triedb
 import (
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/godot/common/db"
 )
 
 func TestImpl(t *testing.T) {

@@ -1,8 +1,8 @@
 package clientdb
 
 import (
-	"github.com/opennetsys/go-substrate/common/db"
-	types "github.com/opennetsys/go-substrate/types"
+	"github.com/opennetsys/godot/common/db"
+	types "github.com/opennetsys/godot/types"
 )
 
 func createU8a(dbs db.BaseDB, fn types.StorageFunction) StorageMethodU8a {

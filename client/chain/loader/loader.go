@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	chainjson "github.com/opennetsys/go-substrate/client/chain/json"
-	clientchaintypes "github.com/opennetsys/go-substrate/client/chain/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/common/triehash"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	chainjson "github.com/opennetsys/godot/client/chain/json"
+	clientchaintypes "github.com/opennetsys/godot/client/chain/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
+	"github.com/opennetsys/godot/common/triehash"
+	"github.com/opennetsys/godot/common/u8util"
 )
 
 // Loader ...

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/stringutil"
+	"github.com/opennetsys/godot/common/stringutil"
 )
 
 func TestUnhashedTrie(t *testing.T) {

@@ -3,8 +3,8 @@ package clienttypes
 import (
 	"errors"
 
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	"github.com/opennetsys/go-substrate/logger"
+	handlertypes "github.com/opennetsys/godot/client/p2p/handler/types"
+	"github.com/opennetsys/godot/logger"
 )
 
 // DecodeMessage ...

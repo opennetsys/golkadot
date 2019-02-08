@@ -6,8 +6,8 @@ import (
 	"math"
 	"os"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/triecodec"
+	"github.com/opennetsys/godot/common/crypto"
+	"github.com/opennetsys/godot/common/triecodec"
 )
 
 // GetNodeType ...

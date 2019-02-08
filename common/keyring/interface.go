@@ -1,9 +1,9 @@
 package keyring
 
 import (
-	"github.com/opennetsys/go-substrate/common/keyring/address"
-	"github.com/opennetsys/go-substrate/common/keyring/pair"
-	keytypes "github.com/opennetsys/go-substrate/common/keyring/types"
+	"github.com/opennetsys/godot/common/keyring/address"
+	"github.com/opennetsys/godot/common/keyring/pair"
+	keytypes "github.com/opennetsys/godot/common/keyring/types"
 )
 
 // InterfaceKeyRing ...

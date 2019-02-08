@@ -8,7 +8,7 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/hexutil"
+	"github.com/opennetsys/godot/common/hexutil"
 )
 
 // ErrInvalidHex ...

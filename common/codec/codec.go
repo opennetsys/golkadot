@@ -6,9 +6,9 @@ import (
 	"math/big"
 	"reflect"
 
-	codectypes "github.com/opennetsys/go-substrate/common/codec/types"
-	"github.com/opennetsys/go-substrate/common/u8compact"
-	"github.com/opennetsys/go-substrate/logger"
+	codectypes "github.com/opennetsys/godot/common/codec/types"
+	"github.com/opennetsys/godot/common/u8compact"
+	"github.com/opennetsys/godot/logger"
 )
 
 func writeBinary(v interface{}) ([]byte, error) {

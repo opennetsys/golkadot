@@ -1,8 +1,8 @@
 package pair
 
 import (
-	"github.com/opennetsys/go-substrate/common/crypto"
-	keytypes "github.com/opennetsys/go-substrate/common/keyring/types"
+	"github.com/opennetsys/godot/common/crypto"
+	keytypes "github.com/opennetsys/godot/common/keyring/types"
 )
 
 var seeds = map[string][]byte{

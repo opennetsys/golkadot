@@ -5,11 +5,11 @@ import (
 	"errors"
 	"math/big"
 
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	"github.com/opennetsys/go-substrate/common/bnutil"
-	"github.com/opennetsys/go-substrate/common/codec"
-	"github.com/opennetsys/go-substrate/common/u8util"
-	"github.com/opennetsys/go-substrate/logger"
+	handlertypes "github.com/opennetsys/godot/client/p2p/handler/types"
+	"github.com/opennetsys/godot/common/bnutil"
+	"github.com/opennetsys/godot/common/codec"
+	"github.com/opennetsys/godot/common/u8util"
+	"github.com/opennetsys/godot/logger"
 )
 
 // TODO

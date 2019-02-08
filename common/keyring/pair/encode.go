@@ -3,8 +3,8 @@ package pair
 import (
 	"crypto/rand"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/godot/common/crypto"
+	"github.com/opennetsys/godot/common/u8util"
 )
 
 // Encode ...

@@ -4,12 +4,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/opennetsys/go-substrate/client/p2p/defaults"
-	"github.com/opennetsys/go-substrate/client/p2p/peer"
-	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
-	peerstypes "github.com/opennetsys/go-substrate/client/p2p/peers/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/logger"
+	"github.com/opennetsys/godot/client/p2p/defaults"
+	"github.com/opennetsys/godot/client/p2p/peer"
+	peertypes "github.com/opennetsys/godot/client/p2p/peer/types"
+	peerstypes "github.com/opennetsys/godot/client/p2p/peers/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
+	"github.com/opennetsys/godot/logger"
 
 	libp2pHost "github.com/libp2p/go-libp2p-host"
 	libpeer "github.com/libp2p/go-libp2p-peer"

@@ -1,9 +1,9 @@
 package clientdb
 
 import (
-	storagetypes "github.com/opennetsys/go-substrate/client/storage/types"
-	"github.com/opennetsys/go-substrate/common/db"
-	"github.com/opennetsys/go-substrate/common/triedb"
+	storagetypes "github.com/opennetsys/godot/client/storage/types"
+	"github.com/opennetsys/godot/common/db"
+	"github.com/opennetsys/godot/common/triedb"
 )
 
 func createStateDB(dbs *triedb.TrieDB) *StateDB {

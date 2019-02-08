@@ -1,8 +1,8 @@
 package handler
 
 import (
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	handlertypes "github.com/opennetsys/godot/client/p2p/handler/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
 )
 
 // InterfaceHandler describes the methods of the handler package

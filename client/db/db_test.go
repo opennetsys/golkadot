@@ -3,9 +3,9 @@ package clientdb
 import (
 	"testing"
 
-	clientchainloader "github.com/opennetsys/go-substrate/client/chain/loader"
-	clientdbtypes "github.com/opennetsys/go-substrate/client/db/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	clientchainloader "github.com/opennetsys/godot/client/chain/loader"
+	clientdbtypes "github.com/opennetsys/godot/client/db/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
 )
 
 func TestClientDB(t *testing.T) {

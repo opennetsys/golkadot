@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/opennetsys/go-substrate/common/crypto"
+	"github.com/opennetsys/godot/common/crypto"
 )
 
 // Null ...

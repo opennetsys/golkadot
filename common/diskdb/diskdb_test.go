@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/godot/common/db"
 )
 
 func TestDiskDB(t *testing.T) {

@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/keyring/address"
-	ktypes "github.com/opennetsys/go-substrate/common/keyring/types"
-	"github.com/opennetsys/go-substrate/common/u8util"
-	"github.com/opennetsys/go-substrate/logger"
+	"github.com/opennetsys/godot/common/crypto"
+	"github.com/opennetsys/godot/common/keyring/address"
+	ktypes "github.com/opennetsys/godot/common/keyring/types"
+	"github.com/opennetsys/godot/common/u8util"
+	"github.com/opennetsys/godot/logger"
 )
 
 // NewPair ...

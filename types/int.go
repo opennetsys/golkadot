@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/bnutil"
-	"github.com/opennetsys/go-substrate/common/hexutil"
+	"github.com/opennetsys/godot/common/bnutil"
+	"github.com/opennetsys/godot/common/hexutil"
 )
 
 // Int ...

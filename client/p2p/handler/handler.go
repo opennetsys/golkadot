@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
+	handlertypes "github.com/opennetsys/godot/client/p2p/handler/types"
 )
 
 // FromEnum ...

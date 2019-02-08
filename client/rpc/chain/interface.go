@@ -1,9 +1,9 @@
 package chain
 
 import (
-	"github.com/opennetsys/go-substrate/client/p2p/pubsub"
-	rpctypes "github.com/opennetsys/go-substrate/client/rpc/types"
-	"github.com/opennetsys/go-substrate/client/runtime"
+	"github.com/opennetsys/godot/client/p2p/pubsub"
+	rpctypes "github.com/opennetsys/godot/client/rpc/types"
+	"github.com/opennetsys/godot/client/runtime"
 )
 
 // ServiceInterface defines the methods implemented by the chain service

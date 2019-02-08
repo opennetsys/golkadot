@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	p2ptypes "github.com/opennetsys/go-substrate/client/p2p/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	p2ptypes "github.com/opennetsys/godot/client/p2p/types"
+	clienttypes "github.com/opennetsys/godot/client/types"
 )
 
 const (

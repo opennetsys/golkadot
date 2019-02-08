@@ -1,6 +1,6 @@
 package author
 
-import "github.com/opennetsys/go-substrate/client/p2p/pubsub"
+import "github.com/opennetsys/godot/client/p2p/pubsub"
 
 // Service implements the author service
 type Service struct{}
