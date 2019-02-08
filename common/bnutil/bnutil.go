@@ -5,9 +5,9 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/hexutil"
-	"github.com/opennetsys/go-substrate/common/mathutil"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/hexutil"
+	"github.com/opennetsys/golkadot/common/mathutil"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 // FromHex creates a math/big big number from a hex string.

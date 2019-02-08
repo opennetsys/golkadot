@@ -3,9 +3,9 @@ package handler
 import (
 	"errors"
 
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/logger"
+	handlertypes "github.com/opennetsys/golkadot/client/p2p/handler/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/logger"
 )
 
 // note: ensure the struct implements the interface

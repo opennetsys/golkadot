@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/opennetsys/go-substrate/common/assert"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/assert"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 // FromNibbles converts the uint8 slice input from nibbles. Calculate and return a uint8 slice that's made from a list of nibbles.

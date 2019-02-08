@@ -3,7 +3,7 @@ package clientchain
 import (
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 func TestChains(t *testing.T) {

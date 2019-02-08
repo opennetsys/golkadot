@@ -3,12 +3,12 @@ package clienttypes
 import (
 	"math/big"
 
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	peertypes "github.com/opennetsys/go-substrate/client/p2p/peer/types"
-	peerstypes "github.com/opennetsys/go-substrate/client/p2p/peers/types"
-	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
-	p2ptypes "github.com/opennetsys/go-substrate/client/p2p/types"
-	pcrypto "github.com/opennetsys/go-substrate/common/crypto"
+	handlertypes "github.com/opennetsys/golkadot/client/p2p/handler/types"
+	peertypes "github.com/opennetsys/golkadot/client/p2p/peer/types"
+	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
+	synctypes "github.com/opennetsys/golkadot/client/p2p/sync/types"
+	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
+	pcrypto "github.com/opennetsys/golkadot/common/crypto"
 
 	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"

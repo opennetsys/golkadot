@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/opennetsys/go-substrate/common/db"
-	"github.com/opennetsys/go-substrate/common/fileflatdb"
+	"github.com/opennetsys/golkadot/common/db"
+	"github.com/opennetsys/golkadot/common/fileflatdb"
 )
 
 // DiskDB ...

@@ -3,9 +3,9 @@ package address
 import (
 	"errors"
 
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/hexutil"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/crypto"
+	"github.com/opennetsys/golkadot/common/hexutil"
+	"github.com/opennetsys/golkadot/common/u8util"
 
 	"github.com/mr-tron/base58/base58"
 )

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"math/big"
 
-	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	synctypes "github.com/opennetsys/golkadot/client/p2p/sync/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
 )
 
 const (

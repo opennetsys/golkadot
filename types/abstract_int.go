@@ -3,7 +3,7 @@ package types
 import (
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/hexutil"
+	"github.com/opennetsys/golkadot/common/hexutil"
 )
 
 // UintBitLength ...

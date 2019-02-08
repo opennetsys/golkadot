@@ -3,7 +3,7 @@ package p2p
 import (
 	"context"
 
-	"github.com/opennetsys/go-substrate/logger"
+	"github.com/opennetsys/golkadot/logger"
 
 	host "github.com/libp2p/go-libp2p-host"
 	peerstore "github.com/libp2p/go-libp2p-peerstore"

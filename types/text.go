@@ -3,8 +3,8 @@ package types
 import (
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/u8compact"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/u8compact"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 // Text is a string wrapper, along with the length.

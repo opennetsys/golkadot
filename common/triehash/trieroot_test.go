@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/chainspec"
-	"github.com/opennetsys/go-substrate/common/stringutil"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/chainspec"
+	"github.com/opennetsys/golkadot/common/stringutil"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 func TestTrieRoot(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"math"
 	"math/big"
 
-	pcrypto "github.com/opennetsys/go-substrate/common/crypto"
+	pcrypto "github.com/opennetsys/golkadot/common/crypto"
 )
 
 // NewHeader ...

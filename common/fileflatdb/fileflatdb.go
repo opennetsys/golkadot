@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/golkadot/common/db"
 )
 
 // SlotEmpty ...

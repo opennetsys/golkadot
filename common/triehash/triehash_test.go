@@ -1,6 +1,6 @@
 package triehash
 
-import "github.com/opennetsys/go-substrate/common/hexutil"
+import "github.com/opennetsys/golkadot/common/hexutil"
 
 // helper
 func hexToU8a(s string) []uint8 {

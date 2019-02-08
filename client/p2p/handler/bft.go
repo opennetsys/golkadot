@@ -1,8 +1,8 @@
 package handler
 
 import (
-	handlertypes "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	handlertypes "github.com/opennetsys/golkadot/client/p2p/handler/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
 )
 
 // note: ensure the struct implements the interface

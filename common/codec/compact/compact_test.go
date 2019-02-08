@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	codectypes "github.com/opennetsys/go-substrate/common/codec/types"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	codectypes "github.com/opennetsys/golkadot/common/codec/types"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 func TestBNToCompact(t *testing.T) {
@@ -194,7 +194,7 @@ func TestCompactMetaFromBytes(t *testing.T) {
 			},
 		},
 		// note: fails...
-		// see #36 https://github.com/opennetsys/go-substrate/issues/36
+		// see #36 https://github.com/opennetsys/golkadot/issues/36
 		{
 			u8util.FromHex("0x0b00407a10f35a"),
 			out{

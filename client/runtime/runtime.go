@@ -1,6 +1,6 @@
 package runtime
 
-import "github.com/opennetsys/go-substrate/common/triedb"
+import "github.com/opennetsys/golkadot/common/triedb"
 
 // Runtime ...
 type Runtime struct {

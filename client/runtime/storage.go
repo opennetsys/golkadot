@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/opennetsys/go-substrate/common/db"
-	"github.com/opennetsys/go-substrate/common/triehash"
+	"github.com/opennetsys/golkadot/common/db"
+	"github.com/opennetsys/golkadot/common/triehash"
 )
 
 // Storage ...

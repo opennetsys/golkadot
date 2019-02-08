@@ -3,7 +3,7 @@ package wasm
 import (
 	"errors"
 
-	"github.com/opennetsys/go-substrate/logger"
+	"github.com/opennetsys/golkadot/logger"
 	"github.com/perlin-network/life/compiler"
 	"github.com/perlin-network/life/exec"
 )

@@ -3,7 +3,7 @@ package pair
 import (
 	"errors"
 
-	"github.com/opennetsys/go-substrate/common/keyring/address"
+	"github.com/opennetsys/golkadot/common/keyring/address"
 )
 
 // NewPairs ...

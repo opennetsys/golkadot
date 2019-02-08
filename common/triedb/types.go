@@ -2,8 +2,8 @@ package triedb
 
 import (
 	"github.com/davecgh/go-spew/spew"
-	"github.com/opennetsys/go-substrate/common/crypto"
-	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/golkadot/common/crypto"
+	"github.com/opennetsys/golkadot/common/db"
 )
 
 // TODO: refactor

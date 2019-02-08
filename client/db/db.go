@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	clientchainloader "github.com/opennetsys/go-substrate/client/chain/loader"
-	clientdbtypes "github.com/opennetsys/go-substrate/client/db/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/common/db"
-	diskdb "github.com/opennetsys/go-substrate/common/diskdb"
-	"github.com/opennetsys/go-substrate/common/triedb"
+	clientchainloader "github.com/opennetsys/golkadot/client/chain/loader"
+	clientdbtypes "github.com/opennetsys/golkadot/client/db/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/common/db"
+	diskdb "github.com/opennetsys/golkadot/common/diskdb"
+	"github.com/opennetsys/golkadot/common/triedb"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-db/src/index.ts

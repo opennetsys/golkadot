@@ -1,6 +1,6 @@
 package system
 
-import rpctypes "github.com/opennetsys/go-substrate/client/rpc/types"
+import rpctypes "github.com/opennetsys/golkadot/client/rpc/types"
 
 // ServiceInterface describes the methods performed by the system rpc service
 type ServiceInterface interface {

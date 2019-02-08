@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/opennetsys/go-substrate/common/db"
+	"github.com/opennetsys/golkadot/common/db"
 )
 
 func newTrie(codec InterfaceCodec) *TrieDB {

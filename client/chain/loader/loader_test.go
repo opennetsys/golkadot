@@ -3,8 +3,8 @@ package chainloader
 import (
 	"testing"
 
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 func TestLoader(t *testing.T) {

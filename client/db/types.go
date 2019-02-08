@@ -1,6 +1,6 @@
 package clientdb
 
-import "github.com/opennetsys/go-substrate/common/triedb"
+import "github.com/opennetsys/golkadot/common/triedb"
 
 // DefaultPath ...
 var DefaultPath = "~/.go-substrate"

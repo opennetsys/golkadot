@@ -127,3 +127,11 @@ test/common/diskdb:
 .PHONY: move/repo
 move/repo:
 	@find . -type f -name '*.go' -not \( -path './.git/*' -o -path './vendor/*' \) -exec sed -i 's|github.com/c3systems/go-substrate/|github.com/opennetsys/go-substrate/|g' {} \;
+
+.PHONY: move/name
+move/name:
+	@find . -type f -name '*.go' -not \( -path './.git/*' -o -path './vendor/*' \) -exec sed -i 's|github.com/opennetsys/go-substrate/|github.com/opennetsys/godot/|g' {} \;
+
+.PHONY: move/name/golkadot
+move/name/golkadot:
+	@find . -type f -name '*.go' -not \( -path './.git/*' -o -path './vendor/*' \) -exec sed -i 's|github.com/opennetsys/godot/|github.com/opennetsys/golkadot/|g' {} \;

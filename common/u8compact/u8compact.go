@@ -3,9 +3,9 @@ package u8compact
 import (
 	"math/big"
 
-	"github.com/opennetsys/go-substrate/common/bnutil"
-	"github.com/opennetsys/go-substrate/common/mathutil"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/bnutil"
+	"github.com/opennetsys/golkadot/common/mathutil"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 // DefaultBitLength ...

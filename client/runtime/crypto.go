@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/opennetsys/go-substrate/common/crypto"
+	"github.com/opennetsys/golkadot/common/crypto"
 )
 
 // Crypto ...

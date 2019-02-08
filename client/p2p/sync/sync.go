@@ -7,11 +7,11 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/opennetsys/go-substrate/client/p2p/defaults"
-	synctypes "github.com/opennetsys/go-substrate/client/p2p/sync/types"
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	"github.com/opennetsys/go-substrate/common/u8util"
-	"github.com/opennetsys/go-substrate/logger"
+	"github.com/opennetsys/golkadot/client/p2p/defaults"
+	synctypes "github.com/opennetsys/golkadot/client/p2p/sync/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/common/u8util"
+	"github.com/opennetsys/golkadot/logger"
 )
 
 // note: ensure the struct emplements the interface

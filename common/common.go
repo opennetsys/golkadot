@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/opennetsys/go-substrate/common/bnutil"
-	"github.com/opennetsys/go-substrate/common/hexutil"
-	"github.com/opennetsys/go-substrate/common/u8compact"
-	"github.com/opennetsys/go-substrate/common/u8util"
+	"github.com/opennetsys/golkadot/common/bnutil"
+	"github.com/opennetsys/golkadot/common/hexutil"
+	"github.com/opennetsys/golkadot/common/u8compact"
+	"github.com/opennetsys/golkadot/common/u8util"
 )
 
 // ErrTypeUnsupported ...

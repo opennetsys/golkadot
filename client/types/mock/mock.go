@@ -5,13 +5,13 @@
 package mock_clienttypes
 
 import (
-	types "github.com/opennetsys/go-substrate/client/p2p/handler/types"
-	types0 "github.com/opennetsys/go-substrate/client/p2p/peer/types"
-	types1 "github.com/opennetsys/go-substrate/client/p2p/peers/types"
-	types2 "github.com/opennetsys/go-substrate/client/p2p/sync/types"
-	types3 "github.com/opennetsys/go-substrate/client/p2p/types"
-	types4 "github.com/opennetsys/go-substrate/client/types"
-	crypto "github.com/opennetsys/go-substrate/common/crypto"
+	types "github.com/opennetsys/golkadot/client/p2p/handler/types"
+	types0 "github.com/opennetsys/golkadot/client/p2p/peer/types"
+	types1 "github.com/opennetsys/golkadot/client/p2p/peers/types"
+	types2 "github.com/opennetsys/golkadot/client/p2p/sync/types"
+	types3 "github.com/opennetsys/golkadot/client/p2p/types"
+	types4 "github.com/opennetsys/golkadot/client/types"
+	crypto "github.com/opennetsys/golkadot/common/crypto"
 	gomock "github.com/golang/mock/gomock"
 	go_libp2p_net "github.com/libp2p/go-libp2p-net"
 	go_libp2p_peer "github.com/libp2p/go-libp2p-peer"

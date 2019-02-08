@@ -1,8 +1,8 @@
 package author
 
 import (
-	"github.com/opennetsys/go-substrate/client/p2p/pubsub"
-	rpctypes "github.com/opennetsys/go-substrate/client/rpc/types"
+	"github.com/opennetsys/golkadot/client/p2p/pubsub"
+	rpctypes "github.com/opennetsys/golkadot/client/rpc/types"
 )
 
 // ServiceInterface ...

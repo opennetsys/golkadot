@@ -1,7 +1,7 @@
 package clientchaintypes
 
 import (
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
 )
 
 // ChainJSON ...

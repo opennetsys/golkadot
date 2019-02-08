@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"testing"
 
-	clienttypes "github.com/opennetsys/go-substrate/client/types"
-	mocktypes "github.com/opennetsys/go-substrate/client/types/mock"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	mocktypes "github.com/opennetsys/golkadot/client/types/mock"
 
 	"github.com/golang/mock/gomock"
 	ic "github.com/libp2p/go-libp2p-crypto"
