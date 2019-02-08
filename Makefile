@@ -123,3 +123,7 @@ test/common/fileflatdb:
 .PHONY: test/common/diskdb
 test/common/diskdb:
 	@go test -v common/diskdb/*.go
+
+.PHONY: move/repo
+move/repo:
+	@find . -type f -name '*.go' -not \( -path './.git/*' -o -path './vendor/*' \) -exec sed -i 's|github.com/c3systems/go-substrate/|github.com/opennetsys/go-substrate/|g' {} \;
