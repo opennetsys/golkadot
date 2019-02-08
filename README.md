@@ -1,16 +1,16 @@
-# go-substrate
+# godot
 
 > [Polkadot](https://github.com/paritytech/polkadot) [Substrate](https://github.com/paritytech/substrate) implementation in Go
 
-[![License](http://img.shields.io/badge/license-GNU%20AGPL%203.0-blue.svg)](https://raw.githubusercontent.com/opennetsys/go-substrate/master/LICENSE)
-[![CircleCI](https://circleci.com/gh/opennetsys/go-substrate.svg?style=svg)](https://circleci.com/gh/opennetsys/go-substrate)
-[![Coverage Status](https://coveralls.io/repos/github/opennetsys/go-substrate/badge.svg?branch=master)](https://coveralls.io/github/opennetsys/go-substrate?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/opennetsys/go-substrate?)](https://goreportcard.com/report/github.com/opennetsys/go-substrate)
-[![GoDoc](https://godoc.org/github.com/opennetsys/go-substrate?status.svg)](https://godoc.org/github.com/opennetsys/go-substrate)
+[![License](http://img.shields.io/badge/license-GNU%20AGPL%203.0-blue.svg)](https://raw.githubusercontent.com/opennetsys/godot/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/opennetsys/godot.svg?style=svg)](https://circleci.com/gh/opennetsys/godot)
+[![Coverage Status](https://coveralls.io/repos/github/opennetsys/godot/badge.svg?branch=master)](https://coveralls.io/github/opennetsys/godot?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/opennetsys/godot?)](https://goreportcard.com/report/github.com/opennetsys/godot)
+[![GoDoc](https://godoc.org/github.com/opennetsys/godot?status.svg)](https://godoc.org/github.com/opennetsys/godot)
 [![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-NOTE: go-substrate is a very early work-in-progress. It's currently highly unstable and not very useful as it is.
+NOTE: godot is a very early work-in-progress. It's currently highly unstable and not very useful as it is.
 
 ## Contents
 
