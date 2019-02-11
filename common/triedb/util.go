@@ -5,8 +5,8 @@ import (
 	"log"
 	"math"
 	"os"
+	"reflect"
 
-	"github.com/opennetsys/golkadot/common/crypto"
 	"github.com/opennetsys/golkadot/common/triecodec"
 )
 
@@ -32,76 +32,23 @@ func GetNodeType(node Node) int {
 }
 
 // IsKvNode ...
-func IsKvNode(node Node) bool {
-	switch v := node.(type) {
-	case []Node:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 2
-	case [][]uint8:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 2
-	case []*crypto.Blake2b256Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 2
-	case []*crypto.Blake2b512Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 2
-	case []*crypto.Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 2
-	case []interface{}:
-		return len(v) == 2
-	default:
-		return false
+func IsKvNode(node interface{}) bool {
+	val := reflect.ValueOf(node)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		return val.Len() == 2
 	}
+
+	return false
 }
 
 // IsBranchNode ...
-func IsBranchNode(node Node) bool {
-	switch v := node.(type) {
-	case [][]uint8:
-		if IsEmptyNode(v) {
-			return false
-		}
-		return len(v) == 17
-	case []*crypto.Blake2b256Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 17
-	case []*crypto.Blake2b512Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 17
-	case []*crypto.Hash:
-		if IsEmptyNode(node) {
-			return false
-		}
-		return len(v) == 17
-	case []Node:
-		if IsEmptyNode(v) {
-			return false
-		}
-		return len(v) == 17
-	case []interface{}:
-		if IsEmptyNode(v) {
-			return false
-		}
-		return len(v) == 17
-	default:
-		return false
+func IsBranchNode(node interface{}) bool {
+	val := reflect.ValueOf(node)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		return val.Len() == 17
 	}
+
+	return false
 }
 
 // IsExtensionNode ...
@@ -115,89 +62,31 @@ func IsLeafNode(node Node) bool {
 }
 
 // IsEmptyNode ...
-func IsEmptyNode(node Node) bool {
-	switch v := node.(type) {
-	case nil:
+func IsEmptyNode(node interface{}) bool {
+	if node == nil {
 		return true
-	case Node:
-		switch u := v.(type) {
-		case []Node:
-			return u == nil || len(u) == 0
-		}
-		return v == nil
-	case [][]uint8:
-		return v == nil
-	case []*crypto.Blake2b256Hash:
-		return v == nil
-	case []*crypto.Blake2b512Hash:
-		return v == nil
-	case []*crypto.Hash:
-		return v == nil
-	case []uint8:
-		return v == nil
-	case *crypto.Blake2b256Hash:
-		return v == nil
-	case *crypto.Blake2b512Hash:
-		return v == nil
-	case *crypto.Hash:
-		return v == nil
-	case []Node:
-		return v == nil
-	default:
-		return false
 	}
+
+	return false
 }
 
 // IsNull ...
-func IsNull(node Node) bool {
-	switch v := node.(type) {
-	case nil:
+func IsNull(node interface{}) bool {
+	if node == nil {
 		return true
-	case []uint8:
-		return v == nil
-	case *crypto.Blake2b256Hash:
-		return v == nil
-	case *crypto.Blake2b512Hash:
-		return v == nil
-	case *crypto.Hash:
-		return v == nil
-	case [][]uint8:
-		return v == nil
-	case []*crypto.Blake2b256Hash:
-		return v == nil
-	case []*crypto.Blake2b512Hash:
-		return v == nil
-	case []*crypto.Hash:
-		return v == nil
-	case []Node:
-		return v == nil
-	default:
-		return false
 	}
+
+	return false
 }
 
 // Size ...
 func Size(value interface{}) int {
-	switch v := value.(type) {
-	case nil:
-		return 0
-	case []uint8:
-		return len(v)
-	case *crypto.Blake2b256Hash:
-		return len(v)
-	case *crypto.Blake2b512Hash:
-		return len(v)
-	case *crypto.Hash:
-		return len(v)
-	case []Node:
-		return len(v)
-	case Node:
-		return 1
-	case []interface{}:
-		return len(v)
-	default:
-		return 0
+	val := reflect.ValueOf(value)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		return val.Len()
 	}
+
+	return 0
 }
 
 // DecodeNode ...
@@ -325,40 +214,11 @@ func IsMultiSlice(value interface{}) bool {
 		return len(v) > 1
 	case [][]uint8:
 		return len(v) > 1
-	case []*crypto.Blake2b256Hash:
-		return len(v) > 1
-	case []*crypto.Blake2b512Hash:
-		return len(v) > 1
-	case []*crypto.Hash:
-		return len(v) > 1
-	case Node:
-		switch u := v.(type) {
-		case []uint8:
-			return false
-		case *crypto.Blake2b256Hash:
-			return false
-		case *crypto.Blake2b512Hash:
-			return false
-		case *crypto.Hash:
-			return false
-		case [][]uint8:
-			return len(u) > 1
-		case []*crypto.Blake2b256Hash:
-			return len(u) > 1
-		case []*crypto.Blake2b512Hash:
-			return len(u) > 1
-		case []*crypto.Hash:
-			return len(u) > 1
-		case []interface{}:
-			return len(u) > 1
-		default:
-			return false
-		}
 	case []interface{}:
 		return len(v) > 1
-	default:
-		return false
 	}
+
+	return false
 }
 
 var debugEnabled bool

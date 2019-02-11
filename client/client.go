@@ -137,7 +137,7 @@ func (c *Client) RunInformant() {
 func ID() string {
 	// TODO: dynamic
 	version := "0.0.1"
-	name := "go-substrate"
+	name := "golkadot"
 	var stability string
 	isDevelopment := true
 	if isDevelopment {

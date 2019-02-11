@@ -9,23 +9,23 @@ func TestUtils(t *testing.T) {
 	// TODO: table tests
 
 	branchNode := []Node{
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
-		NewNodeEmpty(),
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
 	}
 
 	if IsBranchNode(branchNode) != true {
@@ -33,7 +33,7 @@ func TestUtils(t *testing.T) {
 	}
 
 	branchNode2 := []Node{
-		NewNodeEmpty(),
+		nil,
 	}
 
 	if IsBranchNode(branchNode2) != false {

@@ -1,7 +1,7 @@
 package db
 
 // DefaultPath ...
-var DefaultPath = "~/.go-substrate"
+var DefaultPath = "~/.golkadot"
 
 // DefaultType ...
 var DefaultType = "disk"

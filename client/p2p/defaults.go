@@ -5,7 +5,7 @@ package p2p
 import "fmt"
 
 // DefaultClientID ...
-var DefaultClientID = "go-substrate/0.0.0"
+var DefaultClientID = "golkadot/0.0.0"
 
 // DefaultAddress ...
 var DefaultAddress = "127.0.0.1"

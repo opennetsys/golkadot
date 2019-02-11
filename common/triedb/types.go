@@ -29,11 +29,6 @@ var NodeTypeBranch = 3
 // NodeEncoded ...
 type NodeEncoded struct{}
 
-// NewNodeEmpty ...
-func NewNodeEmpty() Node {
-	return Node(nil)
-}
-
 // EncodedPath ...
 type EncodedPath []uint8
 

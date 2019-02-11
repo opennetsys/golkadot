@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"reflect"
 
 	"github.com/opennetsys/golkadot/common/db"
 	"github.com/opennetsys/golkadot/common/triecodec"
@@ -94,39 +95,26 @@ func (i *Impl) Snapshot(dest *TrieDB, fn db.ProgressCB, root []byte, keys int, p
 
 // GetNode ...
 // NOTE: should usually be single dimension array
-func (i *Impl) GetNode(nhash Node) Node {
-	i.DebugLog("GetNode, hash", nhash)
-	hash := NewNodeListFromNode(nhash)[:]
+func (i *Impl) GetNode(hash interface{}) Node {
+	i.DebugLog("GetNode, hash", hash)
+	val := reflect.ValueOf(hash)
 	var l int
-	var shash []uint8
-	if len(hash) == 1 {
-		shash = NewUint8FromNode(hash[0])
-		l = len(shash)
-	} else {
-		shash = NewUint8FromNode(nhash)
-		l = len(hash)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		l = val.Len()
 	}
-	i.DebugLog("GetNode, hash single", shash)
-	i.DebugLog("GetNode, lengths", l, len(hash), len(shash))
-	i.DebugLog("GetNode, hashes", hash, shash)
-	var isEmpty bool
-	if len(hash) == 0 {
-		isEmpty = KeyEquals(shash, []uint8{})
-		i.DebugLog("GetNode, isEmpty", isEmpty)
-	}
-	if shash == nil || l == 0 || isEmpty {
+
+	if hash == nil || l == 0 {
 		i.DebugLog("GetNode, get node empty")
 		return nil
-	} else if l < 32 { // it's encoded key if len 32
-		// is encodeed bel if less than 32?
+	} else if l < 32 {
 		i.DebugLog("GetNode, less than 32")
-		x := DecodeNode(nhash, i.codec)
+		x := DecodeNode(hash.(Node), i.codec)
 		i.DebugLog("GetNode, less than 32, decoded", x)
 		return x
 	}
 
-	i.DebugLog("GetNode, get hash", shash)
-	x := i.db.Get(shash)
+	i.DebugLog("GetNode, get hash", hash)
+	x := i.db.Get(hash.([]uint8))
 	i.DebugLog("GetNode, get hash result", x)
 	y := DecodeNode(x, i.codec)
 	i.DebugLog("GetNode, decode node result", y)

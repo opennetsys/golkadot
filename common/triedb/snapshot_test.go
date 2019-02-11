@@ -54,8 +54,8 @@ func TestSnapshots(t *testing.T) {
 			{K: []uint8("twzei"), V: []uint8("und Deutch")},
 			{K: []uint8("do"), V: []uint8("do it")},
 			{K: []uint8("dog"), V: []uint8("doggie")},
-			//&triehash.TriePair{K: []uint8("dogge"), V: []uint8("bigger doge")},
-			//&triehash.TriePair{K: []uint8("dodge"), V: []uint8("coin")},
+			&triehash.TriePair{K: []uint8("dogge"), V: []uint8("bigger dog")},
+			&triehash.TriePair{K: []uint8("dodge"), V: []uint8("coin")},
 		}
 
 		root := triehash.TrieRoot(values)
@@ -64,20 +64,26 @@ func TestSnapshots(t *testing.T) {
 			trie.Put(value.K, value.V)
 		}
 
-		t.Skip()
 		trie.Snapshot(back, nil)
 
 		if !reflect.DeepEqual(back.GetRoot(), trie.GetRoot()) {
 			t.Fail()
 		}
 
-		if hex.EncodeToString(back.GetRoot()[:]) != hex.EncodeToString(root[:]) {
-			t.Fail()
+		{
+			got := hex.EncodeToString(back.GetRoot()[:])
+			want := hex.EncodeToString(root[:])
+			if got != want {
+				t.Errorf("got %q, want %q", got, want)
+			}
 		}
 
-		for _, value := range values {
-			if !reflect.DeepEqual(trie.Get(value.K), value.V) {
-				t.Fail()
+		{
+			got := trie.Get(values[0].K)
+			want := values[0].V
+
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("got %v, want %v", got, want)
 			}
 		}
 	})
