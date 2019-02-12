@@ -8,7 +8,6 @@ import (
 	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
 	synctypes "github.com/opennetsys/golkadot/client/p2p/sync/types"
 	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
-	pcrypto "github.com/opennetsys/golkadot/common/crypto"
 
 	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
@@ -35,12 +34,12 @@ type InterfaceSync interface {
 type InterfaceChains interface {
 	// note: required from p2p.peer.AddConnection
 	GetBestBlocksNumber() (*big.Int, error)
-	GetBestBlocksHash() (*pcrypto.Blake2b256Hash, error)
-	GetGenesisHash() (*pcrypto.Blake2b256Hash, error)
+	GetBestBlocksHash() ([]byte, error)
+	GetGenesisHash() ([]byte, error)
 	// note: required by sync.processBlock
 	ImportBlock(block *StateBlock) (bool, error)
 	// note required by sync.QueuBlocks
-	GetBlockDataByHash(hash *pcrypto.Blake2b256Hash) (*StateBlock, error)
+	GetBlockDataByHash(hash []byte) (*StateBlock, error)
 }
 
 // InterfacePeer defines the methods of peer

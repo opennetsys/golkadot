@@ -1,10 +1,14 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 	"os"
 
+	ic "github.com/libp2p/go-libp2p-crypto"
+	libpeer "github.com/libp2p/go-libp2p-peer"
 	"github.com/opennetsys/golkadot/client"
+	clientdbtypes "github.com/opennetsys/golkadot/client/db/types"
 	"github.com/opennetsys/golkadot/client/p2p"
 	"github.com/opennetsys/golkadot/client/rpc"
 	"github.com/opennetsys/golkadot/client/telemetry"
@@ -25,18 +29,18 @@ func setup() {
 
 	var p2pAddress string
 	var p2pNodes []string
-	var p2pPort int
-	var p2pMaxPeers int
+	var p2pPort uint
+	var p2pMaxPeers uint
 	var p2pNoBootnodes bool
 
 	var rpcPath string
 	var rpcTypes []string
-	var rpcPort int
+	var rpcPort uint
 
 	var telemetryName string
 	var telemetryURL string
 
-	var wasmHeapSize int
+	var wasmHeapSize uint
 
 	var chain string
 	var role string
@@ -44,14 +48,63 @@ func setup() {
 
 	rootCmd = &cobra.Command{
 		Use:   "start",
-		Short: "",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
+		Short: "Start node",
+		Long:  `Starts the Polkadot node`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			priv, pub, err := ic.GenerateKeyPairWithReader(ic.RSA, 256, rand.Reader)
+			if err != nil {
+				return err
+			}
+
+			pi := libpeer.ID("foobar")
+
 			// TODO: implement
-			config := &clienttypes.ConfigClient{}
+			config := &clienttypes.ConfigClient{
+				DB: &clientdbtypes.Config{
+					Compact:  dbCompact,
+					IsTrieDB: true,
+					Path:     dbPath,
+					Snapshot: dbSnapshot,
+					Type:     dbType,
+				},
+				Chain: "dev",
+				P2P: &clienttypes.ConfigP2P{
+					Address:     p2pAddress,
+					ClientID:    "",
+					MaxPeers:    p2pMaxPeers,
+					Nodes:       p2pNodes,
+					NoBootNodes: p2pNoBootnodes,
+					Port:        p2pPort,
+				},
+				Peer: &clienttypes.ConfigPeer{
+					BestHash:   nil,
+					BestNumber: nil,
+					ID:         pi,
+					PeerInfo:   nil,
+					ShortID:    "",
+				},
+				Peers: &clienttypes.ConfigPeers{
+					Priv: priv,
+					Pub:  pub,
+					ID:   pi,
+				},
+				RPC: &clienttypes.ConfigRPC{
+				/*
+					Host:  nil
+					SystemService: nil
+					StateService: nil,
+					ChainService: nil,
+					AuthorService: nil,
+					ID: nil,
+				*/
+				},
+				Telemetry: &clienttypes.TelemetryConfig{},
+				Wasm:      &clienttypes.WasmConfig{},
+			}
 			cl := client.NewClient()
 			cl.Start(config)
 
+			return nil
 		},
 	}
 
@@ -62,18 +115,18 @@ func setup() {
 
 	rootCmd.PersistentFlags().StringVarP(&p2pAddress, "p2p-address", "", p2p.DefaultAddress, "The interface to bind to (p2p-port > 0)")
 	rootCmd.PersistentFlags().StringArrayVarP(&p2pNodes, "p2p-nodes", "", nil, "Reserved nodes to make initial connections to")
-	rootCmd.PersistentFlags().IntVarP(&p2pMaxPeers, "p2p-max-peers", "", p2p.DefaultMaxPeers, "The maximum allowed peers")
-	rootCmd.PersistentFlags().IntVarP(&p2pPort, "p2p-port", "", p2p.DefaultPort, "Sets the peer-to-peer port, 0 for non-listening mode")
+	rootCmd.PersistentFlags().UintVarP(&p2pMaxPeers, "p2p-max-peers", "", p2p.DefaultMaxPeers, "The maximum allowed peers")
+	rootCmd.PersistentFlags().UintVarP(&p2pPort, "p2p-port", "", p2p.DefaultPort, "Sets the peer-to-peer port, 0 for non-listening mode")
 	rootCmd.PersistentFlags().BoolVarP(&p2pNoBootnodes, "p2p-no-bootnodes", "", false, "When specified, do not make connections to chain-specific bootnodes")
 
 	rootCmd.PersistentFlags().StringVarP(&rpcPath, "rpc-path", "", rpc.DefaultPath, "Sets the endpoint for RPC POST requests")
 	rootCmd.PersistentFlags().StringArrayVarP(&rpcTypes, "rpc-types", "", nil, "Sets the available RPC protocol types")
-	rootCmd.PersistentFlags().IntVarP(&rpcPort, "rpc-port", "", p2p.DefaultPort, "Sets the port to use for local RPC")
+	rootCmd.PersistentFlags().UintVarP(&rpcPort, "rpc-port", "", p2p.DefaultPort, "Sets the port to use for local RPC")
 
 	rootCmd.PersistentFlags().StringVarP(&telemetryName, "telemetry-name", "", "", "Unique name of this node to report")
 	rootCmd.PersistentFlags().StringVarP(&telemetryURL, "telemetry-url", "", telemetry.DefaultURL, "Websocket endpoint for telemetry stats")
 
-	rootCmd.PersistentFlags().IntVarP(&wasmHeapSize, "wasm-heap-size", "", wasm.DefaultHeapSizeKB, "Initial size for the WASM runtime heap (KB)")
+	rootCmd.PersistentFlags().UintVarP(&wasmHeapSize, "wasm-heap-size", "", wasm.DefaultHeapSizeKB, "Initial size for the WASM runtime heap (KB)")
 
 	rootCmd.PersistentFlags().StringVarP(&chain, "chain", "", "main", "Use the chain specified, one of (dev, main) or custom '<chain>.json'")
 	rootCmd.PersistentFlags().StringVarP(&clientID, "client-id", "", client.ID(), "The client/version identifier for the running node")

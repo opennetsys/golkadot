@@ -6,8 +6,7 @@ import (
 )
 
 func createU8a(dbs db.BaseDB, fn types.StorageFunction) StorageMethodU8a {
-	// TODO
-	return StorageMethodU8a{}
+	return NewStorageMethodU8a(dbs, fn)
 }
 
 func createBn(dbs db.BaseDB, fn types.StorageFunction, n int) StorageMethodBn {

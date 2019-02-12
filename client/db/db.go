@@ -14,6 +14,7 @@ import (
 	"github.com/opennetsys/golkadot/common/db"
 	diskdb "github.com/opennetsys/golkadot/common/diskdb"
 	"github.com/opennetsys/golkadot/common/triedb"
+	types "github.com/opennetsys/golkadot/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-db/src/index.ts
@@ -45,31 +46,40 @@ type InterfaceChainDbs interface {
 // StorageMethodU8a ...
 // TODO
 type StorageMethodU8a struct {
+	base      *Base
+	createKey types.StorageFunction
 	//Del(params ...interface{})
 	//Get(params ...interface{}) []uint8
 	//Set(value []uint8, params ...interface{})
 	//OnUpdate(callback func(value []uint8))
 }
 
+// NewStorageMethodU8a ...
+func NewStorageMethodU8a(dbs db.BaseDB, createKey types.StorageFunction) StorageMethodU8a {
+	return StorageMethodU8a{
+		base:      NewBase(dbs),
+		createKey: createKey,
+	}
+}
+
 // Del ...
-func (s *StorageMethodU8a) Del(params ...interface{}) {
-	// TODO
+func (s *StorageMethodU8a) Del(keyParam interface{}) {
+	s.base.Del(s.createKey(keyParam))
 }
 
 // Get ...
-func (s *StorageMethodU8a) Get(params ...interface{}) []uint8 {
-	// TODO
-	return nil
+func (s *StorageMethodU8a) Get(keyParam interface{}) []uint8 {
+	return s.base.Get(s.createKey(keyParam))
 }
 
 // Set ...
-func (s *StorageMethodU8a) Set(value []uint8, params ...interface{}) {
-	// TODO
+func (s *StorageMethodU8a) Set(value []uint8, keyParam interface{}) {
+	s.base.Set(s.createKey(keyParam), value)
 }
 
 // OnUpdate ...
 func (s *StorageMethodU8a) OnUpdate(callback func(value []uint8)) {
-	// TODO
+	s.base.OnUpdate(callback)
 }
 
 // StorageMethodBn ...
@@ -110,6 +120,10 @@ type DB struct {
 func NewDB(config *clienttypes.ConfigClient, chain *clientchainloader.Loader) *DB {
 	if config == nil {
 		log.Fatal("config must not be nil")
+	}
+
+	if config.DB == nil {
+		log.Fatal("config db must not be nil")
 	}
 
 	ret := &DB{}
@@ -215,4 +229,43 @@ func (c *DB) Blocks() *BlockDB {
 // State ...
 func (c *DB) State() *StateDB {
 	return c.StateDB
+}
+
+// Base ...
+type Base struct {
+	db db.BaseDB
+}
+
+// NewBase ...
+func NewBase(dbs db.BaseDB) *Base {
+	return &Base{
+		db: dbs,
+	}
+}
+
+// Del ...
+func (b *Base) Del(key []uint8) {
+	b.db.Del(key)
+}
+
+// Get ...
+func (b *Base) Get(key []uint8) []uint8 {
+	value := b.db.Get(key)
+
+	return value
+}
+
+// Set ...
+func (b *Base) Set(key []uint8, value []uint8) []uint8 {
+	b.db.Put(key, value)
+	// b.subscribers.each(func(subscriber) {
+	// subscriber(value)
+	//})
+
+	return value
+}
+
+// OnUpdate  ...
+func (b *Base) OnUpdate(subscriber func(value []uint8)) {
+	// b.subscribers = append(b.subscribers, subscriber)
 }

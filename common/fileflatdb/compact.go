@@ -67,7 +67,7 @@ func (c *Compact) Maintain(fn *db.ProgressCB) {
 }
 
 // Open ...
-func (c *Compact) Open(file string, startEmpty bool) int {
+func (c *Compact) Open(file string, startEmpty bool) uintptr {
 	_, err := os.Stat(file)
 	isExisting := !os.IsNotExist(err)
 	if !isExisting || startEmpty {
@@ -83,11 +83,11 @@ func (c *Compact) Open(file string, startEmpty bool) int {
 		log.Fatal(err)
 	}
 
-	return int(f.Fd())
+	return f.Fd()
 }
 
 // doCompact ...
-func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, oldFd int, newAt int, oldAt int, depth int) {
+func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, oldFd uintptr, newAt int, oldAt int, depth int) {
 	increment := (100 / float64(entryNum)) / math.Pow(float64(entryNum), float64(depth))
 
 	for index := 0; index < entryNum; index++ {
@@ -131,7 +131,7 @@ func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, old
 }
 
 // Compact ...
-func (c *Compact) Compact(fn db.ProgressCB, newFd, oldFd int) int {
+func (c *Compact) Compact(fn db.ProgressCB, newFd, oldFd uintptr) int {
 	var keys int
 	var percent int
 
@@ -141,11 +141,11 @@ func (c *Compact) Compact(fn db.ProgressCB, newFd, oldFd int) int {
 }
 
 // CompactReadEntry ...
-func (c *Compact) CompactReadEntry(fd int, at int, index int) []byte {
+func (c *Compact) CompactReadEntry(fd uintptr, at int, index int) []byte {
 	entry := make([]byte, entrySize)
 	entryAt := at + (index * entrySize)
 
-	file := os.NewFile(uintptr(fd), "temp")
+	file := os.NewFile(fd, "temp")
 	_, err := file.ReadAt(entry, int64(entryAt))
 	if err != nil {
 		log.Fatal(err)
@@ -155,9 +155,9 @@ func (c *Compact) CompactReadEntry(fd int, at int, index int) []byte {
 }
 
 // CompactReadKey ...
-func (c *Compact) CompactReadKey(fd int, at int64) ([]byte, []byte) {
+func (c *Compact) CompactReadKey(fd uintptr, at int64) ([]byte, []byte) {
 	key := make([]byte, keyTotalSize)
-	file := os.NewFile(uintptr(fd), "temp")
+	file := os.NewFile(fd, "temp")
 	_, err := file.ReadAt(key, at)
 	if err != nil {
 		log.Fatal(err)
@@ -179,8 +179,8 @@ func (c *Compact) CompactReadKey(fd int, at int64) ([]byte, []byte) {
 }
 
 // CompactWriteKey ...
-func (c *Compact) CompactWriteKey(fd int, key, value []byte) int64 {
-	file := os.NewFile(uintptr(fd), "temp")
+func (c *Compact) CompactWriteKey(fd uintptr, key, value []byte) int64 {
+	file := os.NewFile(fd, "temp")
 	stat, err := file.Stat()
 	if err != nil {
 		log.Fatal(err)
@@ -203,14 +203,14 @@ func (c *Compact) CompactWriteKey(fd int, key, value []byte) int64 {
 }
 
 // CompactUpdateLink ...
-func (c *Compact) CompactUpdateLink(fd int, at int, index int, pointer int64, kind int) {
+func (c *Compact) CompactUpdateLink(fd uintptr, at int, index int, pointer int64, kind int) {
 	entry := make([]byte, entrySize)
 	entryAt := at + (index * entrySize)
 
 	entry[0] = byte(kind)
 	writeUIntBE(entry, int64(pointer), int64(1), int64(uintSize))
 
-	file := os.NewFile(uintptr(fd), "temp")
+	file := os.NewFile(fd, "temp")
 	_, err := file.WriteAt(entry, int64(entryAt))
 	if err != nil {
 		log.Fatal(err)
@@ -218,8 +218,8 @@ func (c *Compact) CompactUpdateLink(fd int, at int, index int, pointer int64, ki
 }
 
 // CompactWriteHeader ...
-func (c *Compact) CompactWriteHeader(fd int, at int, index int) int64 {
-	file := os.NewFile(uintptr(fd), "temp")
+func (c *Compact) CompactWriteHeader(fd uintptr, at int, index int) int64 {
+	file := os.NewFile(fd, "temp")
 	stat, err := file.Stat()
 	if err != nil {
 		log.Fatal(err)
@@ -237,9 +237,9 @@ func (c *Compact) CompactWriteHeader(fd int, at int, index int) int64 {
 	return headerAt
 }
 
-func closeFd(fd int) {
+func closeFd(fd uintptr) {
 	// close file descriptor
-	if err := syscall.Close(fd); err != nil {
+	if err := syscall.Close(int(fd)); err != nil {
 		log.Fatal(err)
 	}
 }

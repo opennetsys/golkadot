@@ -149,7 +149,7 @@ func (i *Impl) WriteValue(keyAt int, keyValue []byte, value []byte) *Value {
 
 	writeUIntBE(keyValue, int64(len(value)), int64(keySize), int64(uintSize))
 	writeUIntBE(keyValue, int64(valueAt), int64(keySize)+int64(uintSize), int64(uintSize))
-	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	file := os.NewFile(i.fd(), "fileflatdb")
 	_, err := file.WriteAt(keyValue[keySize:keySize+2*uintSize], int64(keyAt)+int64(keySize))
 	if err != nil {
 		log.Fatal(err)
@@ -222,7 +222,7 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 
 	writeUIntBE(branch, int64(newBranchAt), int64(entryIndex)+1, int64(uintSize))
 
-	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	file := os.NewFile(i.fd(), "fileflatdb")
 	_, err := file.WriteAt(branch[entryIndex:entryIndex+int64(entrySize)], int64(branchAt)+int64(entryIndex))
 	if err != nil {
 		log.Fatal(err)
@@ -241,7 +241,7 @@ func (i *Impl) WriteNewLeaf(branch []byte, branchAt int64, entryIndex int64, key
 
 	branch[entryIndex] = byte(SlotLeaf)
 	writeUIntBE(branch, int64(newKey.KeyAt), int64(entryIndex)+1, int64(uintSize))
-	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	file := os.NewFile(i.fd(), "fileflatdb")
 	_, err := file.WriteAt(branch[entryIndex:entryIndex+int64(entrySize)], int64(branchAt)+int64(entryIndex))
 	if err != nil {
 		log.Fatal(err)
@@ -257,7 +257,7 @@ func (i *Impl) WriteNewLeaf(branch []byte, branchAt int64, entryIndex int64, key
 // WriteUpdatedBuffer  ...
 func (i *Impl) WriteUpdatedBuffer(buffer []byte, bufferAt int64) int64 {
 
-	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+	file := os.NewFile(i.fd(), "fileflatdb")
 	_, err := file.WriteAt(buffer, bufferAt)
 	if err != nil {
 		log.Fatal(err)
@@ -270,10 +270,11 @@ func (i *Impl) WriteUpdatedBuffer(buffer []byte, bufferAt int64) int64 {
 // WriteNewBuffer  ...
 func (i *Impl) WriteNewBuffer(buffer []byte, withCache bool) int64 {
 	startAt := i.cache.file.fileSize
-	file := os.NewFile(uintptr(i.cache.file.fd), "temp")
+
+	file := os.NewFile(i.fd(), "fileflatdb")
 	_, err := file.WriteAt(buffer, startAt)
 	if err != nil {
-		log.Fatal(err, "1")
+		log.Fatalf("error writing new buffer to file: %v \n", err)
 	}
 
 	if withCache {
@@ -300,4 +301,14 @@ func (i *Impl) WriteNewBuffers(buffers [][]byte) int64 {
 	}
 
 	return i.WriteNewBuffer(concenatedBuffers, false)
+}
+
+// fd ...
+func (i *Impl) fd() uintptr {
+	filepath := i.cache.file.path
+	file, err := os.OpenFile(filepath, os.O_RDWR, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return file.Fd()
 }

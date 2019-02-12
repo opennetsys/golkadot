@@ -30,7 +30,6 @@ type Chain struct {
 }
 
 // NewChain ...
-// TODO: configClient?
 func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
 	var err error
 
@@ -48,9 +47,10 @@ func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
 		return nil, err
 	}
 
-	bestHash := c.Blocks.BestHash.Get()
-	bestNumber := c.Blocks.BestNumber.Get()
+	bestHash := c.Blocks.BestHash.Get(nil)
+	bestNumber := c.Blocks.BestNumber.Get(nil)
 	logGenesis := ""
+
 	if bestNumber.Cmp(big.NewInt(0)) != 0 {
 		logGenesis = fmt.Sprintf("(genesis %s)", u8util.ToHex(c.Genesis.Block.Hash[:], 48, true))
 	}
@@ -68,7 +68,7 @@ func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
 
 // InitGenesis ...
 func (c *Chain) InitGenesis() (*clientchaintypes.ChainGenesis, error) {
-	bestHash := c.Blocks.BestHash.Get()
+	bestHash := c.Blocks.BestHash.Get(nil)
 	if bestHash == nil || len(bestHash) == 0 {
 		return c.CreateGenesis()
 	}
@@ -86,12 +86,12 @@ func (c *Chain) InitGenesisFromBest(bestHeader *clienttypes.Header, rollback boo
 		logger.Error("[chain] state root is nil")
 	}
 	hexState := u8util.ToHex(bestHeader.StateRoot[:], 48, true)
-	fmt.Printf("Initializing from state %s", hexState)
+	fmt.Printf("[chain] initializing from state %s\n", hexState)
 
 	c.State.DB.SetRoot(bestHeader.StateRoot[:])
 
 	if u8util.ToHex(c.State.DB.GetRoot(), 48, true) != hexState {
-		log.Fatalf("Unable to move state to %s", hexState)
+		log.Fatalf("[chain] unable to move state to %s\n", hexState)
 	}
 
 	genesisHash := c.Blocks.Hash.Get(0)
@@ -115,17 +115,18 @@ func (c *Chain) RollbackBlock(bestHeader *clienttypes.Header, rollback bool) *cl
 	prevNumber := bestHeader.BlockNumber.Int64() - 1
 
 	if rollback && prevNumber > 1 {
-		fmt.Printf("Unable to validate root, moving to block #%d, %s\n", prevNumber, u8util.ToHex(prevHash, 48, true))
+		fmt.Printf("[chain] unable to validate root, moving to block #%d, %s\n", prevNumber, u8util.ToHex(prevHash, 48, true))
 
 		prevBlock := c.GetBlock(prevHash)
 
-		c.Blocks.BestHash.Set(prevHash)
+		c.Blocks.BestHash.Set(prevHash, nil)
 		c.Blocks.BestNumber.Set(prevBlock.Header.BlockNumber)
 
 		return c.InitGenesisFromBest(prevBlock.Header, false)
 	}
 
-	panic("Unable to retrieve genesis hash, aborting")
+	log.Fatal("[chain] unable to retrieve genesis hash. aborting\n")
+	return nil
 }
 
 // GetBlock ...
@@ -133,7 +134,7 @@ func (c *Chain) GetBlock(headerHash []uint8) *clienttypes.BlockData {
 	data := c.Blocks.BlockData.Get(headerHash)
 
 	if data == nil || len(data) == 0 {
-		log.Fatalf("Unable to retrieve block %s\n", u8util.ToHex(headerHash, -1, true))
+		log.Fatalf("[chain] unable to retrieve block %s\n", u8util.ToHex(headerHash, -1, true))
 	}
 
 	return clienttypes.NewBlockData(data)
@@ -141,12 +142,12 @@ func (c *Chain) GetBlock(headerHash []uint8) *clienttypes.BlockData {
 
 // GetCode ...
 func (c *Chain) GetCode() []uint8 {
-	_, decodedValue := u8compact.StripLength(storagetypes.Substrate.Code(), 32)
+	_, decodedValue := u8compact.StripLength(storagetypes.Substrate.Code(nil), -1)
 
 	code := c.State.DB.Get(decodedValue)
 
 	if code == nil || len(code) == 0 {
-		panic("Unable to retrieve genesis code")
+		log.Fatal("[chain] unable to retrieve genesis code")
 	}
 
 	return code
@@ -161,7 +162,7 @@ func (c *Chain) CreateGenesis() (*clientchaintypes.ChainGenesis, error) {
 		return nil, err
 	}
 
-	c.Blocks.BestHash.Set(genesis.Block.Hash[:])
+	c.Blocks.BestHash.Set(genesis.Block.Hash[:], nil)
 	c.Blocks.BestNumber.Set(big.NewInt(0))
 	c.Blocks.BlockData.Set(genesis.Block.ToU8a(), genesis.Block.Hash)
 	c.Blocks.Hash.Set(genesis.Block.Hash[:], 0)
@@ -175,9 +176,9 @@ func (c *Chain) CreateGenesisBlock() (*clientchaintypes.ChainGenesis, error) {
 	if err != nil {
 		return nil, err
 	}
-	header.SetStateRoot(crypto.NewBlake2b256(c.State.DB.GetRoot()))
-	header.SetExtrinsicsRoot(crypto.NewBlake2b256(triehash.TrieRoot(nil)))
-	header.SetParentHash(crypto.NewBlake2b256(make([]uint8, 32)))
+	header.SetStateRoot(crypto.NewBlake2b256(c.State.DB.GetRoot())[:])
+	header.SetExtrinsicsRoot(crypto.NewBlake2b256(triehash.TrieRoot(nil))[:])
+	header.SetParentHash(crypto.NewBlake2b256(make([]uint8, 32))[:])
 
 	block := clienttypes.NewBlockData(map[string]interface{}{
 		"hash":   header.Hash,
@@ -213,4 +214,32 @@ func (c *Chain) CreateGenesisState() {
 		// TODO: return err?
 		logger.Errorf("[chain] statedb ok: %v, err:\n%v", ok, err)
 	}
+}
+
+// GetBestBlocksHash ...
+func (c *Chain) GetBestBlocksHash() ([]byte, error) {
+	return c.Blocks.BestHash.Get(nil), nil
+}
+
+// GetBestBlocksNumber ...
+func (c *Chain) GetBestBlocksNumber() (*big.Int, error) {
+	return c.Blocks.BestNumber.Get(), nil
+}
+
+// GetBlockDataByHash ...
+func (c *Chain) GetBlockDataByHash(hash []byte) (*clienttypes.StateBlock, error) {
+	// TODO
+	return nil, nil
+}
+
+// GetGenesisHash ...
+func (c *Chain) GetGenesisHash() ([]byte, error) {
+	// TODO
+	return nil, nil
+}
+
+// ImportBlock ...
+func (c *Chain) ImportBlock(block *clienttypes.StateBlock) (bool, error) {
+	// TODO
+	return false, nil
 }

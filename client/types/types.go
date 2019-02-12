@@ -201,13 +201,13 @@ type BlockRequestFields struct {
 
 // BlockRequestMessageFrom ...
 type BlockRequestMessageFrom struct {
-	Hash        *pcrypto.Blake2b256Hash
+	Hash        []byte
 	BlockNumber *big.Int
 }
 
 // BlockRequestMessageTo ...
 type BlockRequestMessageTo struct {
-	Hash        *pcrypto.Blake2b256Hash
+	Hash        []byte
 	BlockNumber *big.Int
 }
 
@@ -315,10 +315,10 @@ type Digest struct {
 // Header ...
 type Header struct {
 	BlockNumber    *big.Int
-	ParentHash     *pcrypto.Blake2b256Hash
+	ParentHash     []byte
 	Number         *big.Int
-	StateRoot      *pcrypto.Blake2b256Hash
-	ExtrinsicsRoot *pcrypto.Blake2b256Hash
+	StateRoot      []byte
+	ExtrinsicsRoot []byte
 	Digest         *Digest
 	Author         *AccountID
 }
@@ -333,7 +333,7 @@ type Header struct {
 // BlockData TODO
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client-types/src/BlockData.ts
 type BlockData struct {
-	Hash          *pcrypto.Blake2b256Hash
+	Hash          []byte
 	Header        *Header
 	Body          []byte
 	Receipt       []byte
@@ -345,8 +345,8 @@ type BlockData struct {
 type StatusMessage struct {
 	Roles       []StatusMessageRolesEnum
 	BestNumber  *big.Int
-	BestHash    *pcrypto.Blake2b256Hash
-	GenesisHash *pcrypto.Blake2b256Hash
+	BestHash    []byte
+	GenesisHash []byte
 	ChainStatus []byte
 	Version     string
 }

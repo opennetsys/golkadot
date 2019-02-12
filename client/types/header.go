@@ -51,23 +51,23 @@ func (h *Header) GetBlockNumber() *big.Int {
 }
 
 // SetStateRoot ...
-func (h *Header) SetStateRoot(stateRoot *pcrypto.Blake2b256Hash) {
+func (h *Header) SetStateRoot(stateRoot []byte) {
 	h.StateRoot = stateRoot
 }
 
 // SetExtrinsicsRoot ...
-func (h *Header) SetExtrinsicsRoot(root *pcrypto.Blake2b256Hash) {
+func (h *Header) SetExtrinsicsRoot(root []byte) {
 	h.ExtrinsicsRoot = root
 }
 
 // SetParentHash ...
-func (h *Header) SetParentHash(hash *pcrypto.Blake2b256Hash) {
+func (h *Header) SetParentHash(hash []byte) {
 	h.ParentHash = hash
 }
 
 // Hash ...
-func (h *Header) Hash() *pcrypto.Blake2b256Hash {
-	return pcrypto.NewBlake2b256(h.ToU8a())
+func (h *Header) Hash() []byte {
+	return pcrypto.NewBlake2b256(h.ToU8a())[:]
 }
 
 // ToU8a ...

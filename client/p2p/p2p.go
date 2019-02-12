@@ -769,6 +769,6 @@ func (p *P2P) handleEvent(event p2ptypes.EventEnum) {
 }
 
 //// TODO ...
-//func (p *P2P) announceBlock(hash *crypto.Blake2b256Hash, header []byte, body []byte) {
+//func (p *P2P) announceBlock(hash []byte, header []byte, body []byte) {
 //return
 //}

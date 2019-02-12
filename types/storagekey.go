@@ -4,15 +4,18 @@ package types
 type StorageKey []byte
 
 // StorageFunction ...
-type StorageFunction interface {
-	/*
-	  (arg?: any): Uint8Array;
-	  meta StorageFunctionMetadata
-	  method string;
-	  section string;
-	  toJSON: () => any;
-	*/
-}
+//type StorageFunction interface {
+/*
+  (arg?: any): Uint8Array;
+  meta StorageFunctionMetadata
+  method string;
+  section string;
+  toJSON: () => any;
+*/
+//}
+
+// StorageFunction ...
+type StorageFunction func(arg interface{}) []uint8
 
 /*
 import { AnyU8a } from './types';

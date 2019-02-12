@@ -11,16 +11,16 @@ var DefaultClientID = "golkadot/0.0.0"
 var DefaultAddress = "127.0.0.1"
 
 // DefaultMaxPeers ...
-var DefaultMaxPeers = 25
+var DefaultMaxPeers uint = 25
 
 // DefaultPort ...
-var DefaultPort = 31333
+var DefaultPort uint = 31333
 
 // DefaultProtocolPing ...
 var DefaultProtocolPing = "/ipfs/ping/1.0.0"
 
 // DefaultMaxRequestBlocks ...
-var DefaultMaxRequestBlocks = 64
+var DefaultMaxRequestBlocks uint = 64
 
 // DefaultProtocolBase ...
 // TODO: change...

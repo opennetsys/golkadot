@@ -22,5 +22,7 @@ type CreateItemOptions struct {
 
 // CreateFunc ...
 func CreateFunc(section *string, method *string, meta *StorageFunctionMetadata, options *CreateItemOptions) types.StorageFunction {
-	return []uint8{}
+	return func(arg interface{}) []uint8 {
+		return []uint8{}
+	}
 }

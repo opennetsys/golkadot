@@ -5,10 +5,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
-	"github.com/opennetsys/golkadot/common/db"
+	db "github.com/opennetsys/golkadot/common/db"
+	dirutil "github.com/opennetsys/golkadot/common/dirutil"
 )
 
 var uintSize = 5
@@ -24,7 +26,7 @@ var lruDataCount = 8192
 // File ...
 type File struct {
 	serializer *Serializer
-	fd         int
+	fd         uintptr
 	fileSize   int64
 	path       string
 	file       string
@@ -43,7 +45,7 @@ func NewFile(base, file string, options *db.BaseDBOptions) *File {
 
 	f := &File{
 		serializer: NewSerializer(),
-		fd:         -1,
+		fd:         0,
 		fileSize:   0,
 		path:       fmt.Sprintf("%s/%s", base, file),
 		file:       file,
@@ -64,9 +66,9 @@ func NewFile(base, file string, options *db.BaseDBOptions) *File {
 func (f *File) AssertOpen(open bool) {
 	var test bool
 	if open {
-		test = f.fd != -1
+		test = f.fd != 0
 	} else {
-		test = f.fd == -1
+		test = f.fd == 0
 	}
 
 	if !test {
@@ -85,11 +87,13 @@ func (f *File) Close() {
 		log.Fatal(err)
 	}
 
-	f.fd = -1
+	f.fd = 0
 }
 
 // Open ...
 func (f *File) Open(filepath string, startEmpty bool) {
+	filepath = dirutil.NormalizePath(filepath)
+
 	_, err := os.Stat(filepath)
 	isExisting := !os.IsNotExist(err)
 
@@ -99,6 +103,14 @@ func (f *File) Open(filepath string, startEmpty bool) {
 		}
 
 		b := make([]byte, branchSize)
+
+		paths := strings.Split(filepath, "/")
+		folderPath := strings.Join(paths[:len(paths)-1], "/")
+		err := os.MkdirAll(folderPath, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		ioutil.WriteFile(filepath, b, 0644)
 	}
 
@@ -112,6 +124,6 @@ func (f *File) Open(filepath string, startEmpty bool) {
 		log.Fatal(err)
 	}
 
-	f.fd = int(file.Fd())
+	f.fd = file.Fd()
 	f.fileSize = stat.Size()
 }

@@ -18,4 +18,6 @@ func TestClientDB(t *testing.T) {
 		},
 	}, &clientchainloader.Loader{})
 	_ = db
+
+	// TODO
 }

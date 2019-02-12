@@ -1,16 +1,18 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
+	clientchain "github.com/opennetsys/golkadot/client/chain"
+	p2p "github.com/opennetsys/golkadot/client/p2p"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts
-
-// TODO: these are placeholders. need to implement in their respective package
 
 // InformantDelay ...
 var InformantDelay = 10000
@@ -36,16 +38,21 @@ func NewClient() *Client {
 // Start ...
 func (c *Client) Start(config *clienttypes.ConfigClient) {
 	// TODO: implement
-	/*
-		c.chain = clientchain.NewChain(config)
-		c.p2p = NewP2P(config, c.chain)
-		c.rpc = NewRPC(config, c.chain)
-		c.telemetry = NewTelemetry(config, c.chain)
+	var err error
+	c.Chain, err = clientchain.NewChain(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.P2P, err = p2p.New(context.Background(), nil, nil, config, c.Chain)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//c.RPC = NewRPC(config, c.Chain)
+	//c.Telemetry = NewTelemetry(config, c.Chain)
 
-		c.p2p.Start()
-		c.rpc.Start()
-		c.telemetry.Start()
-	*/
+	c.P2P.Start()
+	//c.RPC.Start()
+	//c.Telemetry.Start()
 
 	c.StartInformant()
 }
@@ -58,7 +65,7 @@ func (c *Client) Stop() {
 // StartInformant ...
 func (c *Client) StartInformant() {
 	// TODO: implement
-	//c.informantID = setInterval(c.runInformant, InformationDelay)
+	//c.InformantID = setInterval(c.RunInformant, InformationDelay)
 
 	if c.P2P == nil {
 		return
@@ -66,7 +73,7 @@ func (c *Client) StartInformant() {
 
 	// TODO: implement
 	/*
-		c.p2p.sync.on("imported", func () {
+		c.P2P.Sync.on("imported", func () {
 			if c.telemetry != nil {
 				c.telemetry.BlockImported()
 			}
@@ -129,7 +136,7 @@ func (c *Client) RunInformant() {
 
 	if c.Telemetry != nil {
 		// TODO: implement
-		// c.telemetry.intervalInfo(numPeers, status)
+		// c.Telemetry.intervalInfo(numPeers, status)
 	}
 }
 
