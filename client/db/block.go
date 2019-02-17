@@ -9,9 +9,9 @@ func createU8a(dbs db.BaseDB, fn types.StorageFunction) StorageMethodU8a {
 	return NewStorageMethodU8a(dbs, fn)
 }
 
-func createBn(dbs db.BaseDB, fn types.StorageFunction, n int) StorageMethodBn {
-	// TODO
-	return StorageMethodBn{}
+func createBn(dbs db.BaseDB, createKey types.StorageFunction, bitLen int) StorageMethodBn {
+
+	return NewStorageMethodBn(dbs, createKey, bitLen)
 }
 
 // NewBlockDB ...

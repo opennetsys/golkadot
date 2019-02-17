@@ -11,13 +11,13 @@ import (
 	clientchainloader "github.com/opennetsys/golkadot/client/chain/loader"
 	clientdbtypes "github.com/opennetsys/golkadot/client/db/types"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
-	"github.com/opennetsys/golkadot/common/db"
+	"github.com/opennetsys/golkadot/common/bnutil"
+	db "github.com/opennetsys/golkadot/common/db"
 	diskdb "github.com/opennetsys/golkadot/common/diskdb"
-	"github.com/opennetsys/golkadot/common/triedb"
+	triedb "github.com/opennetsys/golkadot/common/triedb"
+	"github.com/opennetsys/golkadot/common/u8util"
 	types "github.com/opennetsys/golkadot/types"
 )
-
-// TODO: https://github.com/polkadot-js/client/blob/master/packages/client-db/src/index.ts
 
 // Config ...
 type Config struct {
@@ -44,14 +44,9 @@ type InterfaceChainDbs interface {
 }
 
 // StorageMethodU8a ...
-// TODO
 type StorageMethodU8a struct {
 	base      *Base
 	createKey types.StorageFunction
-	//Del(params ...interface{})
-	//Get(params ...interface{}) []uint8
-	//Set(value []uint8, params ...interface{})
-	//OnUpdate(callback func(value []uint8))
 }
 
 // NewStorageMethodU8a ...
@@ -83,29 +78,39 @@ func (s *StorageMethodU8a) OnUpdate(callback func(value []uint8)) {
 }
 
 // StorageMethodBn ...
-// TODO
 type StorageMethodBn struct {
+	base      *Base
+	createKey types.StorageFunction
+	bitLen    int
+}
+
+// NewStorageMethodBn ...
+func NewStorageMethodBn(dbs db.BaseDB, createKey types.StorageFunction, bitLen int) StorageMethodBn {
+	return StorageMethodBn{
+		base:      NewBase(dbs),
+		createKey: createKey,
+		bitLen:    bitLen,
+	}
 }
 
 // Del ...
-func (s *StorageMethodBn) Del(params ...interface{}) {
-	// TODO
+func (s *StorageMethodBn) Del(keyParams ...interface{}) {
+	s.base.Del(s.createKey(keyParams))
 }
 
 // Get ...
-func (s *StorageMethodBn) Get(params ...interface{}) *big.Int {
-	// TODO
-	return nil
+func (s *StorageMethodBn) Get(keyParams ...interface{}) *big.Int {
+	return u8util.ToBN(s.base.Get(s.createKey(keyParams)), true)
 }
 
 // Set ...
-func (s *StorageMethodBn) Set(value *big.Int, params ...interface{}) {
-	// TODO
+func (s *StorageMethodBn) Set(value *big.Int, keyParams ...interface{}) {
+	s.base.Set(s.createKey(keyParams), bnutil.ToUint8Slice(value, s.bitLen, true, false))
 }
 
 // OnUpdate ...
-func (s *StorageMethodBn) OnUpdate(callback func(value *big.Int)) {
-	// TODO
+func (s *StorageMethodBn) OnUpdate(callback func(value []uint8)) {
+	s.base.OnUpdate(callback)
 }
 
 // DB ...

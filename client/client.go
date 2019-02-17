@@ -43,7 +43,7 @@ func (c *Client) Start(config *clienttypes.ConfigClient) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.P2P, err = p2p.New(context.Background(), nil, nil, config, c.Chain)
+	c.P2P, err = p2p.NewP2P(context.Background(), nil, nil, config, c.Chain)
 	if err != nil {
 		log.Fatal(err)
 	}

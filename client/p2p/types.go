@@ -24,6 +24,8 @@ var (
 	ErrNoChainService = errors.New("a chain service is required")
 	// ErrNoHost ...
 	ErrNoHost = errors.New("the p2p service has no host")
+	// ErrNoPublicKey ...
+	ErrNoPublicKey = errors.New("the p2p service has no public key associated with it")
 )
 
 // P2P implements the p2p interface

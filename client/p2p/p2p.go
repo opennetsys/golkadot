@@ -35,14 +35,17 @@ import (
 // Ensure the struct implements the interface
 var _ clienttypes.InterfaceP2P = (*P2P)(nil)
 
-// New builds a new p2p service
-func New(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cfg *clienttypes.ConfigClient, c clienttypes.InterfaceChains) (*P2P, error) {
+// NewP2P builds a new p2p service
+func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{}, cfg *clienttypes.ConfigClient, c clienttypes.InterfaceChains) (*P2P, error) {
 	// 1. check inputs
 	if cfg == nil {
 		return nil, ErrNoConfig
 	}
 	if cfg.P2P == nil {
 		return nil, errors.New("nil p2p config")
+	}
+	if cfg.P2P.Pub == nil {
+		return nil, ErrNoPublicKey
 	}
 	if c == nil {
 		return nil, ErrNoChainService

@@ -82,7 +82,7 @@ func (i *Impl) RetrieveLeaf(doCreate bool, branch []byte, branchAt int, entryInd
 
 	if matchIndex != keySize {
 		if doCreate {
-			return i.WriteNewBranch(branch, int64(branchAt), int64(entryIndex), key, int64(keyAt.Uint64()), prevKey, int64(matchIndex), int64(matchIndex-keyIndex-1))
+			return i.WriteNewBranch(branch, int64(branchAt), int64(entryIndex), key, int64(keyAt.Uint64()), prevKey, uint64(matchIndex), int64(matchIndex-keyIndex-1))
 		}
 
 		return nil
@@ -97,7 +97,10 @@ func (i *Impl) RetrieveLeaf(doCreate bool, branch []byte, branchAt int, entryInd
 
 // FindKey ...
 func (i *Impl) FindKey(key *NibbleBuffer, doCreate bool, keyIndex, branchAt int64) *Key {
-	entryIndex := int(key.Nibbles[keyIndex]) * entrySize
+	var entryIndex int
+	if len(key.Nibbles) > 0 {
+		entryIndex = int(key.Nibbles[keyIndex]) * entrySize
+	}
 	branch := i.cache.GetCachedBranch(branchAt)
 	entryType := branch[entryIndex]
 	switch int(entryType) {
@@ -178,16 +181,23 @@ func (i *Impl) WriteNewKey(key *NibbleBuffer) *Key {
 }
 
 // WriteNewBranch ...
-func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, key *NibbleBuffer, prevAt int64, prevKey *NibbleBuffer, matchIndex int64, depth int64) *Key {
+func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, key *NibbleBuffer, prevAt int64, prevKey *NibbleBuffer, matchIndex uint64, depth int64) *Key {
 
 	newKey := i.WriteNewKey(key)
 
-	if matchIndex >= int64(len(key.Nibbles)) {
-		matchIndex = int64(len(key.Nibbles) - 1)
+	if matchIndex >= uint64(len(key.Nibbles)) && len(key.Nibbles) > 0 {
+		matchIndex = uint64(len(key.Nibbles) - 1)
 	}
 
-	keyIndex := int(key.Nibbles[matchIndex]) * entrySize
-	prevIndex := int(prevKey.Nibbles[matchIndex]) * entrySize
+	var keyIndex int
+	if len(key.Nibbles) > 0 {
+		keyIndex = int(key.Nibbles[matchIndex]) * entrySize
+	}
+
+	var prevIndex int
+	if len(prevKey.Nibbles) > 0 {
+		prevIndex = int(prevKey.Nibbles[matchIndex]) * entrySize
+	}
 	var buffers [][]byte
 	newBranchAt := i.cache.file.fileSize
 	newBranch := make([]byte, branchSize)
@@ -202,7 +212,7 @@ func (i *Impl) WriteNewBranch(branch []byte, branchAt int64, entryIndex int64, k
 
 	var offset int64 = 1
 	for depth > 0 {
-		branchIndex := int64(key.Nibbles[matchIndex-offset]) * int64(entrySize)
+		branchIndex := int64(key.Nibbles[int64(matchIndex)-offset]) * int64(entrySize)
 
 		newBranch = make([]byte, branchSize)
 		newBranch[branchIndex] = byte(SlotBranch)
@@ -306,9 +316,14 @@ func (i *Impl) WriteNewBuffers(buffers [][]byte) int64 {
 // fd ...
 func (i *Impl) fd() uintptr {
 	filepath := i.cache.file.path
+
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		log.Fatalf("[fileflatdb] file %q does not exist", filepath)
+	}
+
 	file, err := os.OpenFile(filepath, os.O_RDWR, 0755)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb] error opening file: %v", err)
 	}
 	return file.Fd()
 }

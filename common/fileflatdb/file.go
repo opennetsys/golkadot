@@ -43,11 +43,13 @@ func NewFile(base, file string, options *db.BaseDBOptions) *File {
 		isCompressed = true
 	}
 
+	filepath := dirutil.NormalizePath(fmt.Sprintf("%s/%s", base, file))
+
 	f := &File{
 		serializer: NewSerializer(),
 		fd:         0,
 		fileSize:   0,
-		path:       fmt.Sprintf("%s/%s", base, file),
+		path:       filepath,
 		file:       file,
 	}
 

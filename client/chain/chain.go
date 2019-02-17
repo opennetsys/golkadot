@@ -51,6 +51,10 @@ func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
 	bestNumber := c.Blocks.BestNumber.Get(nil)
 	logGenesis := ""
 
+	if bestNumber == nil {
+		log.Fatal("[client/chain] bestNumber is nil")
+	}
+
 	if bestNumber.Cmp(big.NewInt(0)) != 0 {
 		logGenesis = fmt.Sprintf("(genesis %s)", u8util.ToHex(c.Genesis.Block.Hash[:], 48, true))
 	}

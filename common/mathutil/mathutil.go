@@ -279,7 +279,10 @@ func iushrn(value *big.Int, bits uint, hint int, extended bool) *big.Int {
 // BitLen ...
 func BitLen(value *big.Int) int {
 	bits := value.Bits()
-	w := bits[len(bits)-1]
+	var w big.Word
+	if len(bits) > 0 {
+		w = bits[len(bits)-1]
+	}
 	hi := CountBits(int(w))
 	return (len(bits)-1)*26 + hi
 }

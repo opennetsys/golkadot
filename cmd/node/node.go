@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"os"
@@ -75,6 +76,10 @@ func setup() {
 					Nodes:       p2pNodes,
 					NoBootNodes: p2pNoBootnodes,
 					Port:        p2pPort,
+					Syncer:      nil,
+					Priv:        nil,
+					Pub:         nil,
+					Context:     context.Background(),
 				},
 				Peer: &clienttypes.ConfigPeer{
 					BestHash:   nil,
@@ -89,14 +94,12 @@ func setup() {
 					ID:   pi,
 				},
 				RPC: &clienttypes.ConfigRPC{
-				/*
-					Host:  nil
-					SystemService: nil
-					StateService: nil,
-					ChainService: nil,
+					Host:          nil,
+					SystemService: nil,
+					StateService:  nil,
+					ChainService:  nil,
 					AuthorService: nil,
-					ID: nil,
-				*/
+					ID:            nil,
 				},
 				Telemetry: &clienttypes.TelemetryConfig{},
 				Wasm:      &clienttypes.WasmConfig{},
