@@ -14,14 +14,14 @@ import (
 // DiscoveryNotifee ...
 // TODO: make this private?
 type DiscoveryNotifee struct {
-	h host.Host
+	host host.Host
 }
 
 // HandlePeerFound ...
-func (n *DiscoveryNotifee) HandlePeerFound(pi peerstore.PeerInfo) {
-	n.h.Peerstore().AddAddrs(pi.ID, pi.Addrs, peerstore.PermanentAddrTTL)
-	if err := n.h.Connect(context.Background(), pi); err != nil {
-		logger.Errorf("[node] found peer %s\nerr connecting %v", pi.Addrs, err)
+func (d *DiscoveryNotifee) HandlePeerFound(pi peerstore.PeerInfo) {
+	d.host.Peerstore().AddAddrs(pi.ID, pi.Addrs, peerstore.PermanentAddrTTL)
+	if err := d.host.Connect(context.Background(), pi); err != nil {
+		logger.Errorf("[node] found peer %v but failed to connect: %v", pi.Addrs, err)
 
 		return
 	}

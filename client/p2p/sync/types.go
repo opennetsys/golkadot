@@ -30,7 +30,6 @@ type Sync struct {
 	blockRequests clienttypes.StateBlockRequests
 	blockQueue    clienttypes.StateBlockQueue
 	chain         clienttypes.InterfaceChains
-	config        *clienttypes.ConfigClient
 	ctx           context.Context
 	handlers      map[synctypes.EventEnum]clienttypes.EventCallback
 	BestSeen      *big.Int

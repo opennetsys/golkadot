@@ -20,7 +20,7 @@ func (b *BFTHandler) Func(p clienttypes.InterfaceP2P, pr clienttypes.InterfacePe
 	//logger.Errorf("[handler] err unmarshalling block response message\n%v", err)
 	//return err
 	//}
-	//logger.Infof("%v BFT: %v", pr.Cfg().ShortID, string(msgStrBytes))
+	//logger.Infof("%v BFT: %v", pr.Config().ShortID, string(msgStrBytes))
 
 	return nil
 }

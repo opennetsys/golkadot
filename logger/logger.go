@@ -44,6 +44,11 @@ func Print(s string) {
 	logrus.Infof(s)
 }
 
+// Println ...
+func Println(i ...interface{}) {
+	logrus.Infoln(i...)
+}
+
 // Warnf ...
 func Warnf(s string, i ...interface{}) {
 	logrus.Warnf(s, i...)
@@ -57,5 +62,4 @@ func Warn(s string) {
 // Set modifies the logger
 func Set(hook ContextHook, setReport bool) {
 	logrus.SetReportCaller(setReport)
-	logrus.AddHook(hook)
 }

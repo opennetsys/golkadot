@@ -7,9 +7,10 @@ import (
 	"math/big"
 	"time"
 
-	clientchain "github.com/opennetsys/golkadot/client/chain"
 	p2p "github.com/opennetsys/golkadot/client/p2p"
+	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
+	logger "github.com/opennetsys/golkadot/logger"
 )
 
 // TODO: https://github.com/polkadot-js/client/blob/master/packages/client/src/index.ts
@@ -39,22 +40,27 @@ func NewClient() *Client {
 func (c *Client) Start(config *clienttypes.ConfigClient) {
 	// TODO: implement
 	var err error
-	c.Chain, err = clientchain.NewChain(config)
-	if err != nil {
-		log.Fatal(err)
-	}
 	c.P2P, err = p2p.NewP2P(context.Background(), nil, nil, config, c.Chain)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//c.RPC = NewRPC(config, c.Chain)
 	//c.Telemetry = NewTelemetry(config, c.Chain)
+	c.P2P.On(p2ptypes.Started, func() (interface{}, error) {
+		logger.Info("[client] received p2p event: Started")
+		return nil, nil
+	})
+	c.P2P.On(p2ptypes.Stopped, func() (interface{}, error) {
+		logger.Info("[client] received p2p event: Stopped")
+		return nil, nil
+	})
 
 	c.P2P.Start()
 	//c.RPC.Start()
 	//c.Telemetry.Start()
 
 	c.StartInformant()
+	select {}
 }
 
 // Stop ...

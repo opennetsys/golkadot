@@ -266,8 +266,8 @@ func (p *Peer) SetBest(blockNumber *big.Int, hash []byte) error {
 	return nil
 }
 
-// Cfg ...
-func (p *Peer) Cfg() clienttypes.ConfigClient {
+// Config returns the config
+func (p *Peer) Config() clienttypes.ConfigClient {
 	if p.config == nil {
 		return clienttypes.ConfigClient{}
 	}

@@ -58,8 +58,8 @@ type InterfacePeer interface {
 	Send(msg InterfaceMessage) (bool, error)
 	// SetBest sets a new block
 	SetBest(blockNumber *big.Int, hash []byte) error
-	// Cfg returns the peer config
-	Cfg() ConfigClient
+	// Config returns the peer config
+	Config() ConfigClient
 	// GetChain ...
 	GetChain() (InterfaceChains, error)
 	// GetID ...
@@ -130,8 +130,8 @@ type InterfaceP2P interface {
 	Start() error
 	// Stop stops the p2p service
 	Stop() error
-	// Cfg returns the config
-	Cfg() ConfigClient
+	// Config returns the config
+	Config() ConfigClient
 	// GetSyncer ...
 	GetSyncer() (InterfaceSync, error)
 }

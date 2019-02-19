@@ -9,8 +9,10 @@ import (
 	ic "github.com/libp2p/go-libp2p-crypto"
 	libpeer "github.com/libp2p/go-libp2p-peer"
 	"github.com/opennetsys/golkadot/client"
+	clientchain "github.com/opennetsys/golkadot/client/chain"
 	clientdbtypes "github.com/opennetsys/golkadot/client/db/types"
 	"github.com/opennetsys/golkadot/client/p2p"
+	p2psync "github.com/opennetsys/golkadot/client/p2p/sync"
 	"github.com/opennetsys/golkadot/client/rpc"
 	"github.com/opennetsys/golkadot/client/telemetry"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
@@ -57,7 +59,10 @@ func setup() {
 				return err
 			}
 
-			pi := libpeer.ID("foobar")
+			pi, err := libpeer.IDFromPrivateKey(priv)
+			if err != nil {
+				return err
+			}
 
 			// TODO: implement
 			config := &clienttypes.ConfigClient{
@@ -69,18 +74,6 @@ func setup() {
 					Type:     dbType,
 				},
 				Chain: "dev",
-				P2P: &clienttypes.ConfigP2P{
-					Address:     p2pAddress,
-					ClientID:    "",
-					MaxPeers:    p2pMaxPeers,
-					Nodes:       p2pNodes,
-					NoBootNodes: p2pNoBootnodes,
-					Port:        p2pPort,
-					Syncer:      nil,
-					Priv:        nil,
-					Pub:         nil,
-					Context:     context.Background(),
-				},
 				Peer: &clienttypes.ConfigPeer{
 					BestHash:   nil,
 					BestNumber: nil,
@@ -104,7 +97,31 @@ func setup() {
 				Telemetry: &clienttypes.TelemetryConfig{},
 				Wasm:      &clienttypes.WasmConfig{},
 			}
+
 			cl := client.NewClient()
+			cl.Chain, err = clientchain.NewChain(config)
+			if err != nil {
+				return err
+			}
+
+			syncer, err := p2psync.New(context.Background(), cl.Chain)
+			if err != nil {
+				return err
+			}
+
+			config.P2P = &clienttypes.ConfigP2P{
+				Address:     p2pAddress,
+				ClientID:    clientID,
+				MaxPeers:    p2pMaxPeers,
+				Nodes:       p2pNodes,
+				NoBootNodes: p2pNoBootnodes,
+				Port:        p2pPort,
+				Syncer:      syncer,
+				Priv:        priv,
+				Pub:         pub,
+				Context:     context.Background(),
+			}
+
 			cl.Start(config)
 
 			return nil

@@ -18,10 +18,7 @@ import (
 var _ clienttypes.InterfaceSync = (*Sync)(nil)
 
 // New ...
-func New(ctx context.Context, cfg *clienttypes.ConfigClient, chn clienttypes.InterfaceChains) (*Sync, error) {
-	if cfg == nil {
-		return nil, ErrNilConfig
-	}
+func New(ctx context.Context, chn clienttypes.InterfaceChains) (*Sync, error) {
 	if chn == nil {
 		return nil, ErrNilChain
 	}
@@ -31,7 +28,6 @@ func New(ctx context.Context, cfg *clienttypes.ConfigClient, chn clienttypes.Int
 		blockQueue:    make(clienttypes.StateBlockQueue),
 		blockRequests: make(clienttypes.StateBlockRequests),
 		chain:         chn,
-		config:        cfg,
 		ctx:           ctx,
 		handlers:      make(map[synctypes.EventEnum]clienttypes.EventCallback),
 		BestSeen:      new(big.Int),
@@ -231,13 +227,13 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 
 	if !ok {
 		// TODO: nil check
-		logger.Warnf("Unrequested response from %v", pr.Cfg().Peer.ShortID)
+		logger.Warnf("Unrequested response from %v", pr.Config().Peer.ShortID)
 		return nil
 
 	} else if request == nil {
 		return nil
 	} else if response.Message.ID != request.ID {
-		//logger.Warnf("Mismatched response from %v", pr.Cfg().ShortID)
+		//logger.Warnf("Mismatched response from %v", pr.Config().ShortID)
 		//return nil
 	}
 
@@ -291,7 +287,7 @@ func (s *Sync) QueueBlocks(pr clienttypes.InterfacePeer, response *clienttypes.B
 	}
 
 	if count != 0 && firstNumber != nil {
-		logger.Infof("Queued %d blocks from %s, %s", count, pr.Cfg().Peer.ShortID, firstNumber.String())
+		logger.Infof("Queued %d blocks from %s, %s", count, pr.Config().Peer.ShortID, firstNumber.String())
 	}
 
 	return nil
@@ -329,17 +325,17 @@ func (s *Sync) RequestBlocks(pr clienttypes.InterfacePeer) error {
 		}
 	}
 
-	if pr.Cfg().Peer.BestNumber.Cmp(s.BestSeen) == 1 {
-		s.BestSeen = pr.Cfg().Peer.BestNumber
+	if pr.Config().Peer.BestNumber.Cmp(s.BestSeen) == 1 {
+		s.BestSeen = pr.Config().Peer.BestNumber
 	}
 
 	// TODO: This assumes no stale block downloading
 	_, ok := s.blockRequests[pr.GetID()]
-	if ok || from == nil || from.Cmp(pr.Cfg().Peer.BestNumber) == 1 {
+	if ok || from == nil || from.Cmp(pr.Config().Peer.BestNumber) == 1 {
 		return nil
 	}
 
-	logger.Infof("Requesting blocks from %v, %v", pr.Cfg().Peer.ShortID, from.String())
+	logger.Infof("Requesting blocks from %v, %v", pr.Config().Peer.ShortID, from.String())
 
 	timeout := time.Now().Add(time.Duration(REQUEST_TIMEOUT) * time.Millisecond)
 	nextID := pr.GetNextID()

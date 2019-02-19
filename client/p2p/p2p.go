@@ -16,7 +16,7 @@ import (
 	"github.com/opennetsys/golkadot/client/p2p/sync"
 	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
-	"github.com/opennetsys/golkadot/logger"
+	log "github.com/opennetsys/golkadot/logger"
 
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	inet "github.com/libp2p/go-libp2p-net"
@@ -54,7 +54,7 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	// 1. parse the public key for the pid
 	pid, err := libpeer.IDFromPublicKey(cfg.P2P.Pub)
 	if err != nil {
-		logger.Errorf("[p2p] err generating peer id from public key\n%v", err)
+		log.Errorf("[p2p] err generating peer id from public key\n%v", err)
 		return nil, err
 	}
 
@@ -63,11 +63,11 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	// TODO: this is being built in peers, too!
 	ps := pstoremem.NewPeerstore()
 	if err := ps.AddPrivKey(pid, cfg.P2P.Priv); err != nil {
-		logger.Errorf("[p2p] err adding private keey to peer store\n%v", err)
+		log.Errorf("[p2p] err adding private keey to peer store\n%v", err)
 		return nil, err
 	}
 	if err := ps.AddPubKey(pid, cfg.P2P.Pub); err != nil {
-		logger.Errorf("[p2p] err adding public key to peer store\n%v", err)
+		log.Errorf("[p2p] err adding public key to peer store\n%v", err)
 		return nil, err
 	}
 
@@ -76,7 +76,16 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	swarmNet := swarm.NewSwarm(cfg.P2P.Context, pid, ps, nil)
 	tcpTransport := tcp.NewTCPTransport(genUpgrader(swarmNet))
 	if err := swarmNet.AddTransport(tcpTransport); err != nil {
-		logger.Errorf("[p2p] err adding transport to swarmnet\n%v", err)
+		log.Errorf("[p2p] err adding transport to swarmnet\n%v", err)
+		return nil, err
+	}
+	listen, err := ma.NewMultiaddr(cfg.P2P.Address)
+	if err != nil {
+		log.Errorf("[p2p] err parsing address\n%v", err)
+		return nil, err
+	}
+	if err := swarmNet.AddListenAddr(listen); err != nil {
+		log.Errorf("[p2p] err adding swam listen addr\n%v", err)
 		return nil, err
 	}
 	bNode := bhost.New(swarmNet)
@@ -85,18 +94,18 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	// TODO ...
 	dhtSvc, err := dht.New(cfg.P2P.Context, bNode)
 	if err != nil {
-		logger.Errorf("[p2p] err building dht service\n%v", err)
+		log.Errorf("[p2p] err building dht service\n%v", err)
 		return nil, err
 	}
 	if err := dhtSvc.Bootstrap(cfg.P2P.Context); err != nil {
-		logger.Errorf("[p2p] err bootstrapping dht\n%v", err)
+		log.Errorf("[p2p] err bootstrapping dht\n%v", err)
 		return nil, err
 	}
 
 	// 5. build the host
 	newNode := rhost.Wrap(bNode, dhtSvc)
 	for i, addr := range newNode.Addrs() {
-		logger.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
+		log.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
 	}
 
 	// 6. build the discovery service
@@ -105,7 +114,7 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
 	discoverySvc, err := discovery.NewMdnsService(cfg.P2P.Context, newNode, time.Second, defaults.Defaults.Name)
 	if err != nil {
-		logger.Errorf("[p2p] err starting discover service\n%v", err)
+		log.Errorf("[p2p] err starting discover service\n%v", err)
 		return nil, err
 	}
 	discoverySvc.RegisterNotifee(&DiscoveryNotifee{newNode})
@@ -138,15 +147,15 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	//newNode.Peerstore().AddAddrs(pinfo.ID, pinfo.Addrs, peerstore.PermanentAddrTTL)
 	//}
 
-	snc, err := sync.New(ctx, cfg, c)
+	snc, err := sync.New(ctx, c)
 	if err != nil {
-		logger.Errorf("[p2p] err creating syncer\n%v", err)
+		log.Errorf("[p2p] err creating syncer\n%v", err)
 		return nil, err
 	}
 
 	prs, err := peers.New(cfg, c, newNode)
 	if err != nil {
-		logger.Errorf("[p2p] err creating new peers\n%v", err)
+		log.Errorf("[p2p] err creating new peers\n%v", err)
 		return nil, err
 	}
 
@@ -180,11 +189,7 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 // IsStarted ...
 func (p *P2P) IsStarted() bool {
 	// TODO: best practice for determining if server is started?
-	if p.state == nil || p.state.Host == nil || len(p.state.Host.Addrs()) == 0 {
-		return false
-	}
-
-	return true
+	return len(p.state.Host.Addrs()) > 0
 }
 
 // GetNumPeers ...
@@ -218,20 +223,25 @@ func (p *P2P) Start() error {
 		return errors.New("err nil sync")
 	}
 
+	if p.cfg.P2P.Address == "" {
+		log.Errorf("[p2p] address is required. Eg. %s", DefaultAddress)
+		return errors.New("err address is required")
+	}
+
 	listen, err := ma.NewMultiaddr(p.cfg.P2P.Address)
 	if err != nil {
-		logger.Errorf("[p2p] err parsing address\n%v", err)
+		log.Errorf("[p2p] err parsing address\n%v", err)
 		return err
 	}
 	if err := p.state.Host.Network().Listen(listen); err != nil {
-		logger.Errorf("[p2p] err adding swarm listen addr %v to swarmnet\n%v", listen, err)
+		log.Errorf("[p2p] err adding swarm listen addr %v to swarmnet\n%v", listen, err)
 		return err
 	}
 
-	if err = p.handleProtocol(); err != nil {
+	if err := p.handleProtocol(); err != nil {
 		return err
 	}
-	if err = p.handlePing(); err != nil {
+	if err := p.handlePing(); err != nil {
 		return err
 	}
 	go p.dialPeers(nil)
@@ -259,8 +269,8 @@ func (p *P2P) Stop() error {
 	return p.state.Host.Close()
 }
 
-// Cfg returns the cfg
-func (p *P2P) Cfg() clienttypes.ConfigClient {
+// Config returns the config
+func (p *P2P) Config() clienttypes.ConfigClient {
 	// TODO: return err?
 	if p.cfg == nil {
 		return clienttypes.ConfigClient{}
@@ -279,52 +289,52 @@ func (p *P2P) GetSyncer() (clienttypes.InterfaceSync, error) {
 }
 
 func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
-	logger.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
+	log.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
 	p.addAddr(conn)
 }
 
 func (p *P2P) onStream(network inet.Network, stream inet.Stream) {
 	if network == nil || stream == nil {
-		logger.Errorf("[p2p] network or stream is nil")
+		log.Errorf("[p2p] network or stream is nil")
 		return
 	}
 
 	switch stream.Protocol() {
 	case protocol.ID(defaults.Defaults.ProtocolPing), protocol.ID(defaults.Defaults.ProtocolDot):
 		{
-			logger.Info("[p2p] new stream was opened")
+			log.Info("[p2p] new stream was opened")
 			return
 		}
 
 	default:
 		{
 			if p.state == nil {
-				logger.Error("[p2p] nil state")
+				log.Error("[p2p] nil state")
 				return
 			}
 			if p.state.Peers == nil {
-				logger.Error("[p2p] nil peers")
+				log.Error("[p2p] nil peers")
 				return
 			}
 
 			kp, err := p.state.Peers.GetFromID(stream.Conn().RemotePeer())
 			if err != nil {
-				logger.Errorf("[p2p] err getting known peer from id\n%v", err)
+				log.Errorf("[p2p] err getting known peer from id\n%v", err)
 				return
 			}
 			if kp == nil || kp.Peer == nil {
-				logger.Error("[p2p] known peer is nil")
+				log.Error("[p2p] known peer is nil")
 				return
 			}
 
 			go func() {
 				if err = kp.Peer.Receive(stream); err != nil {
-					logger.Errorf("[p2p] err receiving stream\n%v", err)
+					log.Errorf("[p2p] err receiving stream\n%v", err)
 					return
 				}
 
-				logger.Infof("[p2p] message received from %s", kp.Peer.GetShortID())
+				log.Infof("[p2p] message received from %s", kp.Peer.GetShortID())
 			}()
 		}
 	}
@@ -332,29 +342,29 @@ func (p *P2P) onStream(network inet.Network, stream inet.Stream) {
 
 func (p *P2P) addAddr(conn inet.Conn) {
 	if p.state == nil || p.state.Host == nil {
-		logger.Warnf("[p2p] no state or host, cannot add peer %s", conn.RemoteMultiaddr())
+		log.Warnf("[p2p] no state or host, cannot add peer %s", conn.RemoteMultiaddr())
 		return
 	}
 
 	for _, peer := range p.state.Host.Peerstore().Peers() {
 		if conn.RemotePeer() == peer {
 			// note: we already have info on this peer
-			logger.Warnf("[p2p] already have peer in our peerstore")
+			log.Warnf("[p2p] already have peer in our peerstore")
 			return
 		}
 	}
 
 	// note: we don't have this peer's info
 	p.state.Host.Peerstore().AddAddr(conn.RemotePeer(), conn.RemoteMultiaddr(), peerstore.PermanentAddrTTL)
-	logger.Infof("[p2p] added %s to our peerstore", conn.RemoteMultiaddr())
+	log.Infof("[p2p] added %s to our peerstore", conn.RemoteMultiaddr())
 
 	if _, err := p.state.Host.Network().DialPeer(context.Background(), conn.RemotePeer()); err != nil {
-		logger.Warnf("[p2p] err connecting to a peer\n%v", err)
+		log.Warnf("[p2p] err connecting to a peer\n%v", err)
 
 		return
 	}
 
-	logger.Infof("[p2p] connected to %s", conn.RemoteMultiaddr())
+	log.Infof("[p2p] connected to %s", conn.RemoteMultiaddr())
 }
 
 func (p *P2P) handleProtocol() error {
@@ -374,16 +384,16 @@ func (p *P2P) handleProtocol() error {
 func (p *P2P) protocolHandler(stream inet.Stream) {
 	defer stream.Close()
 	if p.state == nil {
-		logger.Error("nil state")
+		log.Error("nil state")
 		return
 	}
 	if p.state.Peers == nil {
-		logger.Error("nil peers")
+		log.Error("nil peers")
 		return
 	}
 
 	if stream == nil {
-		logger.Error("[p2p] got nil stream")
+		log.Error("[p2p] got nil stream")
 		return
 	}
 
@@ -391,28 +401,28 @@ func (p *P2P) protocolHandler(stream inet.Stream) {
 
 	pinfo, err := peerstore.InfoFromP2pAddr(multiAddr)
 	if err != nil {
-		logger.Errorf("[p2p] err getting info from multiaddr %v\n%v", multiAddr, err)
+		log.Errorf("[p2p] err getting info from multiaddr %v\n%v", multiAddr, err)
 		return
 	}
 	if pinfo == nil {
-		logger.Error("nil pinfo")
+		log.Error("nil pinfo")
 		return
 	}
 
 	pr, err := p.state.Peers.Add(*pinfo)
 	if err != nil {
-		logger.Errorf("[p2p] err adding peer\n%v", err)
+		log.Errorf("[p2p] err adding peer\n%v", err)
 		return
 	}
 	if pr == nil || pr.Peer == nil {
-		logger.Error("[p2p] known peer is null")
+		log.Error("[p2p] known peer is null")
 		return
 	}
 
 	// TODO: check if is connected?
 	ok, err := pr.Peer.IsWritable()
 	if err != nil {
-		logger.Errorf("[p2p] err checking if peer is writable\n%v", err)
+		log.Errorf("[p2p] err checking if peer is writable\n%v", err)
 		return
 	}
 	if !ok {
@@ -430,7 +440,7 @@ func (p *P2P) protocolHandler(stream inet.Stream) {
 
 func (p *P2P) dialPeers(pr clienttypes.InterfacePeer) {
 	if !p.IsStarted() {
-		logger.Error("p2p host not started")
+		log.Error("p2p host not started")
 		return
 	}
 
@@ -451,7 +461,7 @@ func (p *P2P) dialPeers(pr clienttypes.InterfacePeer) {
 		select {
 		case <-p.ctx.Done():
 			{
-				logger.Info("[p2p] context canceled. Stopping dialPeers.")
+				log.Info("[p2p] context canceled. Stopping dialPeers.")
 				return
 			}
 		case <-time.After(time.Duration(defaults.Defaults.DialInterval)):
@@ -474,7 +484,7 @@ func (p *P2P) dialPeers(pr clienttypes.InterfacePeer) {
 					p.dialQueue[k].NextDial = p.dialQueue[k].NextDial.Add(time.Duration(defaults.Defaults.DialBackoff))
 					if err = p.dialPeer(p.dialQueue[k].Peer); err != nil {
 						// TODO: nil check
-						logger.Errorf("[p2p] err dialing peer id %s\n%v", p.dialQueue[k].Peer.GetID(), err)
+						log.Errorf("[p2p] err dialing peer id %s\n%v", p.dialQueue[k].Peer.GetID(), err)
 					}
 				}
 			}
@@ -495,10 +505,10 @@ func (p *P2P) dialPeer(pr clienttypes.InterfacePeer) error {
 		err  error
 	)
 	// note: check for nil?
-	conns := p.state.Host.Network().ConnsToPeer(pr.Cfg().Peer.ID)
+	conns := p.state.Host.Network().ConnsToPeer(pr.Config().Peer.ID)
 	if conns == nil || len(conns) == 0 {
-		logger.Infof("[p2p] dialing peer with id %s", pr.GetID())
-		conn, err = p.state.Host.Network().DialPeer(context.Background(), pr.Cfg().Peer.ID)
+		log.Infof("[p2p] dialing peer with id %s", pr.GetID())
+		conn, err = p.state.Host.Network().DialPeer(context.Background(), pr.Config().Peer.ID)
 		if err != nil {
 			return err
 		}
@@ -528,16 +538,16 @@ func (p *P2P) pingHandler(stream inet.Stream) {
 	defer stream.Close()
 
 	if p.state == nil {
-		logger.Error("nil state")
+		log.Error("nil state")
 		return
 	}
 	if p.state.Peers == nil {
-		logger.Error("nil peers")
+		log.Error("nil peers")
 		return
 	}
 
 	if stream == nil {
-		logger.Error("[p2p] got nil stream")
+		log.Error("[p2p] got nil stream")
 		return
 	}
 
@@ -548,7 +558,7 @@ func (p *P2P) pingHandler(stream inet.Stream) {
 	w := bufio.NewWriter(stream)
 
 	if _, err := io.Copy(w, r); err != nil {
-		logger.Errorf("[p2p] err handling ping\n%v", err)
+		log.Errorf("[p2p] err handling ping\n%v", err)
 	}
 }
 
@@ -558,13 +568,13 @@ func (p *P2P) pingPeer(pr clienttypes.InterfacePeer) error {
 		select {
 		case <-p.ctx.Done():
 			{
-				logger.Info("[p2p] context canceled. Stopping pingPeer.")
+				log.Info("[p2p] context canceled. Stopping pingPeer.")
 				return nil
 			}
 		case <-time.After(time.Duration(defaults.Defaults.PingInterval)):
 			{
 				if err = p.sendPingToPeer(pr); err != nil {
-					logger.Errorf("[p2p] err sending ping to peer with ID %v\n%v", pr.Cfg().Peer.ID, err)
+					log.Errorf("[p2p] err sending ping to peer with ID %v\n%v", pr.Config().Peer.ID, err)
 				}
 			}
 		}
@@ -583,7 +593,7 @@ func (p *P2P) sendPingToPeer(pr clienttypes.InterfacePeer) error {
 	}
 
 	// TODO: nil check
-	stream, err := p.state.Host.NewStream(context.Background(), pr.Cfg().Peer.ID, protocol.ID(defaults.Defaults.ProtocolPing))
+	stream, err := p.state.Host.NewStream(context.Background(), pr.Config().Peer.ID, protocol.ID(defaults.Defaults.ProtocolPing))
 	if err != nil {
 		// TODO: disconnect from peer?
 		return err
@@ -637,7 +647,7 @@ func (p *P2P) sendPingToPeer(pr clienttypes.InterfacePeer) error {
 	}
 
 	if !bytes.Equal(b, b2) {
-		logger.Errorf("[p2p] ping err from %v\nexpected %v\nreceived %v", pr.Cfg().Peer.ID, b, b2)
+		log.Errorf("[p2p] ping err from %v\nexpected %v\nreceived %v", pr.Config().Peer.ID, b, b2)
 		return errors.New("pong does not match ping")
 	}
 
@@ -676,20 +686,20 @@ func (p *P2P) requestAny() {
 		select {
 		case <-p.ctx.Done():
 			{
-				logger.Info("[p2p] context canceled. Stopping requestAny.")
+				log.Info("[p2p] context canceled. Stopping requestAny.")
 				return
 			}
 		case <-time.After(time.Duration(defaults.Defaults.RequestInterval)):
 			knownPeers, err = p.state.Peers.KnownPeers()
 			if err != nil {
-				logger.Errorf("[p2p] err requesting known peers\n%v", err)
+				log.Errorf("[p2p] err requesting known peers\n%v", err)
 				continue
 			}
 
 			for idx = range knownPeers {
 				// TODO: check peer is connected?
 				if err = p.sync.RequestBlocks(knownPeers[idx].Peer); err != nil {
-					logger.Errorf("[p2p] err requesting block from peer\n%v", err)
+					log.Errorf("[p2p] err requesting block from peer\n%v", err)
 					continue
 				}
 			}
@@ -699,11 +709,11 @@ func (p *P2P) requestAny() {
 
 func (p *P2P) onPeerDiscovery() {
 	if p.state == nil {
-		logger.Error("[p2p] err nil state")
+		log.Error("[p2p] err nil state")
 		return
 	}
 	if p.state.Peers == nil {
-		logger.Error("[p2p] err nil peers")
+		log.Error("[p2p] err nil peers")
 		return
 	}
 
@@ -730,11 +740,11 @@ func (p *P2P) onPeerDiscovery() {
 
 func (p *P2P) onPeerMessage() {
 	if p.state == nil {
-		logger.Error("[p2p] err nil state")
+		log.Error("[p2p] err nil state")
 		return
 	}
 	if p.state.Peers == nil {
-		logger.Error("[p2p] err nil peers")
+		log.Error("[p2p] err nil peers")
 		return
 	}
 
@@ -756,18 +766,23 @@ func (p *P2P) onPeerMessage() {
 
 func (p *P2P) handleEvent(event p2ptypes.EventEnum) {
 	if event == nil {
-		logger.Info("nil event")
+		log.Info("nil event")
 		return
 	}
 
 	cb, ok := p.handlers[event]
 	if !ok {
-		logger.Infof("[p2p] no event for %s", event.String())
+		log.Infof("[p2p] no event for %s", event.String())
 		return
 	}
 
 	iface, err := cb()
-	logger.Infof("[p2p] handled event %s\nresults:\n%v\n%v", event.String(), iface, err)
+	log.Infof("[p2p] handled event %s\n", event.String())
+	if err != nil {
+		log.Infof("[p2p] callback error: %v\n", err)
+	} else {
+		log.Infof("[p2p] callback result: %v\n", iface)
+	}
 	return
 }
 
