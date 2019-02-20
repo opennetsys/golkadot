@@ -110,7 +110,14 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 		log.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
 	}
 
-	// 6. build the discovery service
+	// 6. build the peers
+	prs, err := peers.New(cfg, c, newNode)
+	if err != nil {
+		log.Errorf("[p2p] err creating new peers\n%v", err)
+		return nil, err
+	}
+
+	// 7. build the discovery service
 	// TODO ...
 	// note: https://libp2p.io/implementations/#discovery
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
@@ -119,13 +126,10 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 		log.Errorf("[p2p] err starting discover service\n%v", err)
 		return nil, err
 	}
-	discoverySvc.RegisterNotifee(&DiscoveryNotifee{newNode})
-
-	prs, err := peers.New(cfg, c, newNode)
-	if err != nil {
-		log.Errorf("[p2p] err creating new peers\n%v", err)
-		return nil, err
-	}
+	discoverySvc.RegisterNotifee(&DiscoveryNotifee{
+		host:  newNode,
+		peers: prs,
+	})
 
 	// TODO: pubsub chan
 	//pubsub, err := floodsub.NewFloodSub(ctx, newNode)
@@ -133,12 +137,14 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	//return nil, fmt.Errorf("err building new pubsub service\n%v", err)
 	//}
 
+	// 8. build the syncer
 	snc, err := sync.New(ctx, c)
 	if err != nil {
 		log.Errorf("[p2p] err creating syncer\n%v", err)
 		return nil, err
 	}
 
+	// 9. build the p2p svc
 	p := &P2P{
 		state: &clienttypes.State{
 			Chain:  c,

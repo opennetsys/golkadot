@@ -76,7 +76,7 @@ func (p *Peers) Add(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 		return nil, ErrNoPeerMap
 	}
 
-	if kp, ok := p.KnownPeersMap[pi.ID]; ok {
+	if kp, ok := p.KnownPeersMap[pi.ID]; ok && kp != nil {
 		return kp, nil
 	}
 
@@ -185,7 +185,7 @@ func (p *Peers) Get(pi pstore.PeerInfo) (*clienttypes.KnownPeer, error) {
 	}
 
 	pr, ok := p.KnownPeersMap[pi.ID]
-	if !ok {
+	if !ok || pr == nil {
 		return nil, ErrNoSuchPeer
 	}
 
