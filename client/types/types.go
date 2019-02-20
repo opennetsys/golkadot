@@ -78,7 +78,7 @@ type ConfigP2P struct {
 	ClientID string
 	// MaxPeers is the maximum number of connected peers to accept
 	MaxPeers uint
-	// Nodes are the nodes that are connected
+	// Nodes are the boot nodes
 	Nodes Nodes
 	// NoBootNodes defines whether the node should connect to others on boot
 	// TODO: re-write this
