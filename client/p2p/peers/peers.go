@@ -213,8 +213,7 @@ func (p *Peers) Log(event peerstypes.EventEnum, iface interface{}) error {
 		return ErrNilEvent
 	}
 
-	// TODO: log pinfo? or peer id?
-	logger.Infof("[peers] peer event: %s, interface: %v", event.String(), iface)
+	logger.Infof("[peers] peer event: %s", event.String())
 
 	p.handleEvent(event, iface)
 

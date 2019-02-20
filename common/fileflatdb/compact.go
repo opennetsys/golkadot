@@ -30,7 +30,7 @@ func NewCompact(file string) *Compact {
 // Maintain ...
 func (c *Compact) Maintain(fn *db.ProgressCB) {
 	if c.fd != -1 {
-		log.Fatal("database cannot be open for compacting")
+		log.Fatalln("[fileflatdb/compact] database cannot be open for compacting")
 	}
 
 	start := time.Now().Unix()
@@ -44,11 +44,11 @@ func (c *Compact) Maintain(fn *db.ProgressCB) {
 
 	newStat, err := os.Stat(newFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to stat new file: %s\n", err)
 	}
 	oldStat, err := os.Stat(c.file)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to stat old file: %s\n", err)
 	}
 	percentage := 100 * (newStat.Size() / oldStat.Size())
 	sizeMB := newStat.Size() / (1024 * 1024)
@@ -56,11 +56,11 @@ func (c *Compact) Maintain(fn *db.ProgressCB) {
 
 	err = os.Remove(c.file)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to remove file: %s\n", err)
 	}
 	err = os.Rename(newFile, c.file)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to rename file: %s\n", err)
 	}
 
 	log.Printf("compacted in %d, %dk keys, %dMB (%d%%)", elapsed, keys/1e3, sizeMB, percentage)
@@ -74,13 +74,13 @@ func (c *Compact) Open(file string, startEmpty bool) uintptr {
 		data := make([]byte, branchSize)
 		err := ioutil.WriteFile(file, data, os.ModePerm)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("[fileflatdb/compact] failed write to file after opening: %s\n", err)
 		}
 	}
 
 	f, err := os.OpenFile(file, os.O_RDONLY, 0755)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed write to open file: %s\n", err)
 	}
 
 	return f.Fd()
@@ -112,7 +112,7 @@ func (c *Compact) doCompact(keys *int, percent int, fn db.ProgressCB, newFd, old
 
 			c.doCompact(keys, percent, fn, newFd, oldFd, int(headerAt), int(dataAt.Uint64()), depth+1)
 		} else {
-			log.Fatalf("Unknown entry type %d", entryType)
+			log.Fatalf("[fileflatdb/compact] unknown entry type %d\n", entryType)
 		}
 
 		var isCompleted bool
@@ -148,7 +148,7 @@ func (c *Compact) CompactReadEntry(fd uintptr, at int, index int) []byte {
 	file := os.NewFile(fd, "temp")
 	_, err := file.ReadAt(entry, int64(entryAt))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to read entry: %s\n", err)
 	}
 
 	return entry
@@ -160,7 +160,7 @@ func (c *Compact) CompactReadKey(fd uintptr, at int64) ([]byte, []byte) {
 	file := os.NewFile(fd, "temp")
 	_, err := file.ReadAt(key, at)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to read key: %s\n", err)
 	}
 
 	valueLength := new(big.Int)
@@ -172,7 +172,7 @@ func (c *Compact) CompactReadKey(fd uintptr, at int64) ([]byte, []byte) {
 	value := make([]byte, valueLength.Uint64())
 	_, err = file.ReadAt(value, int64(valueAt.Uint64()))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to read value: %s\n", err)
 	}
 
 	return key, value
@@ -183,7 +183,7 @@ func (c *Compact) CompactWriteKey(fd uintptr, key, value []byte) int64 {
 	file := os.NewFile(fd, "temp")
 	stat, err := file.Stat()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to stat file: %s\n", err)
 	}
 	valueAt := stat.Size()
 	keyAt := valueAt + int64(len(value))
@@ -192,11 +192,11 @@ func (c *Compact) CompactWriteKey(fd uintptr, key, value []byte) int64 {
 
 	_, err = file.WriteAt(value, valueAt)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to write value: %s\n", err)
 	}
 	_, err = file.WriteAt(key, keyAt)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to compact write key: %s\n", err)
 	}
 
 	return keyAt
@@ -213,7 +213,7 @@ func (c *Compact) CompactUpdateLink(fd uintptr, at int, index int, pointer int64
 	file := os.NewFile(fd, "temp")
 	_, err := file.WriteAt(entry, int64(entryAt))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to compact update link write entry: %s\n", err)
 	}
 }
 
@@ -222,14 +222,14 @@ func (c *Compact) CompactWriteHeader(fd uintptr, at int, index int) int64 {
 	file := os.NewFile(fd, "temp")
 	stat, err := file.Stat()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to stat file: %s\n", err)
 	}
 	headerAt := stat.Size()
 
 	header := make([]byte, branchSize)
 	_, err = file.WriteAt(header, headerAt)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to write header: %s\n", err)
 	}
 
 	c.CompactUpdateLink(fd, at, index, headerAt, SlotBranch)
@@ -240,6 +240,6 @@ func (c *Compact) CompactWriteHeader(fd uintptr, at int, index int) int64 {
 func closeFd(fd uintptr) {
 	// close file descriptor
 	if err := syscall.Close(int(fd)); err != nil {
-		log.Fatal(err)
+		log.Fatalf("[fileflatdb/compact] failed to close file descriptor: %s\n", err)
 	}
 }

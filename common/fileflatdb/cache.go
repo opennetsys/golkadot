@@ -39,9 +39,10 @@ func (c *Cache) GetCachedBranch(branchAt int64) []byte {
 	branch, found := c.lruBranch[branchAt]
 	if !found {
 		branch = make([]byte, branchSize)
-		fd := os.NewFile(c.fd(), "temp")
-		_, err := fd.ReadAt(branch, branchAt)
-		if err != nil {
+		f := c.openFile()
+		defer f.Close()
+
+		if _, err := f.ReadAt(branch, branchAt); err != nil {
 			log.Fatalf("[fileflatdb/cache] get cached branch error: %v", err)
 		}
 
@@ -56,9 +57,11 @@ func (c *Cache) GetCachedData(dataAt int64, length int64) []byte {
 	data, found := c.lruData[dataAt]
 	if !found {
 		data = make([]byte, length)
-		fd := os.NewFile(c.fd(), "temp")
-		_, err := fd.ReadAt(data, dataAt)
-		if err != nil {
+
+		f := c.openFile()
+		defer f.Close()
+
+		if _, err := f.ReadAt(data, dataAt); err != nil {
 			log.Fatalf("[fileflatdb/cache] get cached data error: %v", err)
 		}
 
@@ -68,8 +71,8 @@ func (c *Cache) GetCachedData(dataAt int64, length int64) []byte {
 	return data
 }
 
-// fd ...
-func (c *Cache) fd() uintptr {
+// openFile ...
+func (c *Cache) openFile() *os.File {
 	filepath := c.file.path
 
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
@@ -81,5 +84,10 @@ func (c *Cache) fd() uintptr {
 		log.Fatalf("[fileflatdb/cache] error opening file: %v", err)
 	}
 
-	return file.Fd()
+	return file
+}
+
+// fd ...
+func (c *Cache) fd() uintptr {
+	return c.file.fd
 }

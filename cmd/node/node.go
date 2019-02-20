@@ -54,7 +54,7 @@ func setup() {
 		Short: "Start node",
 		Long:  `Starts the Polkadot node`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			priv, pub, err := ic.GenerateKeyPairWithReader(ic.RSA, 256, rand.Reader)
+			priv, pub, err := ic.GenerateKeyPairWithReader(ic.RSA, 2048, rand.Reader)
 			if err != nil {
 				return err
 			}
