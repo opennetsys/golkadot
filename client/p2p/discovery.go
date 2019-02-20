@@ -3,26 +3,23 @@ package p2p
 import (
 	"context"
 
+	host "github.com/libp2p/go-libp2p-host"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	"github.com/opennetsys/golkadot/client/p2p/peers"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
 	"github.com/opennetsys/golkadot/logger"
-
-	host "github.com/libp2p/go-libp2p-host"
-	peerstore "github.com/libp2p/go-libp2p-peerstore"
 )
 
 // TODO ...
 
-// DiscoveryNotifee ...
-// TODO: make this private?
-type DiscoveryNotifee struct {
+type discoveryNotifee struct {
 	host    host.Host
 	peers   clienttypes.InterfacePeers
 	context context.Context
 }
 
 // HandlePeerFound ...
-func (d *DiscoveryNotifee) HandlePeerFound(pi peerstore.PeerInfo) {
+func (d *discoveryNotifee) HandlePeerFound(pi peerstore.PeerInfo) {
 	kp, err := d.peers.Get(pi)
 	if err != nil {
 		if err == peers.ErrNoSuchPeer {
@@ -47,18 +44,19 @@ func (d *DiscoveryNotifee) HandlePeerFound(pi peerstore.PeerInfo) {
 		return
 	}
 
-	if !kp.IsConnected {
-		logger.Warnf("[p2p] peer %s not connected; re-connecting", pi.ID)
-		if err = d.connect(pi); err != nil {
-			logger.Errorf("[p2p] err connecting to peer %s\n%v", pi.ID, err)
-			return
-		}
+	// TODO ...
+	//if !kp.IsConnected {
+	//logger.Warnf("[p2p] peer %s not connected; re-connecting", pi.ID)
+	//if err = d.connect(pi); err != nil {
+	//logger.Errorf("[p2p] err connecting to peer %s\n%v", pi.ID, err)
+	//return
+	//}
 
-		return
-	}
+	//return
+	//}
 }
 
-func (d *DiscoveryNotifee) connect(pi peerstore.PeerInfo) error {
+func (d *discoveryNotifee) connect(pi peerstore.PeerInfo) error {
 	d.host.Peerstore().AddAddrs(pi.ID, pi.Addrs, peerstore.PermanentAddrTTL)
 	if err := d.host.Connect(d.context, pi); err != nil {
 		logger.Errorf("[p2p] found peer %v but failed to connect: %v", pi.Addrs, err)

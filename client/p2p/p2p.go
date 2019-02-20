@@ -10,16 +10,6 @@ import (
 	"time"
 
 	ipfsaddr "github.com/ipfs/go-ipfs-addr"
-	"github.com/opennetsys/golkadot/client/p2p/defaults"
-	"github.com/opennetsys/golkadot/client/p2p/handler"
-	"github.com/opennetsys/golkadot/client/p2p/peers"
-	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
-	"github.com/opennetsys/golkadot/client/p2p/sync"
-	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
-	clienttypes "github.com/opennetsys/golkadot/client/types"
-	"github.com/opennetsys/golkadot/logger"
-	log "github.com/opennetsys/golkadot/logger"
-
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
@@ -32,6 +22,15 @@ import (
 	rhost "github.com/libp2p/go-libp2p/p2p/host/routed"
 	tcp "github.com/libp2p/go-tcp-transport"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/opennetsys/golkadot/client/p2p/defaults"
+	"github.com/opennetsys/golkadot/client/p2p/handler"
+	"github.com/opennetsys/golkadot/client/p2p/peers"
+	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
+	"github.com/opennetsys/golkadot/client/p2p/sync"
+	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/logger"
+	log "github.com/opennetsys/golkadot/logger"
 )
 
 // Ensure the struct implements the interface
@@ -126,9 +125,10 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 		log.Errorf("[p2p] err starting discover service\n%v", err)
 		return nil, err
 	}
-	discoverySvc.RegisterNotifee(&DiscoveryNotifee{
-		host:  newNode,
-		peers: prs,
+	discoverySvc.RegisterNotifee(&discoveryNotifee{
+		host:    newNode,
+		peers:   prs,
+		context: cfg.P2P.Context,
 	})
 
 	// TODO: pubsub chan
@@ -245,8 +245,8 @@ func (p *P2P) Start() error {
 				return err
 			}
 
-			logger.Infof("[p2p] boot peer full address", addr.String())
-			logger.Infof("[p2p] boot peer info", pinfo)
+			logger.Infof("[p2p] boot peer full address %s", addr.String())
+			logger.Infof("[p2p] boot peer info %v", pinfo)
 
 			if err := p.state.Host.Connect(p.cfg.P2P.Context, *pinfo); err != nil {
 				logger.Errorf("[p2p] bootstrapping peer %s failed\n%v", p.cfg.P2P.Nodes[idx], err)
@@ -305,7 +305,7 @@ func (p *P2P) GetSyncer() (clienttypes.InterfaceSync, error) {
 }
 
 func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
-	log.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
+	log.Infof("[p2p] peer did connect; id %v; peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
 	p.addAddr(conn)
 }
