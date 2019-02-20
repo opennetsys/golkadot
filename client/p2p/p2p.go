@@ -9,15 +9,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/opennetsys/golkadot/client/p2p/defaults"
-	"github.com/opennetsys/golkadot/client/p2p/handler"
-	"github.com/opennetsys/golkadot/client/p2p/peers"
-	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
-	"github.com/opennetsys/golkadot/client/p2p/sync"
-	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
-	clienttypes "github.com/opennetsys/golkadot/client/types"
-	log "github.com/opennetsys/golkadot/logger"
-
+	ipfsaddr "github.com/ipfs/go-ipfs-addr"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	inet "github.com/libp2p/go-libp2p-net"
 	libpeer "github.com/libp2p/go-libp2p-peer"
@@ -30,6 +22,15 @@ import (
 	rhost "github.com/libp2p/go-libp2p/p2p/host/routed"
 	tcp "github.com/libp2p/go-tcp-transport"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/opennetsys/golkadot/client/p2p/defaults"
+	"github.com/opennetsys/golkadot/client/p2p/handler"
+	"github.com/opennetsys/golkadot/client/p2p/peers"
+	peerstypes "github.com/opennetsys/golkadot/client/p2p/peers/types"
+	"github.com/opennetsys/golkadot/client/p2p/sync"
+	p2ptypes "github.com/opennetsys/golkadot/client/p2p/types"
+	clienttypes "github.com/opennetsys/golkadot/client/types"
+	"github.com/opennetsys/golkadot/logger"
+	log "github.com/opennetsys/golkadot/logger"
 )
 
 // Ensure the struct implements the interface
@@ -108,7 +109,14 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 		log.Infof("[p2p] %d: %s/ipfs/%s\n", i, addr, newNode.ID().Pretty())
 	}
 
-	// 6. build the discovery service
+	// 6. build the peers
+	prs, err := peers.New(cfg, c, newNode)
+	if err != nil {
+		log.Errorf("[p2p] err creating new peers\n%v", err)
+		return nil, err
+	}
+
+	// 7. build the discovery service
 	// TODO ...
 	// note: https://libp2p.io/implementations/#discovery
 	// note: use https://github.com/libp2p/go-libp2p/blob/master/p2p/discovery/mdns.go rather than whyrusleeping
@@ -117,7 +125,11 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 		log.Errorf("[p2p] err starting discover service\n%v", err)
 		return nil, err
 	}
-	discoverySvc.RegisterNotifee(&DiscoveryNotifee{newNode})
+	discoverySvc.RegisterNotifee(&discoveryNotifee{
+		host:    newNode,
+		peers:   prs,
+		context: cfg.P2P.Context,
+	})
 
 	// TODO: pubsub chan
 	//pubsub, err := floodsub.NewFloodSub(ctx, newNode)
@@ -125,40 +137,14 @@ func NewP2P(ctx context.Context, cancel context.CancelFunc, ch chan interface{},
 	//return nil, fmt.Errorf("err building new pubsub service\n%v", err)
 	//}
 
-	// TODO ...
-	//if cfg.Peer != "" {
-	//addr, err := ipfsaddr.ParseString(cfg.Peer)
-	//if err != nil {
-	//return nil, fmt.Errorf("err parsing node uri flag: %s\n%v", cfg.URI, err)
-	//}
-
-	//pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
-	//if err != nil {
-	//return nil, fmt.Errorf("err getting info from peerstore\n%v", err)
-	//}
-
-	//log.Println("[node] FULL", addr.String())
-	//log.Println("[node] PIN INFO", pinfo)
-
-	//if err := newNode.Connect(ctx, *pinfo); err != nil {
-	//return nil, fmt.Errorf("[node] bootstrapping a peer failed\n%v", err)
-	//}
-
-	//newNode.Peerstore().AddAddrs(pinfo.ID, pinfo.Addrs, peerstore.PermanentAddrTTL)
-	//}
-
+	// 8. build the syncer
 	snc, err := sync.New(ctx, c)
 	if err != nil {
 		log.Errorf("[p2p] err creating syncer\n%v", err)
 		return nil, err
 	}
 
-	prs, err := peers.New(cfg, c, newNode)
-	if err != nil {
-		log.Errorf("[p2p] err creating new peers\n%v", err)
-		return nil, err
-	}
-
+	// 9. build the p2p svc
 	p := &P2P{
 		state: &clienttypes.State{
 			Chain:  c,
@@ -244,6 +230,36 @@ func (p *P2P) Start() error {
 	if err := p.handlePing(); err != nil {
 		return err
 	}
+
+	if len(p.cfg.P2P.Nodes) > 0 {
+		for idx := range p.cfg.P2P.Nodes {
+			addr, err := ipfsaddr.ParseString(p.cfg.P2P.Nodes[idx])
+			if err != nil {
+				logger.Errorf("[p2p] err parsing boot address uri flag: %s\n%v", p.cfg.P2P.Nodes[idx], err)
+				return err
+			}
+
+			pinfo, err := peerstore.InfoFromP2pAddr(addr.Multiaddr())
+			if err != nil {
+				logger.Errorf("[p2p] err getting info from peerstore for %s\n%v", p.cfg.P2P.Nodes[idx], err)
+				return err
+			}
+
+			logger.Infof("[p2p] boot peer full address %s", addr.String())
+			logger.Infof("[p2p] boot peer info %v", pinfo)
+
+			if err := p.state.Host.Connect(p.cfg.P2P.Context, *pinfo); err != nil {
+				logger.Errorf("[p2p] bootstrapping peer %s failed\n%v", p.cfg.P2P.Nodes[idx], err)
+				return err
+			}
+
+			if _, err = p.state.Peers.Add(*pinfo); err != nil {
+				logger.Errorf("[p2p] err connecting to peer %v\n%v", pinfo.ID, err)
+				return err
+			}
+		}
+	}
+
 	go p.dialPeers(nil)
 
 	p.handleEvent(p2ptypes.Started)
@@ -289,7 +305,7 @@ func (p *P2P) GetSyncer() (clienttypes.InterfaceSync, error) {
 }
 
 func (p *P2P) onConn(network inet.Network, conn inet.Conn) {
-	log.Infof("[p2p] peer did connect\nid %v peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
+	log.Infof("[p2p] peer did connect; id %v; peerAddr %v", conn.RemotePeer().Pretty(), conn.RemoteMultiaddr())
 
 	p.addAddr(conn)
 }

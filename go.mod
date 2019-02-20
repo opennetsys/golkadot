@@ -2,15 +2,16 @@ module github.com/opennetsys/golkadot
 
 replace github.com/go-interpreter/wagon v0.0.0 => github.com/perlin-network/wagon v0.3.1-0.20180825141017-f8cb99b55a39
 
+replace github.com/libp2p/go-libp2p-crypto v2.0.1+incompatible => github.com/libp2p/go-libp2p-crypto v2.0.5+incompatible
+
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
-	github.com/btcsuite/btcd v0.0.0-20190115013929-ed77733ec07d
+	github.com/btcsuite/btcd v0.0.0-20190115013929-ed77733ec07d // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/ethereum/go-ethereum v1.8.20
 	github.com/fd/go-nat v1.0.0 // indirect
-	github.com/gogo/protobuf v1.2.0
 	github.com/golang/mock v1.2.0
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/google/uuid v1.1.0 // indirect
@@ -18,8 +19,10 @@ require (
 	github.com/gxed/GoEndian v0.0.0-20160916112711-0f5c6873267e // indirect
 	github.com/gxed/eventfd v0.0.0-20160916113412-80a92cca79a8 // indirect
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/ipfs/go-cid v0.9.0 // indirect
 	github.com/ipfs/go-datastore v3.2.0+incompatible // indirect
+	github.com/ipfs/go-ipfs-addr v0.1.25
 	github.com/ipfs/go-ipfs-util v1.2.8 // indirect
 	github.com/ipfs/go-todocounter v1.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -64,19 +67,18 @@ require (
 	github.com/libp2p/go-testutil v1.2.10 // indirect
 	github.com/libp2p/go-ws-transport v2.0.15+incompatible // indirect
 	github.com/miekg/dns v1.1.4 // indirect
-	github.com/minio/sha256-simd v0.0.0-20190117184323-cc1980cb0338
+	github.com/minio/sha256-simd v0.0.0-20190117184323-cc1980cb0338 // indirect
 	github.com/mr-tron/base58 v1.1.0
 	github.com/multiformats/go-multiaddr v1.4.0
 	github.com/multiformats/go-multibase v0.3.0 // indirect
 	github.com/multiformats/go-multicodec v0.1.6 // indirect
-	github.com/multiformats/go-multihash v1.0.8
 	github.com/multiformats/go-multistream v0.3.9 // indirect
 	github.com/perlin-network/life v0.0.0-20181118045116-6bf6615afaa9
 	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pierrec/xxHash v0.1.1
 	github.com/sirupsen/logrus v1.3.0
 	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3
+	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/tendermint/iavl v0.12.0 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.0
 	github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2 // indirect
@@ -90,6 +92,6 @@ require (
 	github.com/whyrusleeping/mdns v0.0.0-20180901202407-ef14215e6b30 // indirect
 	github.com/whyrusleeping/multiaddr-filter v0.0.0-20160516205228-e903e4adabd7 // indirect
 	github.com/whyrusleeping/yamux v1.1.5 // indirect
-	golang.org/x/crypto v0.0.0-20190128193316-c7b33c32a30b
+	golang.org/x/crypto v0.0.0-20190219172222-a4c6cb3142f2
 	golang.org/x/tools v0.0.0-20181220221020-d12035dfdc6d // indirect
 )
