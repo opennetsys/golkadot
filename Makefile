@@ -8,9 +8,17 @@ deps:
 build:
 	@go build
 
+.PHONY: build/docker
+build/docker:
+	@docker build -t opennetsys/golkadot:latest .
+
 .PHONY: start
 start:
 	@go run cmd/node/node.go
+
+.PHONY: start/docker
+start/docker:
+	@docker run opennetsys/golkadot:latest ./golkadot --help
 
 .PHONY: test
 test:

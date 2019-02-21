@@ -14,9 +14,16 @@ NOTE: golkadot is a very early work-in-progress. It's currently highly unstable 
 
 ## Contents
 
+- [Install](../install)
 - [Getting started](../getting-started)
 - [Contributing](../contributing)
 - [License](../License)
+
+## Install
+
+```bash
+go get -u github.com/opennetsys/golkadot/cmd/golkadot
+```
 
 ## Getting started
 
