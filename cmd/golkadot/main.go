@@ -16,7 +16,7 @@ import (
 	"github.com/opennetsys/golkadot/client/rpc"
 	"github.com/opennetsys/golkadot/client/telemetry"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
-	"github.com/opennetsys/golkadot/client/wasm"
+	//"github.com/opennetsys/golkadot/client/wasm"
 	"github.com/opennetsys/golkadot/common/db"
 	"github.com/opennetsys/golkadot/logger"
 	"github.com/spf13/cobra"
@@ -146,7 +146,8 @@ func setup() {
 	rootCmd.PersistentFlags().StringVarP(&telemetryName, "telemetry-name", "", "", "Unique name of this node to report")
 	rootCmd.PersistentFlags().StringVarP(&telemetryURL, "telemetry-url", "", telemetry.DefaultURL, "Websocket endpoint for telemetry stats")
 
-	rootCmd.PersistentFlags().UintVarP(&wasmHeapSize, "wasm-heap-size", "", wasm.DefaultHeapSizeKB, "Initial size for the WASM runtime heap (KB)")
+	// wasm.DefaultHeapSizeKB
+	rootCmd.PersistentFlags().UintVarP(&wasmHeapSize, "wasm-heap-size", "", 8*64, "Initial size for the WASM runtime heap (KB)")
 
 	rootCmd.PersistentFlags().StringVarP(&chain, "chain", "", "main", "Use the chain specified, one of (dev, main) or custom '<chain>.json'")
 	rootCmd.PersistentFlags().StringVarP(&clientID, "client-id", "", client.ID(), "The client/version identifier for the running node")

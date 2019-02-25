@@ -8,10 +8,10 @@ import (
 	clientchainloader "github.com/opennetsys/golkadot/client/chain/loader"
 	clientchaintypes "github.com/opennetsys/golkadot/client/chain/types"
 	clientdb "github.com/opennetsys/golkadot/client/db"
-	clientruntime "github.com/opennetsys/golkadot/client/runtime"
+	//clientruntime "github.com/opennetsys/golkadot/client/runtime"
 	storagetypes "github.com/opennetsys/golkadot/client/storage/types"
 	clienttypes "github.com/opennetsys/golkadot/client/types"
-	clientwasm "github.com/opennetsys/golkadot/client/wasm"
+	//clientwasm "github.com/opennetsys/golkadot/client/wasm"
 	"github.com/opennetsys/golkadot/common/crypto"
 	"github.com/opennetsys/golkadot/common/hexutil"
 	"github.com/opennetsys/golkadot/common/triehash"
@@ -22,11 +22,11 @@ import (
 
 // Chain ...
 type Chain struct {
-	Blocks   *clientdb.BlockDB
-	Chain    *clientchaintypes.ChainJSON
-	Executor *clientwasm.Executer
-	Genesis  *clientchaintypes.ChainGenesis
-	State    *clientdb.StateDB
+	Blocks *clientdb.BlockDB
+	Chain  *clientchaintypes.ChainJSON
+	//Executor *clientwasm.Executer
+	Genesis *clientchaintypes.ChainGenesis
+	State   *clientdb.StateDB
 }
 
 // NewChain ...
@@ -64,8 +64,8 @@ func NewChain(config *clienttypes.ConfigClient) (*Chain, error) {
 	// NOTE: Snapshot _before_ we attach the runtime since it ties directly to the backing DBs
 	dbs.Snapshot()
 
-	runtime := clientruntime.NewRuntime(c.State.DB)
-	c.Executor = clientwasm.NewExecuter(config, c.Blocks, c.State, runtime)
+	//runtime := clientruntime.NewRuntime(c.State.DB)
+	//c.Executor = clientwasm.NewExecuter(config, c.Blocks, c.State, runtime)
 
 	return c, nil
 }

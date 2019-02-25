@@ -7,6 +7,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
+	t.Skip()
 	input, err := ioutil.ReadFile("wasm_test_fib.wasm")
 	if err != nil {
 		t.Fatalf("[wasm] error reading file; %s", err)

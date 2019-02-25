@@ -22,7 +22,7 @@ start/docker:
 
 .PHONY: test
 test:
-	@go test -v ./... && echo "ALL PASS" || echo "FAILURE"
+	@go test -v `go list ./... | grep -v wasm` && echo "ALL PASS" || echo "FAILURE"
 
 .PHONY: test/wasm
 test/wasm:
@@ -47,6 +47,10 @@ test/runtime:
 .PHONY: test/client
 test/client:
 	@go test -v client/*.go
+
+.PHONY: test/telemetry
+test/telemetry:
+	@go test -v client/telemetry/*.go
 
 .PHONY: test/clientdb
 test/clientdb:

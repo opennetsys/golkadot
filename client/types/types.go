@@ -31,7 +31,10 @@ type DevConfig struct {
 type RolesConfig struct{}
 
 // TelemetryConfig ...
-type TelemetryConfig struct{}
+type TelemetryConfig struct {
+	Name string
+	URL  string
+}
 
 // WasmConfig ...
 type WasmConfig struct{}
